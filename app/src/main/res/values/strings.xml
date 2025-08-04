@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">OptigAI</string>
+    <string name="back_button_description">Przycisk powrotu</string>
+    <string name="gallery_image_description">Obraz w galerii</string>
+    <string name="item_image">Opis obrazka</string>
+
 </resources>
