@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="lightblue">#2174AB</color>
+    <color name="darkblue">#0F4C74</color>
+    <color name="creme">#FEFAEC</color>
+    <color name="onyx">#1E1E1E</color>
+
+
+
 </resources>
