@@ -1,10 +1,12 @@
 
-package pl.pb.optigai
+package pl.pb.optigai.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import pl.pb.optigai.utils.data.Image
+import pl.pb.optigai.R
 
 
 class ImageAdapter(private val images: List<Image>) :

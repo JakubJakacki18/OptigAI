@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PhotoAlbumActivity"
+            android:name=".ui.PhotoAlbumActivity"
             android:exported="false" />
 
     </application>

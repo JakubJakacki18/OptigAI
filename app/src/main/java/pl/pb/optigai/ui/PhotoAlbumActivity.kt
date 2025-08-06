@@ -1,10 +1,12 @@
-package pl.pb.optigai
+package pl.pb.optigai.ui
 
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import pl.pb.optigai.utils.data.Image
+import pl.pb.optigai.R
 
 class PhotoAlbumActivity : AppCompatActivity() {
 
