@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -27,14 +28,16 @@ class PhotoAlbumActivity : AppCompatActivity() {
             Image(R.drawable.obrazek6)
         )
 
-        // Konfiguracja RecyclerView
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        val adapter = ImageAdapter(imageList)
+        val adapter = ImageAdapter(imageList) { position ->
+            val intent = Intent(this, PhotoActivity::class.java)
+            intent.putExtra("images", ArrayList(imageList))
+            intent.putExtra("position", position)
+            startActivity(intent)
+        }
         recyclerView.adapter = adapter
 
-        // Ustawienie akcji dla przycisku "back"
         backButton.setOnClickListener {
-            // Zamyka bieżącą aktywność i wraca do poprzedniej (MainActivity)
             finish()
         }
     }

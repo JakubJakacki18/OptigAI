@@ -1,5 +1,5 @@
-
 package pl.pb.optigai.ui
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +9,10 @@ import pl.pb.optigai.utils.data.Image
 import pl.pb.optigai.R
 
 
-class ImageAdapter(private val images: List<Image>) :
+class ImageAdapter(
+    private val images: List<Image>,
+    private val onImageClick: (position: Int) -> Unit
+) :
     RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -25,6 +28,10 @@ class ImageAdapter(private val images: List<Image>) :
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val image = images[position]
         holder.imageView.setImageResource(image.resId)
+
+        holder.itemView.setOnClickListener {
+            onImageClick(position)
+        }
     }
 
     override fun getItemCount() = images.size
