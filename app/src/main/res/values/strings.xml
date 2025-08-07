@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">OptigAI</string>
-    <string name="back_button_description">Przycisk powrotu</string>
-    <string name="gallery_image_description">Obraz w galerii</string>
-    <string name="item_image">Opis obrazka</string>
-
+    <string name="back_button_description">Back button</string>
+    <string name="gallery_image_description">Image in gallery</string>
+    <string name="item_image">Image description</string>
+    <string name="content_description_preview_image">Image preview</string>
+    <string name="content_description_previous_image">Previous image button</string>
+    <string name="content_description_next_image">Next image button</string>
+    <string name="content_description_zoom_button">Toggle zoom on image</string>
 </resources>

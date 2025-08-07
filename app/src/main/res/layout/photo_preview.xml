@@ -22,8 +22,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        >
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/previewImageView"
@@ -31,6 +30,7 @@
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/content_description_preview_image"
             tools:src="@drawable/obrazek1" />
 
     </FrameLayout>
@@ -52,6 +52,7 @@
         android:layout_marginStart="16dp"
         android:background="@drawable/next_prev_button"
         android:src="@drawable/ic_back_button"
+        android:contentDescription="@string/content_description_previous_image"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="@+id/bottomBar"
         app:layout_constraintTop_toTopOf="@+id/bottomBar" />
@@ -61,6 +62,7 @@
         android:layout_width="136dp"
         android:layout_height="136dp"
         android:src="@drawable/middle_button"
+        android:contentDescription="@string/content_description_zoom_button"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="@+id/bottomBar"
         app:layout_constraintEnd_toEndOf="@+id/bottomBar"
@@ -73,6 +75,7 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/next_prev_button"
         android:src="@drawable/ic_next_button"
+        android:contentDescription="@string/content_description_next_image"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintEnd_toEndOf="@+id/bottomBar"
         app:layout_constraintTop_toTopOf="@+id/bottomBar" />
