@@ -36,25 +36,25 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <Button
-            android:id="@+id/button7"
+            android:id="@+id/openGalleryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Button" />
+            android:text="Open galery" />
 
         <Button
-            android:id="@+id/button8"
+            android:id="@+id/takePhotoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Button" />
+            android:text="Take photo" />
 
         <Button
-            android:id="@+id/button9"
+            android:id="@+id/openSettingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Button" />
+            android:text="Open settings" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
