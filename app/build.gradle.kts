@@ -40,8 +40,6 @@ android {
 }
 
 dependencies {
-    val cameraxVersion = "1.4.2"
-
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
@@ -50,6 +48,7 @@ dependencies {
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.androidx.camera.extensions)
 
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.core.ktx)
