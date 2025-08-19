@@ -5,6 +5,7 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
@@ -18,6 +19,9 @@
         android:theme="@style/Theme.OptigAI"
         tools:targetApi="31">
         <activity
+            android:name=".ui.AnalysisActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.CameraActivity"
             android:exported="false" />
         <activity
@@ -25,6 +29,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

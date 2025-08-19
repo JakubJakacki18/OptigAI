@@ -2,6 +2,7 @@ package pl.pb.optigai.ui
 
 import android.content.ContentResolver
 import android.content.ContentValues
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -124,12 +125,14 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    Toast
-                        .makeText(
-                            this@CameraActivity,
-                            "Photo saved successfully",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                    val savedUri = outputFileResults.savedUri
+                    if (savedUri != null) {
+                        val intent = Intent(this@CameraActivity, AnalysisActivity::class.java)
+                        intent.putExtra("IMAGE_URI", savedUri.toString())
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this@CameraActivity, "Błąd zapisu zdjęcia", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
         )
