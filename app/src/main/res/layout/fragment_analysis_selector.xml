@@ -26,10 +26,10 @@
             android:text="Analysis text" />
 
         <Button
-            android:id="@+id/analysisBraileButton"
+            android:id="@+id/analysisBrailleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analysis Braile" />
+            android:text="Analysis Braille" />
         <Button
             android:id="@+id/analysisItemButton"
             android:layout_width="wrap_content"

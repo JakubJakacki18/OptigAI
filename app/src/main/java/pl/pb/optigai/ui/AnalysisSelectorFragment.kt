@@ -26,4 +26,28 @@ class AnalysisSelectorFragment : Fragment() {
         }
         return view
     }
+//
+//    override fun onViewCreated(
+//        view: View,
+//        savedInstanceState: Bundle?,
+//    ) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        val buttonTextAnalysis = view.findViewById<ImageView>(R.id.analysisTextButton)
+//        val buttonBrailleAnalysis = view.findViewById<ImageView>(R.id.analysisBrailleButton)
+//        val buttonItemAnalysis = view.findViewById<ImageView>(R.id.analysisItemButton)
+//
+//        buttonTextAnalysis.setOnClickListener {
+//            // Navigate to Text Analysis Fragment
+//            parentFragmentManager
+//                .beginTransaction()
+//                .replace(R.id.fragmentContainer, AnalysisResultFragment())
+//                .addToBackStack(null)
+//                .commit()
+//        }
+//        buttonBrailleAnalysis.setOnClickListener {
+//        }
+//        buttonItemAnalysis.setOnClickListener {
+//        }
+//    }
 }
