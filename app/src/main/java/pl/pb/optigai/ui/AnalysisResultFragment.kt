@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import pl.pb.optigai.R
@@ -23,6 +24,10 @@ class AnalysisResultFragment : Fragment() {
         val imageView: ImageView = view.findViewById(R.id.analyzedPhoto)
         viewModel.photoUri.observe(viewLifecycleOwner) { uri ->
             imageView.setImageURI(uri)
+        }
+        val resultText : TextView = view.findViewById(R.id.resultText)
+        viewModel.analysisResult.observe(viewLifecycleOwner) { result ->
+            resultText.text = result
         }
         return view
     }

@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import pl.pb.optigai.R
+import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.data.AnalysisViewModel
 
 class AnalysisSelectorFragment : Fragment() {
@@ -26,28 +27,40 @@ class AnalysisSelectorFragment : Fragment() {
         }
         return view
     }
-//
-//    override fun onViewCreated(
-//        view: View,
-//        savedInstanceState: Bundle?,
-//    ) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        val buttonTextAnalysis = view.findViewById<ImageView>(R.id.analysisTextButton)
-//        val buttonBrailleAnalysis = view.findViewById<ImageView>(R.id.analysisBrailleButton)
-//        val buttonItemAnalysis = view.findViewById<ImageView>(R.id.analysisItemButton)
-//
-//        buttonTextAnalysis.setOnClickListener {
-//            // Navigate to Text Analysis Fragment
-//            parentFragmentManager
-//                .beginTransaction()
-//                .replace(R.id.fragmentContainer, AnalysisResultFragment())
-//                .addToBackStack(null)
-//                .commit()
-//        }
-//        buttonBrailleAnalysis.setOnClickListener {
-//        }
-//        buttonItemAnalysis.setOnClickListener {
-//        }
-//    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val buttonTextAnalysis = view.findViewById<Button>(R.id.analysisTextButton)
+        val buttonBrailleAnalysis = view.findViewById<Button>(R.id.analysisBrailleButton)
+        val buttonItemAnalysis = view.findViewById<Button>(R.id.analysisItemButton)
+
+        buttonTextAnalysis.setOnClickListener {
+            viewModel.setResult(AnalyseService.analyseText())
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+        buttonBrailleAnalysis.setOnClickListener {
+            viewModel.setResult(AnalyseService.analyseBraille())
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+        buttonItemAnalysis.setOnClickListener {
+            viewModel.setResult(AnalyseService.analyseItem())
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+    }
 }

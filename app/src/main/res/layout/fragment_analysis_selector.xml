@@ -23,17 +23,17 @@
             android:id="@+id/analysisTextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analysis text" />
+            android:text="@string/analise_text_fragment_analysis_selector" />
 
         <Button
             android:id="@+id/analysisBrailleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analysis Braille" />
+            android:text="@string/analise_braille_fragment_analysis_selector" />
         <Button
             android:id="@+id/analysisItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analysis item" />
+            android:text="@string/analise_item_fragment_analysis_selector" />
     </LinearLayout>
 </FrameLayout>
