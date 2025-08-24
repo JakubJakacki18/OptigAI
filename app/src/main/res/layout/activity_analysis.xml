@@ -34,10 +34,10 @@
                 android:stateListAnimator="@animator/scale_animator"/>
 
             <TextView
-                android:id="@+id/galleryTitle"
+                android:id="@+id/headerTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ANALIZA"
+                android:text="@string/analysis_header_shared"
                 android:textSize="60sp"
                 android:fontFamily="@font/signikab"
                 android:textStyle="bold"
