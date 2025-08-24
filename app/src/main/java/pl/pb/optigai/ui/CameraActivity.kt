@@ -42,6 +42,10 @@ class CameraActivity : AppCompatActivity() {
         }
 
         viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
+        viewBinding.openGalleryButton.setOnClickListener {
+            val intent = Intent(this, PhotoAlbumActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private val activityResultLauncher =
