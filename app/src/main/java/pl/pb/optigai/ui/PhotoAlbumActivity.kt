@@ -44,7 +44,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
     }
 
     val absoluteStoragePath: String = Environment.getExternalStorageDirectory().absolutePath
-    val relativePicturesPath = "Pictures/OptigAI"
+    val relativePicturesPath = "Pictures/OptigAI/"
     val picturesPath = File(absoluteStoragePath + File.separator + relativePicturesPath)
 
 //    fun imageReader(): List<Image> {
@@ -62,14 +62,15 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
             )
-        val selection = "${MediaStore.Images.Media.SIZE} > 0"
+        val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND ${MediaStore.Images.Media.SIZE} > 0"
+        val selectionArgs = arrayOf(relativePicturesPath)
 
         val query =
             context.contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
                 selection,
-                null,
+                selectionArgs,
                 "${MediaStore.Images.Media.DATE_ADDED} DESC",
             )
 
