@@ -3,49 +3,83 @@ package pl.pb.optigai.ui
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.pb.optigai.R
+import pl.pb.optigai.databinding.PhotoAlbumBinding
+import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.Image
-import java.io.File
 
 class PhotoAlbumActivity : AppCompatActivity() {
+    private lateinit var viewBinding: PhotoAlbumBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.photo_album)
+        viewBinding = PhotoAlbumBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
-        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+        if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
+            activityResultLauncher.launch(REQUIRED_PERMISSIONS)
+        } else {
+            loadImagesToRecyclerView()
+        }
         val backButton: ImageView = findViewById(R.id.backButton)
-
-        // Przykładowe dane obrazów
-        val imageList =
-            imageReader(this)
-
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-        val adapter =
-            ImageAdapter(imageList) { position ->
-                val intent = Intent(this, PhotoActivity::class.java)
-                intent.putExtra("images", ArrayList(imageList))
-                intent.putExtra("position", position)
-                startActivity(intent)
-            }
-        recyclerView.adapter = adapter
 
         backButton.setOnClickListener {
             finish()
         }
     }
 
-    val absoluteStoragePath: String = Environment.getExternalStorageDirectory().absolutePath
-    val relativePicturesPath = "Pictures/OptigAI/"
-    val picturesPath = File(absoluteStoragePath + File.separator + relativePicturesPath)
+    fun loadImagesToRecyclerView() {
+        viewBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
+        lifecycleScope.launch {
+            val imageList =
+                withContext(Dispatchers.IO) {
+                    imageReader(this@PhotoAlbumActivity)
+                }
+            val adapter =
+                ImageAdapter(imageList) { position ->
+                    val intent = Intent(this@PhotoAlbumActivity, PhotoActivity::class.java)
+                    intent.putExtra("images", ArrayList(imageList))
+                    intent.putExtra("position", position)
+                    startActivity(intent)
+                }
+            viewBinding.recyclerView.adapter = adapter
+        }
+    }
+
+    companion object {
+        private val REQUIRED_PERMISSIONS =
+            mutableListOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            ).toTypedArray()
+        const val RELATIVE_PICTURES_PATH = "Pictures/OptigAI/"
+    }
+
+    private val activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            var permissionGranted = true
+            permissions.entries.forEach {
+                if (it.key in REQUIRED_PERMISSIONS && !it.value) {
+                    permissionGranted = false
+                }
+            }
+            if (!permissionGranted) {
+                Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
+            } else {
+                loadImagesToRecyclerView()
+            }
+        }
 
 //    fun imageReader(): List<Image> {
 //        val listAllFiles = picturesPath.listFiles()
@@ -63,7 +97,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 MediaStore.Images.Media.DISPLAY_NAME,
             )
         val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND ${MediaStore.Images.Media.SIZE} > 0"
-        val selectionArgs = arrayOf(relativePicturesPath)
+        val selectionArgs = arrayOf(RELATIVE_PICTURES_PATH)
 
         val query =
             context.contentResolver.query(
