@@ -40,6 +40,9 @@
             android:name=".ui.PhotoAlbumActivity"
             android:exported="false" />
         <activity android:name=".ui.PhotoActivity" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

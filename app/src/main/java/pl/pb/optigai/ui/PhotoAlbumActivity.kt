@@ -3,6 +3,7 @@ package pl.pb.optigai.ui
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,6 +24,7 @@ import pl.pb.optigai.utils.data.Image
 
 class PhotoAlbumActivity : AppCompatActivity() {
     private lateinit var viewBinding: PhotoAlbumBinding
+    private lateinit var imageList: List<Image>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,38 +34,64 @@ class PhotoAlbumActivity : AppCompatActivity() {
         if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
             activityResultLauncher.launch(REQUIRED_PERMISSIONS)
         } else {
-            loadImagesToRecyclerView()
+            loadImages()
         }
-        val backButton: ImageView = findViewById(R.id.backButton)
 
-        backButton.setOnClickListener {
+        viewBinding.backButton.setOnClickListener {
             finish()
         }
     }
 
-    fun loadImagesToRecyclerView() {
-        viewBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
+    override fun onResume() {
+        super.onResume()
+        // This is important: reload the view settings when the activity resumes,
+        // in case the user changed them in the settings screen.
+        loadImages()
+    }
+
+    private fun loadImages() {
         lifecycleScope.launch {
-            val imageList =
-                withContext(Dispatchers.IO) {
-                    imageReader(this@PhotoAlbumActivity)
-                }
-            val adapter =
-                ImageAdapter(imageList) { position ->
-                    val intent = Intent(this@PhotoAlbumActivity, PhotoActivity::class.java)
-                    intent.putExtra("images", ArrayList(imageList))
-                    intent.putExtra("position", position)
-                    startActivity(intent)
-                }
-            viewBinding.recyclerView.adapter = adapter
+            imageList = withContext(Dispatchers.IO) {
+                imageReader(this@PhotoAlbumActivity)
+            }
+            updateRecyclerView()
         }
+    }
+
+    private fun updateRecyclerView() {
+        if (!::imageList.isInitialized) {
+            return
+        }
+
+        val sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val isGridView = sharedPref.getBoolean("isGridView", true)
+
+        if (isGridView) {
+            viewBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
+        } else {
+            viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
+        }
+
+        val adapter = ImageAdapter(imageList) { position ->
+            val intent = Intent(this, PhotoActivity::class.java)
+            intent.putExtra("images", ArrayList(imageList))
+            intent.putExtra("position", position)
+            startActivity(intent)
+        }
+        viewBinding.recyclerView.adapter = adapter
     }
 
     companion object {
         private val REQUIRED_PERMISSIONS =
-            mutableListOf(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            ).toTypedArray()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                mutableListOf(
+                    android.Manifest.permission.READ_MEDIA_IMAGES,
+                ).toTypedArray()
+            } else {
+                mutableListOf(
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                ).toTypedArray()
+            }
         const val RELATIVE_PICTURES_PATH = "Pictures/OptigAI/"
     }
 
@@ -77,18 +106,16 @@ class PhotoAlbumActivity : AppCompatActivity() {
             if (!permissionGranted) {
                 Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
             } else {
-                loadImagesToRecyclerView()
+                loadImages()
             }
         }
-
-//    fun imageReader(): List<Image> {
+    //    fun imageReader(): List<Image> {
 //        val listAllFiles = picturesPath.listFiles()
 //        return listAllFiles
 //            ?.filter { it.name.endsWith(".jpg", ignoreCase = true) }
 //            ?.map { file -> Image(Uri.fromFile(file)) }
 //            ?: emptyList()
-//    }
-
+    //    }
     fun imageReader(context: Context): List<Image> {
         val images = mutableListOf<Image>()
         val projection =
