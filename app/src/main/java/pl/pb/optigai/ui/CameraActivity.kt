@@ -41,12 +41,12 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
-        viewBinding.takePhotoButton?.setOnClickListener { takePhoto() }
-        viewBinding.openGalleryButton?.setOnClickListener {
+        viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
+        viewBinding.openGalleryButton.setOnClickListener {
             val intent = Intent(this, PhotoAlbumActivity::class.java)
             startActivity(intent)
         }
-        viewBinding.openSettingsButton?.setOnClickListener {
+        viewBinding.openSettingsButton.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
@@ -74,11 +74,7 @@ class CameraActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS =
             mutableListOf(
                 android.Manifest.permission.CAMERA,
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+            ).toTypedArray()
     }
 
     private suspend fun startCamera() {
@@ -112,9 +108,7 @@ class CameraActivity : AppCompatActivity() {
             ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, name)
                 put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OptigAI")
-                }
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OptigAI")
             }
 
         val outputOptions =
