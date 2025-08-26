@@ -13,13 +13,50 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.8" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/nav_background"
+        android:padding="4dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:background="@drawable/back_button"
+            android:src="@drawable/ic_back_button"
+            android:contentDescription="@string/back_button_description"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:stateListAnimator="@animator/scale_animator"/>
+
+        <TextView
+            android:id="@+id/headerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/analysis_header_shared"
+            android:textSize="60sp"
+            android:fontFamily="@font/signikab"
+            android:textStyle="bold"
+            android:textColor="@color/onyx"
+            app:layout_constraintStart_toEndOf="@+id/backButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="HardcodedText" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <FrameLayout
         android:id="@+id/imageContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="10dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerLayout"
         app:layout_constraintBottom_toTopOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -31,7 +68,7 @@
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
             android:contentDescription="@string/content_description_preview_image"
-            tools:src="@drawable/obrazek1" />
+            tools:src="@drawable/photo1" />
 
     </FrameLayout>
 
@@ -43,7 +80,8 @@
         app:layout_constraintTop_toTopOf="@+id/guideline"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:stateListAnimator="@animator/scale_animator"/>
 
     <ImageView
         android:id="@+id/leftArrow"
@@ -55,7 +93,8 @@
         android:contentDescription="@string/content_description_previous_image"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="@+id/bottomBar"
-        app:layout_constraintTop_toTopOf="@+id/bottomBar" />
+        app:layout_constraintTop_toTopOf="@+id/bottomBar"
+        android:stateListAnimator="@animator/scale_animator"/>
 
     <ImageView
         android:id="@+id/middleButton"
@@ -66,7 +105,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="@+id/bottomBar"
         app:layout_constraintEnd_toEndOf="@+id/bottomBar"
-        app:layout_constraintTop_toTopOf="@+id/bottomBar" />
+        app:layout_constraintTop_toTopOf="@+id/bottomBar"
+        android:stateListAnimator="@animator/scale_animator"/>
 
     <ImageView
         android:id="@+id/rightArrow"

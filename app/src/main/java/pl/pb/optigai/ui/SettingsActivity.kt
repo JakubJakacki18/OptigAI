@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.RadioGroup
@@ -8,6 +9,7 @@ import pl.pb.optigai.R
 
 class SettingsActivity : AppCompatActivity() {
 
+    @SuppressLint("UseKtx")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)

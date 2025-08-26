@@ -8,13 +8,23 @@
     <string name="content_description_next_image">Next image button</string>
     <string name="content_description_zoom_button">Toggle zoom on image</string>
     <string name="empty_result_fragment_analysis_result">Something went wrong</string>
-    <string name="analise_text_fragment_analysis_selector">Analyze text</string>
-    <string name="analise_braille_fragment_analysis_selector">Analyze Braille</string>
-    <string name="analise_item_fragment_analysis_selector">Analyze item</string>
+    <string name="analise_text_fragment_analysis_selector">ANALYZE TEXT</string>
+    <string name="analise_braille_fragment_analysis_selector">ANALYZE BRAILLE</string>
+    <string name="analise_item_fragment_analysis_selector">ANALYZE ITEM</string>
     <string name="analysis_header_shared">ANALYSIS</string>
     <string name="gallery_header_shared">GALLERY</string>
     <string name="open_settings_description">Settings</string>
     <string name="take_photo_description">Take Photo</string>
     <string name="open_gallery_description">Gallery</string>
+    <string name="gallery_layout_description">Change Gallery Layout</string>
+    <string name="photo_analysis_description">Photo Analysis</string>
+    <string name="background_photo_description">Background Photo for Analysis</string>
+    <string name="open_camera">Open Camera</string>
+    <string name="open_gallery">Open Gallery</string>
+    <string name="chosen_gallery_view">Choose your preferred gallery view:</string>
+    <string name="grid_view">Grid View</string>
+    <string name="list_view">List View</string>
+    <string name="number2">2</string>
+    <string name="settings_header">SETTINGS\n</string>
 
 </resources>

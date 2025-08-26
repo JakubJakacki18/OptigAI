@@ -3,37 +3,83 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.AnalysisSelectorFragment">
+    tools:context="AnalysisSelectorFragment">
+
     <ImageView
         android:id="@+id/analyzedPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerInside"
-        android:alpha="0.5"
-        />
+        android:contentDescription="@string/background_photo_description"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:alpha="0.5" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        >
+        android:gravity="center">
 
-        <Button
+        <TextView
             android:id="@+id/analysisTextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="@string/analise_text_fragment_analysis_selector" />
+            android:background="@drawable/analysis_selector_button"
+            android:text="@string/analise_text_fragment_analysis_selector"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/signikab"
+            android:textColor="@color/onyx"
+            android:textSize="32sp"
+            android:minHeight="100dp"
+            android:stateListAnimator="@animator/scale_animator"/>
 
-        <Button
+        <TextView
             android:id="@+id/analysisBrailleButton"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="@string/analise_braille_fragment_analysis_selector" />
-        <Button
+            android:background="@drawable/analysis_selector_button"
+            android:text="@string/analise_braille_fragment_analysis_selector"
+            android:layout_marginTop="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/signikab"
+            android:textColor="@color/onyx"
+            android:textSize="32sp"
+            android:minHeight="50dp"
+            android:maxLines="2"
+            android:stateListAnimator="@animator/scale_animator"/>
+
+        <TextView
             android:id="@+id/analysisItemButton"
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="@string/analise_item_fragment_analysis_selector" />
+            android:background="@drawable/analysis_selector_button"
+            android:text="@string/analise_item_fragment_analysis_selector"
+            android:layout_marginTop="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/signikab"
+            android:textColor="@color/onyx"
+            android:textSize="32sp"
+            android:minHeight="100dp"
+            android:stateListAnimator="@animator/scale_animator"/>
+
     </LinearLayout>
+
 </FrameLayout>

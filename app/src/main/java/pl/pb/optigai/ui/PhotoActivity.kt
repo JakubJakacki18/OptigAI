@@ -16,6 +16,7 @@ class PhotoActivity : AppCompatActivity() {
     private lateinit var leftArrow: ImageView
     private lateinit var rightArrow: ImageView
     private lateinit var middleButton: ImageView
+    private lateinit var backButton: ImageView // Add this line
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +26,8 @@ class PhotoActivity : AppCompatActivity() {
         leftArrow = findViewById(R.id.leftArrow)
         rightArrow = findViewById(R.id.rightArrow)
         middleButton = findViewById(R.id.middleButton)
+        backButton = findViewById(R.id.backButton) // Find the back button
 
-        // Get the list of images and the clicked image's position from the intent
         images =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getParcelableArrayListExtra("images", Image::class.java) ?: emptyList()
@@ -36,10 +37,8 @@ class PhotoActivity : AppCompatActivity() {
             }
         currentIndex = intent.getIntExtra("position", 0)
 
-        // Display the initial image
         updateImage()
 
-        // Set click listeners for the navigation arrows
         leftArrow.setOnClickListener {
             if (currentIndex > 0) {
                 currentIndex--
@@ -58,6 +57,11 @@ class PhotoActivity : AppCompatActivity() {
             val intent = Intent(this@PhotoActivity, AnalysisActivity::class.java)
             intent.putExtra("IMAGE_URI", currentImage.uri.toString())
             startActivity(intent)
+        }
+
+        // Add this click listener for the back button
+        backButton.setOnClickListener {
+            finish() // This will return the user to the previous activity (PhotoAlbumActivity)
         }
     }
 

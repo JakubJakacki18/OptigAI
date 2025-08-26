@@ -3,28 +3,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/light_blue"
     tools:context=".ui.AnalysisResultFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <ImageView
             android:id="@+id/analyzedPhoto"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:contentDescription="@string/photo_analysis_description"
             android:scaleType="centerInside"
             android:layout_weight="0.5"/>
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/analysis_result_box"
             android:layout_weight="0.5">
 
             <TextView
                 android:id="@+id/resultText"
+                android:layout_margin="15dp"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikasb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/empty_result_fragment_analysis_result"/>

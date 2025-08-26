@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -7,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -17,15 +17,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoAlbumBinding
 import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.Image
+
 
 class PhotoAlbumActivity : AppCompatActivity() {
     private lateinit var viewBinding: PhotoAlbumBinding
     private lateinit var imageList: List<Image>
 
+    @SuppressLint("UseKtx")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoAlbumBinding.inflate(layoutInflater)
@@ -40,12 +41,22 @@ class PhotoAlbumActivity : AppCompatActivity() {
         viewBinding.backButton.setOnClickListener {
             finish()
         }
+        viewBinding.layoutButton.setOnClickListener {
+            val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+            val isGridView = sharedPref.getBoolean("isGridView", true)
+
+            val newIsGridView = !isGridView
+            sharedPref.edit().putBoolean("isGridView", newIsGridView).apply()
+
+            viewBinding.layoutButton.text = if (newIsGridView) "2" else "1"
+
+            updateRecyclerView()
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
-        // This is important: reload the view settings when the activity resumes,
-        // in case the user changed them in the settings screen.
         loadImages()
     }
 
@@ -59,17 +70,17 @@ class PhotoAlbumActivity : AppCompatActivity() {
     }
 
     private fun updateRecyclerView() {
-        if (!::imageList.isInitialized) {
-            return
-        }
+        if (!::imageList.isInitialized) return
 
-        val sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
         val isGridView = sharedPref.getBoolean("isGridView", true)
 
         if (isGridView) {
             viewBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
+            viewBinding.layoutButton.text = "2"
         } else {
             viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
+            viewBinding.layoutButton.text = "1"
         }
 
         val adapter = ImageAdapter(imageList) { position ->
@@ -80,6 +91,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
         }
         viewBinding.recyclerView.adapter = adapter
     }
+
 
     companion object {
         private val REQUIRED_PERMISSIONS =

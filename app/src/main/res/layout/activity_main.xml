@@ -22,13 +22,13 @@
             android:id="@+id/cameraButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Otwórz Aparat" />
+            android:text="@string/open_camera" />
 
         <Button
             android:id="@+id/galleryButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Otwórz Galerię" />
+            android:text="@string/open_gallery" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

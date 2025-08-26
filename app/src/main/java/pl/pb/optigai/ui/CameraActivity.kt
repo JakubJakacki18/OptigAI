@@ -1,9 +1,7 @@
 package pl.pb.optigai.ui
 
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -18,7 +16,6 @@ import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import pl.pb.optigai.R
 import pl.pb.optigai.databinding.ActivityCameraBinding
 import pl.pb.optigai.utils.PermissionHandler
 import java.text.SimpleDateFormat
@@ -139,7 +136,7 @@ class CameraActivity : AppCompatActivity() {
                         intent.putExtra("IMAGE_URI", savedUri.toString())
                         startActivity(intent)
                     } else {
-                        Toast.makeText(this@CameraActivity, "Błąd zapisu zdjęcia", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CameraActivity, "Error saving photo", Toast.LENGTH_SHORT).show()
                     }
                 }
             },

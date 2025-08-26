@@ -1,7 +1,8 @@
 package pl.pb.optigai.ui
 
-import android.net.Uri
+import AnalysisSelectorFragment
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -25,6 +26,11 @@ class AnalysisActivity : AppCompatActivity() {
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisSelectorFragment())
                 .commit()
+        }
+
+        val backButton: View = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
+            finish()
         }
     }
 }
