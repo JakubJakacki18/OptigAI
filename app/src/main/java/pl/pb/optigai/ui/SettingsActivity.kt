@@ -1,40 +1,42 @@
 package pl.pb.optigai.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.RadioGroup
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import pl.pb.optigai.R
+import pl.pb.optigai.databinding.ActivitySettingsBinding
+import pl.pb.optigai.utils.data.SettingsViewModel
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var viewBinding: ActivitySettingsBinding
+    private val viewModel: SettingsViewModel by viewModels()
 
-    @SuppressLint("UseKtx")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        viewBinding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
-        val radioGroup = findViewById<RadioGroup>(R.id.viewRadioGroup)
-        val backButton: ImageView = findViewById(R.id.backButton)
-        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-
-        // Read the saved preference and set the correct radio button
-        val isGridView = sharedPref.getBoolean("isGridView", true)
-        if (isGridView) {
-            radioGroup.check(R.id.gridRadioButton)
-        } else {
-            radioGroup.check(R.id.listRadioButton)
-        }
-
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            with(sharedPref.edit()) {
-                putBoolean("isGridView", checkedId == R.id.gridRadioButton)
-                apply()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isGridView.collect { isGridView ->
+                    viewBinding.viewRadioGroup.check(
+                        if (isGridView) R.id.gridRadioButton else R.id.listRadioButton,
+                    )
+                    viewBinding.viewRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+                        lifecycleScope.launch {
+                            val isGrid = checkedId == R.id.gridRadioButton
+                            viewModel.setIsGridView(isGrid)
+                        }
+                    }
+                }
             }
         }
 
-        // Set the back button click listener
-        backButton.setOnClickListener {
+        viewBinding.backButton.setOnClickListener {
             finish()
         }
     }

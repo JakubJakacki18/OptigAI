@@ -1,6 +1,5 @@
 package pl.pb.optigai.ui
 
-import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -10,23 +9,26 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pl.pb.optigai.databinding.PhotoAlbumBinding
 import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.Image
-
+import pl.pb.optigai.utils.data.SettingsViewModel
+import kotlin.getValue
 
 class PhotoAlbumActivity : AppCompatActivity() {
+    private val viewModel: SettingsViewModel by viewModels()
     private lateinit var viewBinding: PhotoAlbumBinding
     private lateinit var imageList: List<Image>
 
-    @SuppressLint("UseKtx")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoAlbumBinding.inflate(layoutInflater)
@@ -42,17 +44,12 @@ class PhotoAlbumActivity : AppCompatActivity() {
             finish()
         }
         viewBinding.layoutButton.setOnClickListener {
-            val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-            val isGridView = sharedPref.getBoolean("isGridView", true)
-
-            val newIsGridView = !isGridView
-            sharedPref.edit().putBoolean("isGridView", newIsGridView).apply()
-
-            viewBinding.layoutButton.text = if (newIsGridView) "2" else "1"
-
-            updateRecyclerView()
+            lifecycleScope.launch {
+                val isGridView = getIsGridView()
+                viewModel.setIsGridView(!isGridView)
+                updateRecyclerView()
+            }
         }
-
     }
 
     override fun onResume() {
@@ -62,36 +59,39 @@ class PhotoAlbumActivity : AppCompatActivity() {
 
     private fun loadImages() {
         lifecycleScope.launch {
-            imageList = withContext(Dispatchers.IO) {
-                imageReader(this@PhotoAlbumActivity)
-            }
+            imageList =
+                withContext(Dispatchers.IO) {
+                    imageReader(this@PhotoAlbumActivity)
+                }
             updateRecyclerView()
         }
     }
 
+    private suspend fun getIsGridView(): Boolean = viewModel.isGridView.first()
+
     private fun updateRecyclerView() {
         if (!::imageList.isInitialized) return
 
-        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
-        val isGridView = sharedPref.getBoolean("isGridView", true)
-
-        if (isGridView) {
-            viewBinding.recyclerView.layoutManager = GridLayoutManager(this, 2)
-            viewBinding.layoutButton.text = "2"
-        } else {
-            viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
-            viewBinding.layoutButton.text = "1"
+        lifecycleScope.launch {
+            val isGridView = getIsGridView()
+            if (isGridView) {
+                viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, 2)
+                viewBinding.layoutButton.text = "2"
+            } else {
+                viewBinding.recyclerView.layoutManager = LinearLayoutManager(this@PhotoAlbumActivity)
+                viewBinding.layoutButton.text = "1"
+            }
         }
 
-        val adapter = ImageAdapter(imageList) { position ->
-            val intent = Intent(this, PhotoActivity::class.java)
-            intent.putExtra("images", ArrayList(imageList))
-            intent.putExtra("position", position)
-            startActivity(intent)
-        }
+        val adapter =
+            ImageAdapter(imageList) { position ->
+                val intent = Intent(this, PhotoActivity::class.java)
+                intent.putExtra("images", ArrayList(imageList))
+                intent.putExtra("position", position)
+                startActivity(intent)
+            }
         viewBinding.recyclerView.adapter = adapter
     }
-
 
     companion object {
         private val REQUIRED_PERMISSIONS =
@@ -121,6 +121,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 loadImages()
             }
         }
+
     //    fun imageReader(): List<Image> {
 //        val listAllFiles = picturesPath.listFiles()
 //        return listAllFiles
