@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 import pl.pb.optigai.Settings
 
 private val Context.settingsDataStore: DataStore<Settings> by dataStore(
-    fileName = "settings.pb",
+    fileName = "settings.optigai",
     serializer = SettingsSerializer,
 )
 

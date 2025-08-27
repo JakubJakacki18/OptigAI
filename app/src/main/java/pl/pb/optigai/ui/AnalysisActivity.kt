@@ -16,10 +16,15 @@ class AnalysisActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_analysis)
 
+        val isBitmapPassed = intent.getBooleanExtra("IS_BITMAP_PASSED", false)
         val uriString = intent.getStringExtra("IMAGE_URI")
-        val uri = uriString?.toUri()
 
-        uri?.let { analysisViewModel.initPhotoUri(it) }
+        if (isBitmapPassed) {
+            analysisViewModel.isBitmapPassed.value = true
+        } else {
+            val uri = uriString?.toUri()
+            uri?.let { analysisViewModel.initPhotoUri(it) }
+        }
 
         if (savedInstanceState == null) {
             supportFragmentManager

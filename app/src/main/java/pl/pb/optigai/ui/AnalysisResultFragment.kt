@@ -9,7 +9,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import pl.pb.optigai.R
+import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
+import pl.pb.optigai.utils.data.BitmapCache
 import kotlin.getValue
 
 class AnalysisResultFragment : Fragment() {
@@ -23,9 +25,13 @@ class AnalysisResultFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_analysis_result, container, false)
         val imageView: ImageView = view.findViewById(R.id.analyzedPhoto)
         viewModel.photoUri.observe(viewLifecycleOwner) { uri ->
-            imageView.setImageURI(uri)
+            AnalyseUtils.updateImageView(imageView, uri, null)
         }
-        val resultText : TextView = view.findViewById(R.id.resultText)
+        viewModel.isBitmapPassed.observe(viewLifecycleOwner) { isBitmapPassed ->
+            if (!isBitmapPassed) return@observe
+            AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
+        }
+        val resultText: TextView = view.findViewById(R.id.resultText)
         viewModel.analysisResult.observe(viewLifecycleOwner) { result ->
             resultText.text = result
         }
