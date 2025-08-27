@@ -14,7 +14,7 @@ object SettingsSerializer : Serializer<Settings> {
             .setIsGridView(true)
             .setGridColumns(2)
             .setLanguageValue(Settings.Language.SYSTEM_DEFAULT_VALUE)
-            .setIsSavingPhoto(false)
+            .setIsPhotoSaving(true)
             .build()
 
     override suspend fun readFrom(input: InputStream): Settings =

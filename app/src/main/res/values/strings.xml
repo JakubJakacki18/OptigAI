@@ -26,5 +26,8 @@
     <string name="list_view">List View</string>
     <string name="number2">2</string>
     <string name="settings_header">SETTINGS\n</string>
+    <string name="is_photo_saving_option_title">Would you like to save the photos you take?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

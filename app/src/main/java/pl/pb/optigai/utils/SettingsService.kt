@@ -29,8 +29,8 @@ class SettingsService private constructor(
     val defaultSaveLocation: Flow<String> =
         settingsFlow.map { it.defaultSaveLocation }
 
-    val isSavingPhoto: Flow<Boolean> =
-        settingsFlow.map { it.isSavingPhoto }
+    val isPhotoSaving: Flow<Boolean> =
+        settingsFlow.map { it.isPhotoSaving }
 
     suspend fun updateIsGridView(isGridView: Boolean) {
         dataStore.updateData { current ->
@@ -68,11 +68,11 @@ class SettingsService private constructor(
         }
     }
 
-    suspend fun setSavingPhoto(enabled: Boolean) {
+    suspend fun updateIsPhotoSaving(enabled: Boolean) {
         dataStore.updateData { current ->
             current
                 .toBuilder()
-                .setIsSavingPhoto(enabled)
+                .setIsPhotoSaving(enabled)
                 .build()
         }
     }

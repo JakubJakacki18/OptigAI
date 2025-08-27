@@ -15,7 +15,7 @@ class SettingsViewModel(
     val isGridView = settingsService.isGridView
     val language = settingsService.language
     val defaultSaveLocation = settingsService.defaultSaveLocation
-    val isSavingPhoto = settingsService.isSavingPhoto
+    val isPhotoSaving = settingsService.isPhotoSaving
 
     fun setGridColumns(columns: Int) {
         viewModelScope.launch {
@@ -26,6 +26,12 @@ class SettingsViewModel(
     fun setIsGridView(isGridView: Boolean) {
         viewModelScope.launch {
             settingsService.updateIsGridView(isGridView)
+        }
+    }
+
+    fun setIsPhotoSaving(isPhotoSaving: Boolean) {
+        viewModelScope.launch {
+            settingsService.updateIsPhotoSaving(isPhotoSaving)
         }
     }
 }

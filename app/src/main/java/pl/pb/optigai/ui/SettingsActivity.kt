@@ -19,7 +19,14 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+        bindIsGridViewRadioButtons()
+        bindIsPhotoSavingRadioButtons()
+        viewBinding.backButton.setOnClickListener {
+            finish()
+        }
+    }
 
+    private fun bindIsGridViewRadioButtons() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isGridView.collect { isGridView ->
@@ -28,16 +35,30 @@ class SettingsActivity : AppCompatActivity() {
                     )
                     viewBinding.viewRadioGroup.setOnCheckedChangeListener { _, checkedId ->
                         lifecycleScope.launch {
-                            val isGrid = checkedId == R.id.gridRadioButton
-                            viewModel.setIsGridView(isGrid)
+                            val isGridViewValue = checkedId == R.id.gridRadioButton
+                            viewModel.setIsGridView(isGridViewValue)
                         }
                     }
                 }
             }
         }
+    }
 
-        viewBinding.backButton.setOnClickListener {
-            finish()
+    private fun bindIsPhotoSavingRadioButtons() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isPhotoSaving.collect { isPhotoSaving ->
+                    viewBinding.isPhotoSavingRadioGroup.check(
+                        if (isPhotoSaving) R.id.yesIsPhotoSavingRadioButton else R.id.noIsPhotoSavingRadioButton,
+                    )
+                    viewBinding.isPhotoSavingRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+                        lifecycleScope.launch {
+                            val isPhotoSavingValue = checkedId == R.id.yesIsPhotoSavingRadioButton
+                            viewModel.setIsPhotoSaving(isPhotoSavingValue)
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -19,15 +20,19 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pl.pb.optigai.databinding.ActivityCameraBinding
 import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.BitmapCache
+import pl.pb.optigai.utils.data.SettingsViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.getValue
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
+    private val viewModel: SettingsViewModel by viewModels()
     private var imageCapture: ImageCapture? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,11 +104,12 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun takePhoto() {
-        val saveToStorage = true
-        if (saveToStorage) {
-            takePhotoAndSaveToExternalStorage()
-        } else {
-            takePhotoAndSaveToTemporaryBitmap()
+        lifecycleScope.launch {
+            if (getIsSavingPhoto()) {
+                takePhotoAndSaveToExternalStorage()
+            } else {
+                takePhotoAndSaveToTemporaryBitmap()
+            }
         }
     }
 
@@ -190,4 +196,6 @@ class CameraActivity : AppCompatActivity() {
         val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
         return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
+
+    private suspend fun getIsSavingPhoto(): Boolean = viewModel.isPhotoSaving.first()
 }
