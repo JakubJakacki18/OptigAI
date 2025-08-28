@@ -1,6 +1,8 @@
 package pl.pb.optigai.ui
 
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -21,7 +23,11 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
         bindIsGridViewRadioButtons()
         bindIsPhotoSavingRadioButtons()
-        viewBinding.backButton.setOnClickListener {
+        val headerTitle: TextView = findViewById(R.id.headerTitle)
+        headerTitle.text = getString(R.string.settings_header)
+
+        val backButton: View = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
             finish()
         }
     }

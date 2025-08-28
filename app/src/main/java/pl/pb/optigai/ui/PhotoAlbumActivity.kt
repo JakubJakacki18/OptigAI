@@ -23,6 +23,7 @@ import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.Image
 import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
+import pl.pb.optigai.R
 
 class PhotoAlbumActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels()
@@ -40,9 +41,11 @@ class PhotoAlbumActivity : AppCompatActivity() {
             loadImages()
         }
 
+        viewBinding.headerTitle.text = getString(R.string.analysis_header_shared)
         viewBinding.backButton.setOnClickListener {
             finish()
         }
+
         viewBinding.layoutButton.setOnClickListener {
             lifecycleScope.launch {
                 val isGridView = getIsGridView()

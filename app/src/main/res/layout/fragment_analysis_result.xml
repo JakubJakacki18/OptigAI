@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,8 +11,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:ignore="UselessParent">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/analyzedPhoto"
@@ -18,23 +19,29 @@
             android:layout_height="0dp"
             android:contentDescription="@string/photo_analysis_description"
             android:scaleType="centerInside"
-            android:layout_weight="0.5"/>
+            android:layout_weight="2"/>
 
-        <ScrollView
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/analysis_result_box"
-            android:layout_weight="0.5">
-
-            <TextView
-                android:id="@+id/resultText"
-                android:layout_margin="15dp"
-                android:textSize="24sp"
-                android:fontFamily="@font/signikasb"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/empty_result_fragment_analysis_result"/>
-        </ScrollView>
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 
-</FrameLayout>
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/resultScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/analysis_result_box"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <TextView
+            android:id="@+id/resultText"
+            android:layout_margin="15dp"
+            android:textSize="28sp"
+            android:fontFamily="@font/signikasb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_result_fragment_analysis_result"/>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

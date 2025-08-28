@@ -13,6 +13,7 @@
     <string name="analise_item_fragment_analysis_selector">ANALYZE ITEM</string>
     <string name="analysis_header_shared">ANALYSIS</string>
     <string name="gallery_header_shared">GALLERY</string>
+    <string name="preview_header_shared">PREVIEW</string>
     <string name="open_settings_description">Settings</string>
     <string name="take_photo_description">Take Photo</string>
     <string name="open_gallery_description">Gallery</string>

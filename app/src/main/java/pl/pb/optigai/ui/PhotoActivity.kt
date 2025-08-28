@@ -3,7 +3,9 @@ package pl.pb.optigai.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.data.Image
@@ -59,9 +61,12 @@ class PhotoActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Add this click listener for the back button
+        val headerTitle: TextView = findViewById(R.id.headerTitle)
+        headerTitle.text = getString(R.string.preview_header_shared)
+
+        val backButton: View = findViewById(R.id.backButton)
         backButton.setOnClickListener {
-            finish() // This will return the user to the previous activity (PhotoAlbumActivity)
+            finish()
         }
     }
 
