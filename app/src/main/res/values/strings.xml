@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">OptigAI</string>
-    <string name="back_button_description">Back button</string>
+    <string name="back_button_description">Go back</string>
     <string name="gallery_image_description">Image in gallery</string>
     <string name="item_image">Image description</string>
     <string name="content_description_preview_image">Image preview</string>
@@ -26,7 +26,7 @@
     <string name="grid_view">Grid View</string>
     <string name="list_view">List View</string>
     <string name="number2">2</string>
-    <string name="settings_header">SETTINGS\n</string>
+    <string name="settings_header">SETTINGS</string>
     <string name="is_photo_saving_option_title">Would you like to save the photos you take?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

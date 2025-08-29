@@ -3,7 +3,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView // <-- Changed from Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import pl.pb.optigai.R
@@ -39,9 +39,9 @@ class AnalysisSelectorFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        val buttonTextAnalysis = view.findViewById<TextView>(R.id.analysisTextButton) // <-- Changed to TextView
-        val buttonBrailleAnalysis = view.findViewById<TextView>(R.id.analysisBrailleButton) // <-- Changed to TextView
-        val buttonItemAnalysis = view.findViewById<TextView>(R.id.analysisItemButton) // <-- Changed to TextView
+        val buttonTextAnalysis = view.findViewById<TextView>(R.id.analysisTextButton)
+        val buttonBrailleAnalysis = view.findViewById<TextView>(R.id.analysisBrailleButton)
+        val buttonItemAnalysis = view.findViewById<TextView>(R.id.analysisItemButton)
 
         buttonTextAnalysis.setOnClickListener {
             viewModel.setResult(AnalyseService.analyseText())
