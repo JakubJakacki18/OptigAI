@@ -139,8 +139,8 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
             )
-        val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND ${MediaStore.Images.Media.SIZE} > 0"
-        val selectionArgs = arrayOf(RELATIVE_PICTURES_PATH)
+        val selection = null
+        val selectionArgs = null
 
         val query =
             context.contentResolver.query(

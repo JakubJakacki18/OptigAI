@@ -1,3 +1,5 @@
+package pl.pb.optigai.ui
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import pl.pb.optigai.R
-import pl.pb.optigai.ui.AnalysisResultFragment
 import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
@@ -43,24 +46,36 @@ class AnalysisSelectorFragment : Fragment() {
         val buttonBrailleAnalysis = view.findViewById<TextView>(R.id.analysisBrailleButton)
         val buttonItemAnalysis = view.findViewById<TextView>(R.id.analysisItemButton)
 
+        // Tworzymy instancję klasy, aby móc wywoływać jej metody.
+        val analyseService = AnalyseService(requireContext())
+
         buttonTextAnalysis.setOnClickListener {
-            viewModel.setResult(AnalyseService.analyseText())
+            val result = analyseService.analyseText()
+            viewModel.setResult(result)
             parentFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisResultFragment())
                 .addToBackStack(null)
                 .commit()
         }
+
         buttonBrailleAnalysis.setOnClickListener {
-            viewModel.setResult(AnalyseService.analyseBraille())
-            parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                .addToBackStack(null)
-                .commit()
+            // Uruchamiamy korutynę, aby móc wywołać funkcję suspend
+            lifecycleScope.launch {
+                val result = analyseService.analyseBraille()
+                viewModel.setResult(result)
+
+                parentFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                    .addToBackStack(null)
+                    .commit()
+            }
         }
+
         buttonItemAnalysis.setOnClickListener {
-            viewModel.setResult(AnalyseService.analyseItem())
+            val result = analyseService.analyseItem()
+            viewModel.setResult(result)
             parentFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisResultFragment())

@@ -2,16 +2,16 @@ package pl.pb.optigai.ui
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.coroutines.tasks.await
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.support.common.FileUtil
-import org.tensorflow.lite.support.common.TensorProcessor
-import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.image.ops.TransformToGrayscaleOp
-import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -19,16 +19,15 @@ import java.nio.channels.FileChannel
 
 class BrailleRecognizer(private val context: android.content.Context) {
 
-    // Nazwa pliku modelu
     private val modelName = "braille_recognition_model.tflite"
-
-    // Nazwy klas, które model przewiduje (np. "a", "b", "c"...)
     private val labels = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
-
     private var interpreter: Interpreter? = null
 
-    // Inicjalizacja interpretera
-    fun initialize() {
+    init {
+        initialize()
+    }
+
+    private fun initialize() {
         try {
             val modelByteBuffer = loadModelFile()
             interpreter = Interpreter(modelByteBuffer)
@@ -38,7 +37,6 @@ class BrailleRecognizer(private val context: android.content.Context) {
         }
     }
 
-    // Funkcja do wczytywania pliku modelu z folderu assets
     private fun loadModelFile(): ByteBuffer {
         val fileDescriptor = context.assets.openFd(modelName)
         val fileInputStream = FileInputStream(fileDescriptor.fileDescriptor)
@@ -48,45 +46,84 @@ class BrailleRecognizer(private val context: android.content.Context) {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    // Funkcja do przetwarzania obrazu i rozpoznawania znaku Braille'a
-    fun recognize(imageBitmap: Bitmap): String {
+    private fun recognizeSingleCharacter(imageBitmap: Bitmap): String {
         if (interpreter == null) {
             Log.e("BrailleRecognizer", "Interpreter nie jest zainicjalizowany.")
             return "Błąd: model nie jest gotowy."
         }
 
-        // 1. Przetwarzanie obrazu
         val tensorImage = TensorImage(DataType.FLOAT32)
         tensorImage.load(imageBitmap)
 
         val imageProcessor = ImageProcessor.Builder()
             .add(ResizeOp(28, 28, ResizeOp.ResizeMethod.BILINEAR))
             .add(TransformToGrayscaleOp())
-            .add(NormalizeOp(0.0f, 255.0f))
             .build()
 
         val processedImage = imageProcessor.process(tensorImage)
 
-        // 2. Przygotowanie bufora wyjściowego
         val outputShape = interpreter!!.getOutputTensor(0).shape()
         val outputDataType = interpreter!!.getOutputTensor(0).dataType()
         val outputTensor = TensorBuffer.createFixedSize(outputShape, outputDataType)
 
-        // 3. Uruchomienie predykcji
         interpreter!!.run(processedImage.buffer, outputTensor.buffer)
 
-        // 4. Analiza wyników
         val probabilities = outputTensor.floatArray
         val highestProbabilityIndex = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
 
-        return if (highestProbabilityIndex != -1) {
+        return if (highestProbabilityIndex != -1 && highestProbabilityIndex < labels.size) {
             labels[highestProbabilityIndex]
         } else {
-            "Nie rozpoznano"
+            Log.e("BrailleRecognizer", "Model predicted an invalid index: $highestProbabilityIndex")
+            "?"
         }
     }
 
-    // Funkcja do zamykania interpretera, aby zwolnić zasoby
+    /**
+     * Używa ML Kit do rozpoznawania i segmentacji tekstu Braille'a,
+     * a następnie przekazuje każdy wykryty znak do modelu TensorFlow Lite.
+     */
+    suspend fun recognizeText(imageBitmap: Bitmap): String {
+        val recognizedText = StringBuilder()
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        val inputImage = InputImage.fromBitmap(imageBitmap, 0)
+
+        try {
+            val result = recognizer.process(inputImage).await()
+            val textBlocks = result.textBlocks
+
+            // Iteruj przez każdy wykryty blok tekstu (znak Braille'a)
+            for (textBlock in textBlocks) {
+                for (line in textBlock.lines) {
+                    val boundingBox = line.boundingBox
+                    if (boundingBox != null) {
+                        try {
+                            // Wytnij znak Braille'a na podstawie jego bounding boxa
+                            val characterBitmap = Bitmap.createBitmap(
+                                imageBitmap,
+                                boundingBox.left,
+                                boundingBox.top,
+                                boundingBox.width(),
+                                boundingBox.height()
+                            )
+                            // Rozpoznaj wycięty znak i dodaj do wyniku
+                            val recognizedChar = recognizeSingleCharacter(characterBitmap)
+                            recognizedText.append(recognizedChar)
+                            characterBitmap.recycle()
+                        } catch (e: Exception) {
+                            Log.e("BrailleRecognizer", "Błąd przy wycinaniu fragmentu: ${e.message}")
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("BrailleRecognizer", "Błąd podczas rozpoznawania tekstu ML Kit: ${e.message}")
+            return "Błąd: ${e.message}"
+        }
+
+        return recognizedText.toString()
+    }
+
     fun close() {
         interpreter?.close()
     }

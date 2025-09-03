@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.androidx.camera.extensions)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.concurrent.futures.ktx)
@@ -62,6 +64,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.constraintlayout.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

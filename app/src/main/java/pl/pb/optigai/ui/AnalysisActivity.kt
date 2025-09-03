@@ -1,6 +1,5 @@
 package pl.pb.optigai.ui
 
-import AnalysisSelectorFragment
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -11,6 +10,14 @@ import androidx.core.net.toUri
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.data.AnalysisViewModel
 
+// AnalysisActivity.kt
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
+import pl.pb.optigai.utils.data.BitmapCache
+import kotlin.compareTo
+
 class AnalysisActivity : AppCompatActivity() {
     private val analysisViewModel: AnalysisViewModel by viewModels()
 
@@ -18,14 +25,25 @@ class AnalysisActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_analysis)
 
-        val isBitmapPassed = intent.getBooleanExtra("IS_BITMAP_PASSED", false)
         val uriString = intent.getStringExtra("IMAGE_URI")
+        val uri = uriString?.toUri()
 
-        if (isBitmapPassed) {
-            analysisViewModel.isBitmapPassed.value = true
-        } else {
-            val uri = uriString?.toUri()
-            uri?.let { analysisViewModel.initPhotoUri(it) }
+        uri?.let {
+            analysisViewModel.initPhotoUri(it)
+
+            val loadedBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(contentResolver, it)
+                ImageDecoder.decodeBitmap(source)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.getBitmap(contentResolver, it)
+            }
+
+            // Corrected: Convert the bitmap to ARGB_8888 format
+            val convertedBitmap = loadedBitmap.copy(Bitmap.Config.ARGB_8888, true)
+
+            BitmapCache.bitmap = convertedBitmap
+            analysisViewModel.isBitmapPassed.postValue(true)
         }
 
         if (savedInstanceState == null) {
