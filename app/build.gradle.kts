@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.androidx.camera.extensions)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
-
+    implementation ("com.quickbirdstudios:opencv:4.5.2")
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
