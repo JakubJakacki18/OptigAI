@@ -1,25 +1,24 @@
 package pl.pb.optigai.utils
 
 import android.content.Context
-import pl.pb.optigai.ui.BrailleRecognizer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pl.pb.optigai.utils.data.BitmapCache
 
-class AnalyseService(private val context: Context) {
+class AnalyseService(
+    private val context: Context,
+) {
+    fun analyseText(): String = "Text recognition not yet implemented"
 
-    fun analyseText(): String {
-        return "Text recognition not yet implemented"
-    }
+    suspend fun analyseBraille(): String =
+        withContext(Dispatchers.Default) {
+            val bitmap = BitmapCache.bitmap ?: return@withContext "Brak obrazu"
+            val recognizer = BrailleRecognizer(context)
 
-    suspend fun analyseBraille(): String {
-        val bitmap = BitmapCache.bitmap ?: return "Brak obrazu"
-        val recognizer = BrailleRecognizer(context)
+            val result = recognizer.recognizeText(bitmap)
+            recognizer.close()
+            result
+        }
 
-        val result = recognizer.recognizeText(bitmap)
-        recognizer.close()
-        return result
-    }
-
-    fun analyseItem(): String {
-        return "Item recognition not yet implemented"
-    }
+    fun analyseItem(): String = "Item recognition not yet implemented"
 }

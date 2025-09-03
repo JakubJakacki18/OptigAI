@@ -1,38 +1,63 @@
-package pl.pb.optigai.ui;
+package pl.pb.optigai.utils
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Log;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Rect;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.android.Utils;
-import org.opencv.android.OpenCVLoader;
-import org.tensorflow.lite.DataType;
-import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
-import java.io.FileInputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import android.content.Context
+import android.graphics.Bitmap
+import android.util.Log
+import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
+import org.opencv.core.Mat
+import org.opencv.core.MatOfPoint
+import org.opencv.core.Rect
+import org.opencv.imgproc.Imgproc
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.FileInputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
+import java.util.ArrayList
+import java.util.List
 
 /**
  * Recognizer class for Braille characters using a pre-trained TensorFlow Lite model
  * and OpenCV for image segmentation.
  */
-class BrailleRecognizer(private val context: Context) {
-
+class BrailleRecognizer(
+    private val context: Context,
+) {
     private val modelName = "braille_recognition_model.tflite"
 
     // IMPORTANT: The list of labels must be identical to the ones on which the model was trained.
     // Ensure they are sorted in the same order as in the Python script.
-    private val labels = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+    private val labels =
+        listOf(
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "n",
+            "o",
+            "p",
+            "q",
+            "r",
+            "s",
+            "t",
+            "u",
+            "v",
+            "w",
+            "x",
+            "y",
+            "z",
+        )
     private var interpreter: Interpreter? = null
 
     init {
@@ -192,7 +217,7 @@ class BrailleRecognizer(private val context: Context) {
 
             // Iterate through the rest of the dots to group them
             for (i in 1 until sortedByX.size) {
-                val previousDot = sortedByX[i-1]
+                val previousDot = sortedByX[i - 1]
                 val currentDot = sortedByX[i]
 
                 // If the horizontal gap is small, they are part of the same character
@@ -220,16 +245,18 @@ class BrailleRecognizer(private val context: Context) {
 
                 // Add padding to ensure the entire Braille character is captured
                 val padding = 5
-                val brailleRect = Rect(
-                    minX - padding,
-                    minY - padding,
-                    (maxX - minX) + 2 * padding,
-                    (maxY - minY) + 2 * padding
-                )
+                val brailleRect =
+                    Rect(
+                        minX - padding,
+                        minY - padding,
+                        (maxX - minX) + 2 * padding,
+                        (maxY - minY) + 2 * padding,
+                    )
                 // Add a sanity check to ensure the calculated rectangle is valid
                 if (brailleRect.x >= 0 && brailleRect.y >= 0 &&
                     brailleRect.x + brailleRect.width <= mat.cols() &&
-                    brailleRect.y + brailleRect.height <= mat.rows()) {
+                    brailleRect.y + brailleRect.height <= mat.rows()
+                ) {
                     brailleCells.add(brailleRect)
                 } else {
                     Log.e("BrailleRecognizer", "Invalid rectangle coordinates, skipping segment.")

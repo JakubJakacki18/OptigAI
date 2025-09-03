@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import pl.pb.optigai.R
+import pl.pb.optigai.databinding.FragmentAnalysisSelectorBinding
 import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
@@ -18,22 +19,17 @@ import pl.pb.optigai.utils.data.BitmapCache
 
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
+    private lateinit var viewBinding: FragmentAnalysisSelectorBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_analysis_selector, container, false)
-        val imageView: ImageView = view.findViewById(R.id.analyzedPhoto)
-        viewModel.photoUri.observe(viewLifecycleOwner) { uri ->
-            AnalyseUtils.updateImageView(imageView, uri, null)
-        }
-        viewModel.isBitmapPassed.observe(viewLifecycleOwner) { isBitmapPassed ->
-            if (!isBitmapPassed) return@observe
-            AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
-        }
-        return view
+        viewBinding = FragmentAnalysisSelectorBinding.inflate(inflater, container, false)
+        val imageView: ImageView = viewBinding.analyzedPhoto
+        AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
+        return viewBinding.root
     }
 
     override fun onViewCreated(
@@ -42,11 +38,10 @@ class AnalysisSelectorFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        val buttonTextAnalysis = view.findViewById<TextView>(R.id.analysisTextButton)
-        val buttonBrailleAnalysis = view.findViewById<TextView>(R.id.analysisBrailleButton)
-        val buttonItemAnalysis = view.findViewById<TextView>(R.id.analysisItemButton)
+        val buttonTextAnalysis = viewBinding.analysisTextButton
+        val buttonBrailleAnalysis = viewBinding.analysisBrailleButton
+        val buttonItemAnalysis = viewBinding.analysisItemButton
 
-        // Tworzymy instancję klasy, aby móc wywoływać jej metody.
         val analyseService = AnalyseService(requireContext())
 
         buttonTextAnalysis.setOnClickListener {
@@ -60,7 +55,6 @@ class AnalysisSelectorFragment : Fragment() {
         }
 
         buttonBrailleAnalysis.setOnClickListener {
-            // Uruchamiamy korutynę, aby móc wywołać funkcję suspend
             lifecycleScope.launch {
                 val result = analyseService.analyseBraille()
                 viewModel.setResult(result)
