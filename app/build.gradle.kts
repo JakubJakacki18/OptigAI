@@ -56,7 +56,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.datastore.proto)
     implementation(libs.protobuf.javalite)
-
+    implementation("org.tensorflow:tensorflow-lite:2.15.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
