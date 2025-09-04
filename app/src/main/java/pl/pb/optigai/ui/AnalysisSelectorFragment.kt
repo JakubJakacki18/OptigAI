@@ -68,7 +68,10 @@ class AnalysisSelectorFragment : Fragment() {
         }
 
         buttonItemAnalysis.setOnClickListener {
-            val result = analyseService.analyseItem()
+            if (BitmapCache.bitmap == null) {
+                throw IllegalStateException("BitmapCache.bitmap is null")
+            }
+            val result = analyseService.analyseItem(BitmapCache.bitmap!!)
             viewModel.setResult(result)
             parentFragmentManager
                 .beginTransaction()
