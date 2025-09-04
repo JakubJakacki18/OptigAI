@@ -45,8 +45,8 @@ class AnalysisSelectorFragment : Fragment() {
         val analyseService = AnalyseService(requireContext())
 
         buttonTextAnalysis.setOnClickListener {
-            val result = analyseService.analyseText()
-            viewModel.setResult(result)
+//            val result = analyseService.analyseText()
+//            viewModel.setResult(result)
             parentFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisResultFragment())
@@ -56,8 +56,8 @@ class AnalysisSelectorFragment : Fragment() {
 
         buttonBrailleAnalysis.setOnClickListener {
             lifecycleScope.launch {
-                val result = analyseService.analyseBraille()
-                viewModel.setResult(result)
+//                val result = analyseService.analyseBraille()
+//                viewModel.setResult(result)
 
                 parentFragmentManager
                     .beginTransaction()
