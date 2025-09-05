@@ -7,6 +7,9 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+
+
 
     <application
         android:allowBackup="true"
@@ -37,6 +40,9 @@
             android:name=".ui.PhotoAlbumActivity"
             android:exported="false" />
         <activity android:name=".ui.PhotoActivity" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

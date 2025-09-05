@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "pl.pb.optigai";
+option java_multiple_files = true;
+
+message Settings {
+    enum Language {
+      SYSTEM_DEFAULT = 0;
+      ENGLISH = 1;
+      POLISH = 2;
+    }
+    bool is_grid_view = 1;
+    int32 grid_columns = 2;
+    Language language = 3;
+    string default_save_location = 4;
+    bool is_photo_saving = 5;
+
+
+
+
+}
