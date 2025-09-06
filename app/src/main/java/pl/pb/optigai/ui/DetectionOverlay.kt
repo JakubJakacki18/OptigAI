@@ -50,15 +50,17 @@ class DetectionOverlay(
     }
 
     private fun mapRectToView(rect: RectF): RectF {
-        val scaleX = width.toFloat() / imageWidth.toFloat()
-        val scaleY = height.toFloat() / imageHeight.toFloat()
-
-        return RectF(
-            rect.left * scaleX,
-            rect.top * scaleY,
-            rect.right * scaleX,
-            rect.bottom * scaleY,
+        val matrix = imageView!!.imageMatrix
+        val mapped = RectF(rect)
+        matrix.mapRect(mapped)
+        val viewRect = RectF(
+            imageView!!.paddingLeft.toFloat(),
+            imageView!!.paddingTop.toFloat(),
+            (imageView!!.width - imageView!!.paddingRight).toFloat(),
+            (imageView!!.height - imageView!!.paddingBottom).toFloat()
         )
+        mapped.offset(viewRect.left, viewRect.top)
+        return mapped
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -74,7 +76,7 @@ class DetectionOverlay(
                     d.boundingBox,
                 )
             AppLogger.i(rect.toString())
-            canvas.drawRect(d.boundingBox, boxPaint)
+            canvas.drawRect(rect, boxPaint)
             canvas.drawText("${d.text} ${(d.accuracy * 100).toInt()}%", rect.left, rect.top - 10, textPaint)
         }
     }
