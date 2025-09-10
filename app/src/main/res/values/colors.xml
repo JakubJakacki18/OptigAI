@@ -8,6 +8,23 @@
     <color name="onyx">#1E1E1E</color>
     <color name="photo_tint">#661E88E5</color>
 
+    <color name="red_toggle">#FFFF0000</color>
+    <color name="red_toggle_transparent">#80FF0000</color>
+    <color name="blue_toggle">#0000FF</color>
+    <color name="blue_toggle_transparent">#800000FF</color>
+    <color name="yellow_toggle">#FFFF00</color>
+    <color name="yellow_toggle_transparent">#80FFFF00</color>
+    <color name="black_toggle">#000000</color>
+    <color name="black_toggle_transparent">#80000000</color>
+    <color name="white_toggle">#FFFFFF</color>
+    <color name="white_toggle_transparent">#80FFFFFF</color>
+    <color name="gray_toggle">#888888</color>
+    <color name="gray_toggle_transparent">#80888888</color>
+    <color name="green_toggle">#00FF00</color>
+    <color name="green_toggle_transparent">#8000FF00</color>
+    <color name="purple_toggle">#FF00FF</color>
+    <color name="purple_toggle_transparent">#80FF00FF</color>
+
 
 
 </resources>

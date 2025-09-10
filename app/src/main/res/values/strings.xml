@@ -31,4 +31,21 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
+
+    <string name="toggle_button_color_red_on">Red on</string>
+    <string name="toggle_button_color_red_off">Red off</string>
+    <string name="toggle_button_color_white_on">White on</string>
+    <string name="toggle_button_color_white_off">White off</string>
+    <string name="toggle_button_color_black_on">Black on</string>
+    <string name="toggle_button_color_black_off">Black off</string>
+    <string name="toggle_button_color_purple_on">Purple on</string>
+    <string name="toggle_button_color_purple_off">Purple off</string>
+    <string name="toggle_button_color_yellow_on">Yellow on</string>
+    <string name="toggle_button_color_yellow_off">Yellow off</string>
+    <string name="toggle_button_color_blue_on">Blue on</string>
+    <string name="toggle_button_color_blue_off">Blue off</string>
+    <string name="toggle_button_color_gray_on">Gray on</string>
+    <string name="toggle_button_color_gray_off">Gray off</string>
+    <string name="toggle_button_color_green_on">Green on</string>
+    <string name="toggle_button_color_green_off">Green off</string>
 </resources>

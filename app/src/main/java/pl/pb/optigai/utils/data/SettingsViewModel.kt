@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import pl.pb.optigai.Settings
 import pl.pb.optigai.utils.SettingsService
 
 class SettingsViewModel(
@@ -16,6 +17,7 @@ class SettingsViewModel(
     val language = settingsService.language
     val defaultSaveLocation = settingsService.defaultSaveLocation
     val isPhotoSaving = settingsService.isPhotoSaving
+    val colors = settingsService.colors
 
     fun setGridColumns(columns: Int) {
         viewModelScope.launch {
@@ -32,6 +34,12 @@ class SettingsViewModel(
     fun setIsPhotoSaving(isPhotoSaving: Boolean) {
         viewModelScope.launch {
             settingsService.updateIsPhotoSaving(isPhotoSaving)
+        }
+    }
+
+    fun toggleColorOfBorder(color: Settings.ColorOfBorder) {
+        viewModelScope.launch {
+            settingsService.toggleColorOfBorder(color)
         }
     }
 }

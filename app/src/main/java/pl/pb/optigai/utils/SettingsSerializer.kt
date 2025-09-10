@@ -15,7 +15,15 @@ object SettingsSerializer : Serializer<Settings> {
             .setGridColumns(2)
             .setLanguageValue(Settings.Language.SYSTEM_DEFAULT_VALUE)
             .setIsPhotoSaving(true)
-            .build()
+            .addAllColor(
+                listOf(
+                    Settings.ColorOfBorder.BLUE,
+                    Settings.ColorOfBorder.YELLOW,
+                    Settings.ColorOfBorder.PURPLE,
+                    Settings.ColorOfBorder.GRAY,
+                    Settings.ColorOfBorder.WHITE,
+                ),
+            ).build()
 
     override suspend fun readFrom(input: InputStream): Settings =
         try {
