@@ -1,5 +1,4 @@
 package pl.pb.optigai.ui
-import pl.pb.optigai.ui.AnalysisSelectorFragment
 
 import android.content.Intent
 import android.graphics.Bitmap
