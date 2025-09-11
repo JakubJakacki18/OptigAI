@@ -1,8 +1,10 @@
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -52,13 +54,31 @@ class AnalysisSelectorFragment : Fragment() {
                 .commit()
         }
         buttonBrailleAnalysis.setOnClickListener {
-            viewModel.setResult(AnalyseService.analyseBraille())
-            parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                .addToBackStack(null)
-                .commit()
+            val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
+            progressBar.visibility = View.VISIBLE
+
+            val bitmap = BitmapCache.bitmap
+            Log.d("BrailleAnalysis", "Bitmap is null? ${bitmap == null}")
+            if (bitmap != null) {
+                AnalyseService.analyseBraille(bitmap) { sentence ->
+                    requireActivity().runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        viewModel.setResult(sentence)
+                        parentFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                            .addToBackStack(null)
+                            .commit()
+                    }
+                }
+            } else {
+                // Hide progress bar if bitmap missing
+                progressBar.visibility = View.GONE
+            }
         }
+
+
+
         buttonItemAnalysis.setOnClickListener {
             viewModel.setResult(AnalyseService.analyseItem())
             parentFragmentManager

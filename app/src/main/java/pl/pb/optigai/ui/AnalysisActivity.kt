@@ -2,6 +2,7 @@ package pl.pb.optigai.ui
 
 import AnalysisSelectorFragment
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -10,7 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.data.AnalysisViewModel
+import pl.pb.optigai.utils.data.BitmapCache
 
+@Suppress("DEPRECATION")
 class AnalysisActivity : AppCompatActivity() {
     private val analysisViewModel: AnalysisViewModel by viewModels()
 
@@ -24,8 +27,13 @@ class AnalysisActivity : AppCompatActivity() {
         if (isBitmapPassed) {
             analysisViewModel.isBitmapPassed.value = true
         } else {
-            val uri = uriString?.toUri()
-            uri?.let { analysisViewModel.initPhotoUri(it) }
+            val uri = intent.getStringExtra("IMAGE_URI")?.toUri()
+            uri?.let {
+                val bitmapFromUri = MediaStore.Images.Media.getBitmap(contentResolver, it)
+                BitmapCache.bitmap = bitmapFromUri
+                analysisViewModel.initPhotoUri(it)
+            }
+
         }
 
         if (savedInstanceState == null) {
