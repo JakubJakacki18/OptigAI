@@ -82,8 +82,6 @@ class AnalysisSelectorFragment : Fragment() {
                 progressBar.visibility = View.GONE
             }
         }
-
-
         buttonItemAnalysis.setOnClickListener {
             if (BitmapCache.bitmap == null) {
                 throw IllegalStateException("BitmapCache.bitmap is null")
