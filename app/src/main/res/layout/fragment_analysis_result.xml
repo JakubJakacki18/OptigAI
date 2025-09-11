@@ -13,13 +13,24 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/analyzedPhoto"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:contentDescription="@string/photo_analysis_description"
-            android:scaleType="centerInside"
-            android:layout_weight="2"/>
+            android:layout_weight="2">
+
+            <ImageView
+                android:id="@+id/analyzedPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/photo_analysis_description"
+                android:scaleType="centerInside"
+                />
+
+            <pl.pb.optigai.ui.DetectionOverlay
+                android:id="@+id/overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
         <View
             android:layout_width="match_parent"

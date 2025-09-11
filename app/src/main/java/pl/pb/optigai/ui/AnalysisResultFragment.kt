@@ -28,16 +28,14 @@ class AnalysisResultFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_analysis_result, container, false)
         val imageView: ImageView = view.findViewById(R.id.analyzedPhoto)
-        viewModel.photoUri.observe(viewLifecycleOwner) { uri ->
-            AnalyseUtils.updateImageView(imageView, uri, null)
-        }
-        viewModel.isBitmapPassed.observe(viewLifecycleOwner) { isBitmapPassed ->
-            if (!isBitmapPassed) return@observe
-            AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
-        }
+        val overlay: DetectionOverlay = view.findViewById(R.id.overlay)
+
+        AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
+
         val resultText: TextView = view.findViewById(R.id.resultText)
-        viewModel.analysisResult.observe(viewLifecycleOwner) { result ->
-            resultText.text = result
+        viewModel.analysisResults.observe(viewLifecycleOwner) { result ->
+            overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
+            resultText.text = result.joinToString(separator = "\n") { it.text }
         }
 
         val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)

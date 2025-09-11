@@ -18,12 +18,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoAlbumBinding
 import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.Image
 import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
-import pl.pb.optigai.R
 
 class PhotoAlbumActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels()
@@ -125,13 +125,6 @@ class PhotoAlbumActivity : AppCompatActivity() {
             }
         }
 
-    //    fun imageReader(): List<Image> {
-//        val listAllFiles = picturesPath.listFiles()
-//        return listAllFiles
-//            ?.filter { it.name.endsWith(".jpg", ignoreCase = true) }
-//            ?.map { file -> Image(Uri.fromFile(file)) }
-//            ?: emptyList()
-    //    }
     fun imageReader(context: Context): List<Image> {
         val images = mutableListOf<Image>()
         val projection =
@@ -139,6 +132,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
             )
+//      NIE COMMITUJ TEGO Z NULLAMI!!!!!!!!!!!!!!
         val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND ${MediaStore.Images.Media.SIZE} > 0"
         val selectionArgs = arrayOf(RELATIVE_PICTURES_PATH)
 
