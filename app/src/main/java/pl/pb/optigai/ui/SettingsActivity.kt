@@ -3,6 +3,7 @@ package pl.pb.optigai.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -71,55 +72,39 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindColorToggleButtons() {
-        val toggleRed = viewBinding.toggleRed
-        val toggleBlue = viewBinding.toggleBlue
-        val toggleYellow = viewBinding.toggleYellow
-        val toggleGray = viewBinding.toggleGray
-        val toggleGreen = viewBinding.toggleGreen
-        val togglePurple = viewBinding.togglePurple
-        val toggleBlack = viewBinding.toggleBlack
-        val toggleWhite = viewBinding.toggleWhite
-
+    private fun bindOneColorToggleButton(
+        button: ToggleButton,
+        color: Settings.ColorOfBorder,
+    ) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.colors.collect { colors ->
-                    toggleRed.isChecked = Settings.ColorOfBorder.RED in colors
-                    toggleBlue.isChecked = Settings.ColorOfBorder.BLUE in colors
-                    toggleGreen.isChecked = Settings.ColorOfBorder.GREEN in colors
-                    toggleYellow.isChecked = Settings.ColorOfBorder.YELLOW in colors
-                    toggleGray.isChecked = Settings.ColorOfBorder.GRAY in colors
-                    togglePurple.isChecked = Settings.ColorOfBorder.PURPLE in colors
-                    toggleBlack.isChecked = Settings.ColorOfBorder.BLACK in colors
-                    toggleWhite.isChecked = Settings.ColorOfBorder.WHITE in colors
+                    button.setOnCheckedChangeListener(null)
+                    button.isChecked = color in colors
+                    button.setOnCheckedChangeListener { _, _ ->
+                        lifecycleScope.launch {
+                            viewModel.toggleColorOfBorder(color)
+                        }
+                    }
                 }
             }
         }
-        toggleRed.setOnCheckedChangeListener { _, _ ->
-            lifecycleScope.launch {
-                viewModel.toggleColorOfBorder(Settings.ColorOfBorder.RED)
-            }
-        }
-        toggleBlue.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.BLUE)
-        }
-        toggleGreen.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.GREEN)
-        }
-        toggleYellow.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.YELLOW)
-        }
-        toggleGray.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.GRAY)
-        }
-        togglePurple.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.PURPLE)
-        }
-        toggleBlack.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.BLACK)
-        }
-        toggleWhite.setOnCheckedChangeListener { _, _ ->
-            viewModel.toggleColorOfBorder(Settings.ColorOfBorder.WHITE)
+    }
+
+    private fun bindColorToggleButtons() {
+        val toggleButtons =
+            mapOf(
+                viewBinding.toggleRed to Settings.ColorOfBorder.RED,
+                viewBinding.toggleBlue to Settings.ColorOfBorder.BLUE,
+                viewBinding.toggleYellow to Settings.ColorOfBorder.YELLOW,
+                viewBinding.toggleGray to Settings.ColorOfBorder.GRAY,
+                viewBinding.toggleGreen to Settings.ColorOfBorder.GREEN,
+                viewBinding.togglePurple to Settings.ColorOfBorder.PURPLE,
+                viewBinding.toggleBlack to Settings.ColorOfBorder.BLACK,
+                viewBinding.toggleWhite to Settings.ColorOfBorder.WHITE,
+            )
+        toggleButtons.forEach { (button, color) ->
+            bindOneColorToggleButton(button, color)
         }
     }
 }
