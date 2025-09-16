@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -18,6 +19,8 @@ import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
 import java.lang.IllegalArgumentException
 
+
+@Suppress("DEPRECATION")
 class AnalysisActivity : AppCompatActivity() {
     private val analysisViewModel: AnalysisViewModel by viewModels()
 
@@ -36,6 +39,7 @@ class AnalysisActivity : AppCompatActivity() {
         } else {
             val uriString = intent.getStringExtra("IMAGE_URI")
             uri = uriString?.toUri()
+
         }
 
         uri?.let {

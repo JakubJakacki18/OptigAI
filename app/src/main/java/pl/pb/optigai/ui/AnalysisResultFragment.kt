@@ -37,6 +37,7 @@ class AnalysisResultFragment : Fragment() {
             overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
             resultText.text = result.joinToString(separator = "\n") { it.text }
         }
+
         val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)
         val bottomSheetBehavior = BottomSheetBehavior.from(scrollView)
 

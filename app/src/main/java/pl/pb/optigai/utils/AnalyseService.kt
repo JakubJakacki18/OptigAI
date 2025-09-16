@@ -1,33 +1,88 @@
 package pl.pb.optigai.utils
-
+import java.io.File
+import java.io.FileOutputStream
+import org.json.JSONObject
+import java.io.IOException
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import android.util.Log
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.ObjectDetector
-import pl.pb.optigai.utils.data.BitmapCache
 import pl.pb.optigai.utils.data.DetectionResult
-
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.asRequestBody
 class AnalyseService(
     private val context: Context,
 ) {
+    private val API_KEY = "nT4D3OfHfZE0E8tI4sL0"
+    private val MODEL_URL = "https://detect.roboflow.com/braille-detection-f0rb5/10?api_key=$API_KEY"
     fun analyseText(): String = "Text recognition not yet implemented"
 
-    suspend fun analyseBraille(): String =
-        withContext(Dispatchers.Default) {
-            val bitmap = BitmapCache.bitmap ?: return@withContext "Brak obrazu"
-            val recognizer = BrailleRecognizer(context)
+    fun analyseBraille(bitmap: Bitmap, callback: (String) -> Unit) {
+        try {
+            val tempFile = File.createTempFile("braille", ".jpg")
+            FileOutputStream(tempFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
 
-            val result = recognizer.recognizeText(bitmap)
-            recognizer.close()
-            result
+            val client = OkHttpClient()
+            val requestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart(
+                    "file", tempFile.name,
+                    tempFile.asRequestBody("image/jpeg".toMediaType())
+                )
+                .build()
+
+            val request = Request.Builder()
+                .url(MODEL_URL)
+                .post(requestBody)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e("BrailleAnalysis", "API call failed: ${e.message}")
+                    callback("Error: ${e.message}")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (!it.isSuccessful) {
+                            callback("Error: ${it.code}")
+                        } else {
+                            val jsonStr = it.body?.string() ?: "{}"
+                            Log.d("BrailleAnalysis", "Roboflow response: $jsonStr")
+
+                            val json = JSONObject(jsonStr)
+                            val predictions = json.optJSONArray("predictions")
+                            val chars = mutableListOf<BrailleActivity.BrailleChar>()
+
+                            if (predictions != null) {
+                                for (i in 0 until predictions.length()) {
+                                    val pred = predictions.getJSONObject(i)
+                                    chars.add(
+                                        BrailleActivity.BrailleChar(
+                                            x = pred.getDouble("x").toFloat(),
+                                            y = pred.getDouble("y").toFloat(),
+                                            clazz = pred.getString("class"),
+                                            height = pred.getDouble("height").toFloat()
+                                        )
+                                    )
+                                }
+                            }
+
+                            val sentence = BrailleActivity.decode(chars)
+                            callback(sentence)
+                        }
+                    }
+                }
+            })
+
+        } catch (e: Exception) {
+            callback("Error creating temp file or bitmap: ${e.message}")
         }
-
+    }
     fun analyseItem(bitmap: Bitmap): List<DetectionResult> {
         // Step 1: Create TFLite's TensorImage object
         val image = TensorImage.fromBitmap(bitmap)

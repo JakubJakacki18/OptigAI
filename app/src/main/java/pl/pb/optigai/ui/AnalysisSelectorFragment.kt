@@ -1,10 +1,12 @@
 package pl.pb.optigai.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -28,7 +30,11 @@ class AnalysisSelectorFragment : Fragment() {
     ): View? {
         viewBinding = FragmentAnalysisSelectorBinding.inflate(inflater, container, false)
         val imageView: ImageView = viewBinding.analyzedPhoto
-        AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
+        imageView.post {
+            Log.d("AnalysisSelector", "ImageView size: ${imageView.width} x ${imageView.height}")
+            AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
+        }
+
         return viewBinding.root
     }
 
@@ -55,24 +61,33 @@ class AnalysisSelectorFragment : Fragment() {
         }
 
         buttonBrailleAnalysis.setOnClickListener {
-            lifecycleScope.launch {
-//                val result = analyseService.analyseBraille()
-//                viewModel.setResult(result)
+            val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
+            progressBar.visibility = View.VISIBLE
 
-                parentFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                    .addToBackStack(null)
-                    .commit()
+            val bitmap = BitmapCache.bitmap
+            Log.d("BrailleAnalysis", "Bitmap is null? ${bitmap == null}")
+            if (bitmap != null) {
+                analyseService.analyseBraille(bitmap) { sentence ->
+                    requireActivity().runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        viewModel.setBrailleResult(sentence)
+                        parentFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                            .addToBackStack(null)
+                            .commit()
+                    }
+                }
+            } else {
+                progressBar.visibility = View.GONE
             }
         }
-
         buttonItemAnalysis.setOnClickListener {
             if (BitmapCache.bitmap == null) {
                 throw IllegalStateException("BitmapCache.bitmap is null")
             }
             val result = analyseService.analyseItem(BitmapCache.bitmap!!)
-            viewModel.setResult(result)
+            viewModel.setItemResult(result)
             parentFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisResultFragment())
