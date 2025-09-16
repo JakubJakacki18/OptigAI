@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoPreviewBinding
+import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 
 class PhotoActivity : AppCompatActivity() {
@@ -20,13 +21,7 @@ class PhotoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoPreviewBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        images =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableArrayListExtra("images", Image::class.java) ?: emptyList()
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableArrayListExtra("images") ?: emptyList()
-            }
+        images = PhotoUtils.imageReader(this@PhotoActivity)
         currentIndex = intent.getIntExtra("position", 0)
 
         updateImage()

@@ -19,6 +19,7 @@ protobuf = "4.32.0"
 datastore = "1.1.7"
 datastoreCore = "1.1.7"
 constraintlayoutCore = "1.1.1"
+glide = "5.0.5"
 
 [libraries]
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
@@ -44,6 +45,7 @@ opencv-android = { module = "com.quickbirdstudios:opencv-android", version.ref =
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 androidx-constraintlayout-core = { group = "androidx.constraintlayout", name = "constraintlayout-core", version.ref = "constraintlayoutCore" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

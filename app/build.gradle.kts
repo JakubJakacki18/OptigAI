@@ -54,9 +54,10 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.androidx.camera.extensions)
+    implementation(libs.glide)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
-    implementation ("com.quickbirdstudios:opencv:4.5.2")
+    implementation("com.quickbirdstudios:opencv:4.5.2")
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -76,7 +77,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
-
 }
 
 protobuf {

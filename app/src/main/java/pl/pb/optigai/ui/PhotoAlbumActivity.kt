@@ -1,12 +1,7 @@
 package pl.pb.optigai.ui
-
-import android.content.ContentUris
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -21,6 +16,7 @@ import kotlinx.coroutines.withContext
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoAlbumBinding
 import pl.pb.optigai.utils.PermissionHandler
+import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
@@ -64,7 +60,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
         lifecycleScope.launch {
             imageList =
                 withContext(Dispatchers.IO) {
-                    imageReader(this@PhotoAlbumActivity)
+                    PhotoUtils.imageReader(this@PhotoAlbumActivity)
                 }
             updateRecyclerView()
         }
@@ -89,7 +85,6 @@ class PhotoAlbumActivity : AppCompatActivity() {
         val adapter =
             ImageAdapter(imageList) { position ->
                 val intent = Intent(this, PhotoActivity::class.java)
-                intent.putExtra("images", ArrayList(imageList))
                 intent.putExtra("position", position)
                 startActivity(intent)
             }
@@ -124,40 +119,4 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 loadImages()
             }
         }
-
-    fun imageReader(context: Context): List<Image> {
-        val images = mutableListOf<Image>()
-        val projection =
-            arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-            )
-//      NIE COMMITUJ TEGO Z NULLAMI!!!!!!!!!!!!!!
-        val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND ${MediaStore.Images.Media.SIZE} > 0"
-        val selectionArgs = arrayOf(RELATIVE_PICTURES_PATH)
-
-        val query =
-            context.contentResolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                "${MediaStore.Images.Media.DATE_ADDED} DESC",
-            )
-
-        query?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            while (cursor.moveToNext()) {
-                val id = cursor.getLong(idColumn)
-                val contentUri =
-                    ContentUris.withAppendedId(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        id,
-                    )
-                images.add(Image(contentUri))
-            }
-        }
-        Log.d("PhotoAlbumActivity", "Found ${images.size} images")
-        return images
-    }
 }

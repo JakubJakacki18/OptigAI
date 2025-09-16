@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.data.Image
 
@@ -34,8 +35,12 @@ class ImageAdapter(
         position: Int,
     ) {
         val image = images[position]
-        holder.imageView.setImageURI(image.uri)
-
+        Glide
+            .with(holder.itemView.context)
+            .load(image.uri)
+            .sizeMultiplier(0.5f)
+            .centerCrop()
+            .into(holder.imageView)
         holder.itemView.setOnClickListener {
             onImageClick(position)
         }
