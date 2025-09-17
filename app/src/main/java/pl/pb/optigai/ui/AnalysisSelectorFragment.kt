@@ -6,19 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.FragmentAnalysisSelectorBinding
 import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
-
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private lateinit var viewBinding: FragmentAnalysisSelectorBinding
@@ -61,27 +56,29 @@ class AnalysisSelectorFragment : Fragment() {
         }
 
         buttonBrailleAnalysis.setOnClickListener {
-            val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
-            progressBar.visibility = View.VISIBLE
-
             val bitmap = BitmapCache.bitmap
-            Log.d("BrailleAnalysis", "Bitmap is null? ${bitmap == null}")
             if (bitmap != null) {
-                analyseService.analyseBraille(bitmap) { sentence ->
-                    requireActivity().runOnUiThread {
-                        progressBar.visibility = View.GONE
-                        viewModel.setBrailleResult(sentence)
-                        parentFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                            .addToBackStack(null)
-                            .commit()
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, LoadingFragment())
+                    .addToBackStack(null)
+                    .commit()
+
+                view.post {
+                    analyseService.analyseBraille(bitmap) { sentence ->
+                        requireActivity().runOnUiThread {
+                            parentFragmentManager.popBackStack()
+                            viewModel.setBrailleResult(sentence)
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                                .addToBackStack(null)
+                                .commit()
+                        }
                     }
                 }
-            } else {
-                progressBar.visibility = View.GONE
             }
         }
+
+
         buttonItemAnalysis.setOnClickListener {
             if (BitmapCache.bitmap == null) {
                 throw IllegalStateException("BitmapCache.bitmap is null")

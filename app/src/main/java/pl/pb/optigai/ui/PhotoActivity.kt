@@ -1,7 +1,6 @@
 package pl.pb.optigai.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -14,7 +13,6 @@ import pl.pb.optigai.utils.data.Image
 class PhotoActivity : AppCompatActivity() {
     private lateinit var images: List<Image>
     private var currentIndex: Int = 0
-
     private lateinit var viewBinding: PhotoPreviewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +58,6 @@ class PhotoActivity : AppCompatActivity() {
         viewBinding.previewImageView.setImageURI(currentImage.uri)
         updateNavigationButtons()
     }
-
     private fun updateNavigationButtons() {
         viewBinding.leftArrow.isEnabled = currentIndex > 0
         viewBinding.rightArrow.isEnabled = currentIndex < images.size - 1

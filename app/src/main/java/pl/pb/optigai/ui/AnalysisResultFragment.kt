@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -51,7 +50,9 @@ class AnalysisResultFragment : Fragment() {
                 }
             }
         }
-
+        viewModel.brailleResult.observe(viewLifecycleOwner) { brailleText ->
+            resultText.text = brailleText
+        }
         val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)
         val bottomSheetBehavior = BottomSheetBehavior.from(scrollView)
 
