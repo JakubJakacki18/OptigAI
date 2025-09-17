@@ -7,18 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
+import pl.pb.optigai.utils.data.ColorMap
+import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
 
 class AnalysisResultFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -34,8 +41,15 @@ class AnalysisResultFragment : Fragment() {
 
         val resultText: TextView = view.findViewById(R.id.resultText)
         viewModel.analysisResults.observe(viewLifecycleOwner) { result ->
-            overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
-            resultText.text = result.joinToString(separator = "\n") { it.text }
+            lifecycleScope.launch {
+                settingsViewModel.colors.collect { colorEnums ->
+                    val availableColorsResId = colorEnums.map { ColorMap.getColorRes(it) }
+                    val availableColors = availableColorsResId.map { requireContext().getColor(it) }
+                    overlay.setAvailableColors(availableColors)
+                    overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
+                    resultText.text = result.joinToString(separator = "\n") { it.text }
+                }
+            }
         }
 
         val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)

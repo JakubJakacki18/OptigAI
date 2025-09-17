@@ -21,9 +21,10 @@ class DetectionOverlay(
     private var imageHeight = 0
     private var imageView: ImageView? = null
 
+    private var colorsAvailable: List<Int?> = emptyList()
+
     private val boxPaint =
         Paint().apply {
-            color = Color.RED
             style = Paint.Style.STROKE
             strokeWidth = 6f
         }
@@ -53,12 +54,13 @@ class DetectionOverlay(
         val matrix = imageView!!.imageMatrix
         val mapped = RectF(rect)
         matrix.mapRect(mapped)
-        val viewRect = RectF(
-            imageView!!.paddingLeft.toFloat(),
-            imageView!!.paddingTop.toFloat(),
-            (imageView!!.width - imageView!!.paddingRight).toFloat(),
-            (imageView!!.height - imageView!!.paddingBottom).toFloat()
-        )
+        val viewRect =
+            RectF(
+                imageView!!.paddingLeft.toFloat(),
+                imageView!!.paddingTop.toFloat(),
+                (imageView!!.width - imageView!!.paddingRight).toFloat(),
+                (imageView!!.height - imageView!!.paddingBottom).toFloat(),
+            )
         mapped.offset(viewRect.left, viewRect.top)
         return mapped
     }
@@ -76,8 +78,15 @@ class DetectionOverlay(
                     d.boundingBox,
                 )
             AppLogger.i(rect.toString())
+            AppLogger.i("Colors available: $colorsAvailable")
+            boxPaint.color = colorsAvailable.randomOrNull() ?: Color.BLUE
+            AppLogger.i("Using color: ${boxPaint.color}")
             canvas.drawRect(rect, boxPaint)
             canvas.drawText("${d.text} ${(d.accuracy * 100).toInt()}%", rect.left, rect.top - 10, textPaint)
         }
+    }
+
+    fun setAvailableColors(colorsAvailable: List<Int?>) {
+        this.colorsAvailable = colorsAvailable
     }
 }
