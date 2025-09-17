@@ -18,7 +18,7 @@ import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
-
+import androidx.fragment.app.commit
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private lateinit var viewBinding: FragmentAnalysisSelectorBinding
@@ -61,27 +61,29 @@ class AnalysisSelectorFragment : Fragment() {
         }
 
         buttonBrailleAnalysis.setOnClickListener {
-            val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
-            progressBar.visibility = View.VISIBLE
-
             val bitmap = BitmapCache.bitmap
-            Log.d("BrailleAnalysis", "Bitmap is null? ${bitmap == null}")
             if (bitmap != null) {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, LoadingFragment())
+                    .addToBackStack(null) // so back button works
+                    .commit()
+
                 analyseService.analyseBraille(bitmap) { sentence ->
                     requireActivity().runOnUiThread {
-                        progressBar.visibility = View.GONE
+                        // Pop the LoadingFragment
+                        parentFragmentManager.popBackStack()
+
+                        // Show results
                         viewModel.setBrailleResult(sentence)
-                        parentFragmentManager
-                            .beginTransaction()
+                        parentFragmentManager.beginTransaction()
                             .replace(R.id.fragmentContainer, AnalysisResultFragment())
                             .addToBackStack(null)
                             .commit()
                     }
                 }
-            } else {
-                progressBar.visibility = View.GONE
             }
         }
+
         buttonItemAnalysis.setOnClickListener {
             if (BitmapCache.bitmap == null) {
                 throw IllegalStateException("BitmapCache.bitmap is null")
