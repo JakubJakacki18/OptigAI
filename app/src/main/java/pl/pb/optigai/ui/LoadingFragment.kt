@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
+import androidx.core.content.ContextCompat
+import pl.pb.optigai.R
 
 class LoadingFragment : Fragment() {
     override fun onCreateView(
@@ -24,10 +26,12 @@ class LoadingFragment : Fragment() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White),
+                    .background(Color(ContextCompat.getColor(requireContext(), R.color.light_blue))),
                 contentAlignment = Alignment.Center
             ) {
-                LoadingAnimation()
+                LoadingAnimation(
+                    circleColor = Color(ContextCompat.getColor(requireContext(), R.color.creme))
+                )
             }
         }
         return composeView

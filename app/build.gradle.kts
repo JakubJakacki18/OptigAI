@@ -18,13 +18,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    configurations.all {
-        resolutionStrategy {
-            force("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
-            force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
-            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
-        }
-    }
     buildTypes {
         release {
             isMinifyEnabled = false

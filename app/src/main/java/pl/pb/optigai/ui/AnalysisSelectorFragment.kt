@@ -6,19 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.FragmentAnalysisSelectorBinding
 import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
-import androidx.fragment.app.commit
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private lateinit var viewBinding: FragmentAnalysisSelectorBinding
@@ -65,24 +60,24 @@ class AnalysisSelectorFragment : Fragment() {
             if (bitmap != null) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainer, LoadingFragment())
-                    .addToBackStack(null) // so back button works
+                    .addToBackStack(null)
                     .commit()
 
-                analyseService.analyseBraille(bitmap) { sentence ->
-                    requireActivity().runOnUiThread {
-                        // Pop the LoadingFragment
-                        parentFragmentManager.popBackStack()
-
-                        // Show results
-                        viewModel.setBrailleResult(sentence)
-                        parentFragmentManager.beginTransaction()
-                            .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                            .addToBackStack(null)
-                            .commit()
+                view.post {
+                    analyseService.analyseBraille(bitmap) { sentence ->
+                        requireActivity().runOnUiThread {
+                            parentFragmentManager.popBackStack()
+                            viewModel.setBrailleResult(sentence)
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.fragmentContainer, AnalysisResultFragment())
+                                .addToBackStack(null)
+                                .commit()
+                        }
                     }
                 }
             }
         }
+
 
         buttonItemAnalysis.setOnClickListener {
             if (BitmapCache.bitmap == null) {
