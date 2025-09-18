@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.mlkit.vision)
     implementation(libs.androidx.camera.extensions)
+    implementation(libs.mlkit.text.recognition)
     implementation(libs.glide)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")

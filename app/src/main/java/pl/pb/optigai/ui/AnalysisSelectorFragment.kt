@@ -8,12 +8,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.FragmentAnalysisSelectorBinding
 import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
+import pl.pb.optigai.utils.data.DetectionResult
 
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
@@ -47,35 +50,29 @@ class AnalysisSelectorFragment : Fragment() {
         val analyseService = AnalyseService(requireContext())
 
         buttonTextAnalysis.setOnClickListener {
-//            val result = analyseService.analyseText()
-//            viewModel.setResult(result)
+            throwExceptionIfBitmapIsNull()
+            showLoadingFragment()
             viewModel.setDetectionResult(emptyList())
-            parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                .addToBackStack(null)
-                .commit()
+            lifecycleScope.launch {
+                val resultOfAnalysis = analyseService.analyseText(BitmapCache.bitmap!!)
+                viewModel.setDetectionResult(resultOfAnalysis)
+                viewModel.setSummaryTextResult(getResultSummaryText(resultOfAnalysis))
+                parentFragmentManager.popBackStack()
+                showResultFragment()
+            }
         }
 
         buttonBrailleAnalysis.setOnClickListener {
             val bitmap = BitmapCache.bitmap
             if (bitmap != null) {
-                parentFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, LoadingFragment())
-                    .addToBackStack(null)
-                    .commit()
+                showLoadingFragment()
                 viewModel.setDetectionResult(emptyList())
                 view.post {
                     analyseService.analyseBraille(bitmap) { sentence ->
                         requireActivity().runOnUiThread {
                             parentFragmentManager.popBackStack()
                             viewModel.setSummaryTextResult(sentence)
-                            parentFragmentManager
-                                .beginTransaction()
-                                .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                                .addToBackStack(null)
-                                .commit()
+                            showResultFragment()
                         }
                     }
                 }
@@ -88,20 +85,8 @@ class AnalysisSelectorFragment : Fragment() {
             val resultOfAnalysis = analyseService.analyseItem(BitmapCache.bitmap!!)
 
             viewModel.setDetectionResult(resultOfAnalysis)
-            val resultSummary =
-                if (resultOfAnalysis.isNotEmpty()) {
-                    resultOfAnalysis.joinToString(separator = "\n") {
-                        it.text
-                    }
-                } else {
-                    R.string.empty_result_fragment_analysis_result.toString()
-                }
-            viewModel.setSummaryTextResult(resultSummary)
-            parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, AnalysisResultFragment())
-                .addToBackStack(null)
-                .commit()
+            viewModel.setSummaryTextResult(getResultSummaryText(resultOfAnalysis))
+            showResultFragment()
         }
     }
 
@@ -118,4 +103,21 @@ class AnalysisSelectorFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
+
+    private fun showResultFragment() {
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer, AnalysisResultFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun getResultSummaryText(detectionResult: List<DetectionResult>): String =
+        if (detectionResult.isNotEmpty()) {
+            detectionResult.joinToString(separator = "\n") {
+                it.text
+            }
+        } else {
+            R.string.empty_result_fragment_analysis_result.toString()
+        }
 }

@@ -82,7 +82,18 @@ class DetectionOverlay(
             boxPaint.color = colorsAvailable.randomOrNull() ?: Color.BLUE
             AppLogger.i("Using color: ${boxPaint.color}")
             canvas.drawRect(rect, boxPaint)
-            canvas.drawText("${d.text} ${(d.accuracy * 100).toInt()}%", rect.left, rect.top - 10, textPaint)
+            val text =
+                if (d.accuracy != null) {
+                    "${d.text} ${(d.accuracy * 100).toInt()}%"
+                } else {
+                    ""
+                }
+            canvas.drawText(
+                text,
+                rect.left,
+                rect.top - 10,
+                textPaint,
+            )
         }
     }
 
