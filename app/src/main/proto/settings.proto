@@ -15,9 +15,10 @@ message Settings {
         RED = 2;
         BLUE = 3;
         YELLOW = 4;
-        GRAY = 5;
+        CYAN = 5;
         GREEN = 6;
         PURPLE = 7;
+        ORANGE = 8;
     }
     bool is_grid_view = 1;
     int32 grid_columns = 2;

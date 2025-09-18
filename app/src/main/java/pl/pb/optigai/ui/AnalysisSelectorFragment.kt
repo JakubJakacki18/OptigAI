@@ -14,6 +14,7 @@ import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
+
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private lateinit var viewBinding: FragmentAnalysisSelectorBinding
@@ -48,6 +49,7 @@ class AnalysisSelectorFragment : Fragment() {
         buttonTextAnalysis.setOnClickListener {
 //            val result = analyseService.analyseText()
 //            viewModel.setResult(result)
+            viewModel.setDetectionResult(emptyList())
             parentFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisResultFragment())
@@ -58,17 +60,19 @@ class AnalysisSelectorFragment : Fragment() {
         buttonBrailleAnalysis.setOnClickListener {
             val bitmap = BitmapCache.bitmap
             if (bitmap != null) {
-                parentFragmentManager.beginTransaction()
+                parentFragmentManager
+                    .beginTransaction()
                     .replace(R.id.fragmentContainer, LoadingFragment())
                     .addToBackStack(null)
                     .commit()
-
+                viewModel.setDetectionResult(emptyList())
                 view.post {
                     analyseService.analyseBraille(bitmap) { sentence ->
                         requireActivity().runOnUiThread {
                             parentFragmentManager.popBackStack()
-                            viewModel.setBrailleResult(sentence)
-                            parentFragmentManager.beginTransaction()
+                            viewModel.setSummaryTextResult(sentence)
+                            parentFragmentManager
+                                .beginTransaction()
                                 .replace(R.id.fragmentContainer, AnalysisResultFragment())
                                 .addToBackStack(null)
                                 .commit()
@@ -78,18 +82,40 @@ class AnalysisSelectorFragment : Fragment() {
             }
         }
 
-
         buttonItemAnalysis.setOnClickListener {
-            if (BitmapCache.bitmap == null) {
-                throw IllegalStateException("BitmapCache.bitmap is null")
-            }
-            val result = analyseService.analyseItem(BitmapCache.bitmap!!)
-            viewModel.setItemResult(result)
+            throwExceptionIfBitmapIsNull()
+            // showLoadingFragment()
+            val resultOfAnalysis = analyseService.analyseItem(BitmapCache.bitmap!!)
+
+            viewModel.setDetectionResult(resultOfAnalysis)
+            val resultSummary =
+                if (resultOfAnalysis.isNotEmpty()) {
+                    resultOfAnalysis.joinToString(separator = "\n") {
+                        it.text
+                    }
+                } else {
+                    R.string.empty_result_fragment_analysis_result.toString()
+                }
+            viewModel.setSummaryTextResult(resultSummary)
             parentFragmentManager
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, AnalysisResultFragment())
                 .addToBackStack(null)
                 .commit()
         }
+    }
+
+    private fun throwExceptionIfBitmapIsNull() {
+        if (BitmapCache.bitmap == null) {
+            throw IllegalStateException("BitmapCache.bitmap is null")
+        }
+    }
+
+    private fun showLoadingFragment() {
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer, LoadingFragment())
+            .addToBackStack(null)
+            .commit()
     }
 }

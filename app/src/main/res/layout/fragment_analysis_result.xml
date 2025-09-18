@@ -46,13 +46,13 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <TextView
-            android:id="@+id/resultText"
+            android:id="@+id/summaryResultText"
             android:layout_margin="15dp"
             android:textSize="28sp"
             android:fontFamily="@font/signikasb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/empty_result_fragment_analysis_result"/>
+            android:text="@string/error_result_fragment_analysis_result"/>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

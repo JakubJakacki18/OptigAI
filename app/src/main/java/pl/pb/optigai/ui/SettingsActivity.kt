@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivitySettingsBinding
-import pl.pb.optigai.utils.AppLogger
 import pl.pb.optigai.utils.data.SettingsViewModel
 
 class SettingsActivity : AppCompatActivity() {
@@ -97,11 +96,12 @@ class SettingsActivity : AppCompatActivity() {
                 viewBinding.toggleRed to Settings.ColorOfBorder.RED,
                 viewBinding.toggleBlue to Settings.ColorOfBorder.BLUE,
                 viewBinding.toggleYellow to Settings.ColorOfBorder.YELLOW,
-                viewBinding.toggleGray to Settings.ColorOfBorder.GRAY,
+                viewBinding.toggleCyan to Settings.ColorOfBorder.CYAN,
                 viewBinding.toggleGreen to Settings.ColorOfBorder.GREEN,
                 viewBinding.togglePurple to Settings.ColorOfBorder.PURPLE,
                 viewBinding.toggleBlack to Settings.ColorOfBorder.BLACK,
                 viewBinding.toggleWhite to Settings.ColorOfBorder.WHITE,
+                viewBinding.toggleOrange to Settings.ColorOfBorder.ORANGE,
             )
         toggleButtons.forEach { (button, color) ->
             bindOneColorToggleButton(button, color)

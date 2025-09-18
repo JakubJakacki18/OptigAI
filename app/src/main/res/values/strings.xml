@@ -7,7 +7,7 @@
     <string name="content_description_previous_image">Previous image button</string>
     <string name="content_description_next_image">Next image button</string>
     <string name="content_description_zoom_button">Toggle zoom on image</string>
-    <string name="empty_result_fragment_analysis_result">Something went wrong</string>
+    <string name="error_result_fragment_analysis_result">Something went wrong</string>
     <string name="analise_text_fragment_analysis_selector">ANALYZE TEXT</string>
     <string name="analise_braille_fragment_analysis_selector">ANALYZE BRAILLE</string>
     <string name="analise_item_fragment_analysis_selector">ANALYZE ITEM</string>
@@ -30,6 +30,7 @@
     <string name="is_photo_saving_option_title">Would you like to save the photos you take?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="empty_result_fragment_analysis_result">Nothing was detected. Try with another photo.</string>
 
 
     <string name="toggle_button_color_red_on">Red on</string>
@@ -48,4 +49,6 @@
     <string name="toggle_button_color_gray_off">Gray off</string>
     <string name="toggle_button_color_green_on">Green on</string>
     <string name="toggle_button_color_green_off">Green off</string>
+    <string name="toggle_button_color_orange_on">Orange on</string>
+    <string name="toggle_button_color_orange_off">Orange off</string>
 </resources>

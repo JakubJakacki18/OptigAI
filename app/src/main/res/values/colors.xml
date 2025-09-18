@@ -18,8 +18,10 @@
     <color name="black_toggle_transparent">#80000000</color>
     <color name="white_toggle">#FFFFFF</color>
     <color name="white_toggle_transparent">#80FFFFFF</color>
-    <color name="gray_toggle">#888888</color>
-    <color name="gray_toggle_transparent">#80888888</color>
+    <color name="cyan_toggle">#00FFFF</color>
+    <color name="cyan_toggle_transparent">#8000FFFF</color>
+    <color name="orange_toggle">#FF7600</color>
+    <color name="orange_toggle_transparent">#80FF7600</color>
     <color name="green_toggle">#00FF00</color>
     <color name="green_toggle_transparent">#8000FF00</color>
     <color name="purple_toggle">#FF00FF</color>

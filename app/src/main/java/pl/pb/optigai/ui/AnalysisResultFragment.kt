@@ -38,20 +38,19 @@ class AnalysisResultFragment : Fragment() {
 
         AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
 
-        val resultText: TextView = view.findViewById(R.id.resultText)
-        viewModel.analysisResults.observe(viewLifecycleOwner) { result ->
+        val summaryResultText: TextView = view.findViewById(R.id.summaryResultText)
+        viewModel.analysisDetectionResults.observe(viewLifecycleOwner) { result ->
             lifecycleScope.launch {
                 settingsViewModel.colors.collect { colorEnums ->
                     val availableColorsResId = colorEnums.map { ColorMap.getColorRes(it) }
                     val availableColors = availableColorsResId.map { requireContext().getColor(it) }
                     overlay.setAvailableColors(availableColors)
                     overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
-                    resultText.text = result.joinToString(separator = "\n") { it.text }
                 }
             }
         }
-        viewModel.brailleResult.observe(viewLifecycleOwner) { brailleText ->
-            resultText.text = brailleText
+        viewModel.analysisSummaryTextResult.observe(viewLifecycleOwner) { summary ->
+            summaryResultText.text = summary
         }
         val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)
         val bottomSheetBehavior = BottomSheetBehavior.from(scrollView)

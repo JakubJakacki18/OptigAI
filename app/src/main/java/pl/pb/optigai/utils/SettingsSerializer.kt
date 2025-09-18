@@ -20,7 +20,7 @@ object SettingsSerializer : Serializer<Settings> {
                     Settings.ColorOfBorder.BLUE,
                     Settings.ColorOfBorder.YELLOW,
                     Settings.ColorOfBorder.PURPLE,
-                    Settings.ColorOfBorder.GRAY,
+                    Settings.ColorOfBorder.CYAN,
                     Settings.ColorOfBorder.WHITE,
                 ),
             ).build()
