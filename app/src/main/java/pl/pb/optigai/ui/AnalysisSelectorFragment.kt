@@ -63,19 +63,14 @@ class AnalysisSelectorFragment : Fragment() {
         }
 
         buttonBrailleAnalysis.setOnClickListener {
-            val bitmap = BitmapCache.bitmap
-            if (bitmap != null) {
-                showLoadingFragment()
-                viewModel.setDetectionResult(emptyList())
-                view.post {
-                    analyseService.analyseBraille(bitmap) { sentence ->
-                        requireActivity().runOnUiThread {
-                            parentFragmentManager.popBackStack()
-                            viewModel.setSummaryTextResult(sentence)
-                            showResultFragment()
-                        }
-                    }
-                }
+            throwExceptionIfBitmapIsNull()
+            showLoadingFragment()
+            viewModel.setDetectionResult(emptyList())
+            lifecycleScope.launch {
+                val resultOfAnalysis = analyseService.analyseBraille(BitmapCache.bitmap!!)
+                viewModel.setSummaryTextResult((resultOfAnalysis))
+                parentFragmentManager.popBackStack()
+                showResultFragment()
             }
         }
 

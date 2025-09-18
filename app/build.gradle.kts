@@ -83,6 +83,9 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }
 
 protobuf {

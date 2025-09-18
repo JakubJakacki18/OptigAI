@@ -1,13 +1,22 @@
-package pl.pb.optigai.utils
+package pl.pb.optigai.ui
+
+import pl.pb.optigai.utils.data.BrailleChar
 
 class BrailleActivity {
-    data class BrailleChar(val x: Float, val y: Float, val clazz: String, val height: Float)
-
     companion object {
-        private val numberMap = mapOf(
-            "A" to "1", "B" to "2", "C" to "3", "D" to "4", "E" to "5",
-            "F" to "6", "G" to "7", "H" to "8", "I" to "9", "J" to "0"
-        )
+        private val numberMap =
+            mapOf(
+                "A" to "1",
+                "B" to "2",
+                "C" to "3",
+                "D" to "4",
+                "E" to "5",
+                "F" to "6",
+                "G" to "7",
+                "H" to "8",
+                "I" to "9",
+                "J" to "0",
+            )
 
         fun decode(predictions: List<BrailleChar>): String {
             if (predictions.isEmpty()) return ""
@@ -18,10 +27,11 @@ class BrailleActivity {
             val sortedChars = predictions.sortedWith(compareBy({ it.y }, { it.x }))
 
             for (char in sortedChars) {
-                val line = lines.find { existingLine ->
-                    val avgY = existingLine.map { it.y }.average().toFloat()
-                    kotlin.math.abs(avgY - char.y) < lineTolerance
-                }
+                val line =
+                    lines.find { existingLine ->
+                        val avgY = existingLine.map { it.y }.average().toFloat()
+                        kotlin.math.abs(avgY - char.y) < lineTolerance
+                    }
                 if (line != null) {
                     line.add(char)
                 } else {

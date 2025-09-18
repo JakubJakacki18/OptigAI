@@ -2,28 +2,29 @@ package pl.pb.optigai.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
-import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
-import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.json.JSONObject
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.ObjectDetector
+import pl.pb.optigai.ui.BrailleActivity
+import pl.pb.optigai.utils.api.IBrailleApi
 import pl.pb.optigai.utils.data.DetectionResult
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 
 class AnalyseService(
     private val context: Context,
 ) {
-    private val API_KEY = "nT4D3OfHfZE0E8tI4sL0"
-    private val MODEL_URL = "https://detect.roboflow.com/braille-detection-f0rb5/10?api_key=$API_KEY"
+    private val apiKey = "nT4D3OfHfZE0E8tI4sL0"
+    private val brailleModelUrl = "https://detect.roboflow.com/"
 
     suspend fun analyseText(bitmap: Bitmap): List<DetectionResult> {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -81,82 +82,40 @@ class AnalyseService(
 //        return result
 //    }
 
-    fun analyseBraille(
-        bitmap: Bitmap,
-        callback: (String) -> Unit,
-    ) {
+    suspend fun analyseBraille(bitmap: Bitmap): String {
         try {
             val tempFile = File.createTempFile("braille", ".jpg")
             FileOutputStream(tempFile).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
             }
+            val requestFile = tempFile.asRequestBody("image/jpeg".toMediaType())
+            val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
 
             val client = OkHttpClient()
-            val requestBody =
-                MultipartBody
-                    .Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart(
-                        "file",
-                        tempFile.name,
-                        tempFile.asRequestBody("image/jpeg".toMediaType()),
-                    ).build()
 
-            val request =
-                Request
+            val retrofit =
+                Retrofit
                     .Builder()
-                    .url(MODEL_URL)
-                    .post(requestBody)
+                    .baseUrl(brailleModelUrl)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build()
+                    .create(IBrailleApi::class.java)
 
-            client.newCall(request).enqueue(
-                object : Callback {
-                    override fun onFailure(
-                        call: Call,
-                        e: IOException,
-                    ) {
-                        Log.e("BrailleAnalysis", "API call failed: ${e.message}")
-                        callback("Error: ${e.message}")
-                    }
-
-                    override fun onResponse(
-                        call: Call,
-                        response: Response,
-                    ) {
-                        response.use {
-                            if (!it.isSuccessful) {
-                                callback("Error: ${it.code}")
-                            } else {
-                                val jsonStr = it.body?.string() ?: "{}"
-                                Log.d("BrailleAnalysis", "Roboflow response: $jsonStr")
-
-                                val json = JSONObject(jsonStr)
-                                val predictions = json.optJSONArray("predictions")
-                                val chars = mutableListOf<BrailleActivity.BrailleChar>()
-
-                                if (predictions != null) {
-                                    for (i in 0 until predictions.length()) {
-                                        val pred = predictions.getJSONObject(i)
-                                        chars.add(
-                                            BrailleActivity.BrailleChar(
-                                                x = pred.getDouble("x").toFloat(),
-                                                y = pred.getDouble("y").toFloat(),
-                                                clazz = pred.getString("class"),
-                                                height = pred.getDouble("height").toFloat(),
-                                            ),
-                                        )
-                                    }
-                                }
-
-                                val sentence = BrailleActivity.decode(chars)
-                                callback(sentence)
-                            }
-                        }
-                    }
-                },
-            )
+            val response = retrofit.uploadBraille(body, apiKey)
+            if (response.isSuccessful) {
+                val result = response.body()
+                AppLogger.d("Braille raw response: $result")
+                val sentence = BrailleActivity.decode(result?.predictions ?: emptyList())
+                AppLogger.d("Braille sentence: $sentence")
+                return sentence
+            } else {
+                AppLogger.e("BrailleError: HTTP ${response.code()} ${response.errorBody()}")
+                return "Error: ${response.code()}"
+            }
         } catch (e: Exception) {
-            callback("Error creating temp file or bitmap: ${e.message}")
+            AppLogger.e("BrailleException: ${e.message}")
+            return "Error creating temp file or bitmap: ${e.message}"
         }
     }
 
@@ -185,7 +144,7 @@ class AnalyseService(
             results.map {
                 // Get the top-1 category and craft the display text
                 val category = it.categories.first()
-                val text = "${category.label}, ${category.score.times(100).toInt()}%"
+                // val text = "${category.label}, ${category.score.times(100).toInt()}%"
 
                 // Create a data object to display the detection result
                 DetectionResult(category.label, it.boundingBox, category.score)
