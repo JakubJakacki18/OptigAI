@@ -19,6 +19,10 @@ class ImageAdapter(
         val imageView: ImageView = view.findViewById(R.id.imageView)
     }
 
+    /**
+     * Called when the RecyclerView needs a new ViewHolder to represent an item.
+     * This function inflates the item layout and returns a new ImageViewHolder.
+     */
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -30,6 +34,10 @@ class ImageAdapter(
         return ImageViewHolder(view)
     }
 
+    /**
+     * Called by the RecyclerView to display the data at the specified position.
+     * This function loads the image using Glide and sets a click listener on the item.
+     */
     override fun onBindViewHolder(
         holder: ImageViewHolder,
         position: Int,
@@ -46,5 +54,8 @@ class ImageAdapter(
         }
     }
 
+    /**
+     * Returns the total number of items in the data set held by the adapter.
+     */
     override fun getItemCount() = images.size
 }

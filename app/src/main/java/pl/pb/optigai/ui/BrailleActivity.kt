@@ -4,6 +4,15 @@ import pl.pb.optigai.utils.data.BrailleChar
 
 class BrailleActivity {
     companion object {
+        /**
+         * Decodes a list of Braille character predictions into a readable string.
+         * The function handles grouping characters into lines, adding word spaces,
+         * and converting letters to numbers when a number prefix is present.
+         *
+         * @param predictions A list of BrailleChar objects containing character information
+         * (e.g., class, x/y coordinates, height).
+         * @return The decoded string of the Braille text.
+         */
         private val numberMap =
             mapOf(
                 "A" to "1",

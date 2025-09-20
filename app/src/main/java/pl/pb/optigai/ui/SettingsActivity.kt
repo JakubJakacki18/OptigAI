@@ -1,9 +1,9 @@
 package pl.pb.optigai.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -14,18 +14,25 @@ import pl.pb.optigai.R
 import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivitySettingsBinding
 import pl.pb.optigai.utils.data.SettingsViewModel
+import androidx.core.graphics.toColorInt
+import androidx.core.content.ContextCompat
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
 
+    /**
+     * Initializes the activity, sets up the view binding, and binds UI components to the ViewModel.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        bindIsGridViewRadioButtons()
-        bindIsPhotoSavingRadioButtons()
-        bindColorToggleButtons()
+
+        bindGalleryViewSlider()
+        bindPhotoSavingToggle()
+        bindColorCircles()
+
         val headerTitle: TextView = findViewById(R.id.headerTitle)
         headerTitle.text = getString(R.string.settings_header)
 
@@ -35,76 +42,118 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindIsGridViewRadioButtons() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isGridView.collect { isGridView ->
-                    viewBinding.viewRadioGroup.check(
-                        if (isGridView) R.id.gridRadioButton else R.id.listRadioButton,
-                    )
-                    viewBinding.viewRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                        lifecycleScope.launch {
-                            val isGridViewValue = checkedId == R.id.gridRadioButton
-                            viewModel.setIsGridView(isGridViewValue)
-                        }
+    /**
+     * Binds the color circles to the ViewModel, handling color display and user selection.
+     */
+    private fun bindColorCircles() {
+        val colorItems = mapOf(
+            viewBinding.colorRed.colorCircle to Settings.ColorOfBorder.RED,
+            viewBinding.colorOrange.colorCircle to Settings.ColorOfBorder.ORANGE,
+            viewBinding.colorYellow.colorCircle to Settings.ColorOfBorder.YELLOW,
+            viewBinding.colorGreen.colorCircle to Settings.ColorOfBorder.GREEN,
+            viewBinding.colorCyan.colorCircle to Settings.ColorOfBorder.CYAN,
+            viewBinding.colorBlue.colorCircle to Settings.ColorOfBorder.BLUE,
+            viewBinding.colorPurple.colorCircle to Settings.ColorOfBorder.PURPLE,
+            viewBinding.colorBlack.colorCircle to Settings.ColorOfBorder.BLACK,
+            viewBinding.colorWhite.colorCircle to Settings.ColorOfBorder.WHITE
+        )
+
+        colorItems.forEach { (circleView, color) ->
+            val checkMark = circleView.findViewById<TextView>(R.id.checkMark)
+            val circleColorInt = getAndroidColor(color)
+
+            // Set background color and optional border
+            circleView.setCardBackgroundColor(circleColorInt)
+            circleView.strokeColor = ContextCompat.getColor(this, R.color.dark_blue)
+            circleView.strokeWidth = 8
+            circleView.cardElevation = 0f
+
+            // Set checkmark color for contrast
+            checkMark?.setTextColor(if (isColorLight(circleColorInt)) Color.BLACK else Color.WHITE)
+
+            // Click listener on the circle itself
+            circleView.setOnClickListener {
+                lifecycleScope.launch { viewModel.toggleColorOfBorder(color) }
+            }
+
+            // Observe ViewModel for selected colors
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.colors.collect { selectedColors ->
+                        checkMark?.visibility = if (selectedColors.contains(color)) View.VISIBLE else View.GONE
                     }
                 }
             }
         }
     }
 
-    private fun bindIsPhotoSavingRadioButtons() {
+
+
+    /**
+     * Determines if a given color is light or dark to set a contrasting text color.
+     * @return true if the color is light, false otherwise.
+     */
+    private fun isColorLight(color: Int): Boolean {
+        val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
+        return darkness < 0.5
+    }
+
+    /**
+     * Binds the gallery view slider to the ViewModel to manage grid columns.
+     */
+    private fun bindGalleryViewSlider() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.gridColumns.collect { gridColumns ->
+                    viewBinding.gridColumnsSlider.value = gridColumns.toFloat()
+                }
+            }
+        }
+
+        viewBinding.gridColumnsSlider.addOnChangeListener { slider, value, fromUser ->
+            if (fromUser) {
+                lifecycleScope.launch {
+                    viewModel.setGridColumns(value.toInt())
+                }
+            }
+        }
+    }
+
+    /**
+     * Binds the photo saving switch to the ViewModel to toggle photo saving.
+     */
+    private fun bindPhotoSavingToggle() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isPhotoSaving.collect { isPhotoSaving ->
-                    viewBinding.isPhotoSavingRadioGroup.check(
-                        if (isPhotoSaving) R.id.yesIsPhotoSavingRadioButton else R.id.noIsPhotoSavingRadioButton,
-                    )
-                    viewBinding.isPhotoSavingRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                        lifecycleScope.launch {
-                            val isPhotoSavingValue = checkedId == R.id.yesIsPhotoSavingRadioButton
-                            viewModel.setIsPhotoSaving(isPhotoSavingValue)
-                        }
-                    }
+                    viewBinding.isPhotoSavingToggle.isChecked = isPhotoSaving
                 }
+            }
+        }
+
+        viewBinding.isPhotoSavingToggle.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch {
+                viewModel.setIsPhotoSaving(isChecked)
             }
         }
     }
 
-    private fun bindOneColorToggleButton(
-        button: ToggleButton,
-        color: Settings.ColorOfBorder,
-    ) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.colors.collect { colors ->
-                    button.setOnCheckedChangeListener(null)
-                    button.isChecked = color in colors
-                    button.setOnCheckedChangeListener { _, _ ->
-                        lifecycleScope.launch {
-                            viewModel.toggleColorOfBorder(color)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun bindColorToggleButtons() {
-        val toggleButtons =
-            mapOf(
-                viewBinding.toggleRed to Settings.ColorOfBorder.RED,
-                viewBinding.toggleBlue to Settings.ColorOfBorder.BLUE,
-                viewBinding.toggleYellow to Settings.ColorOfBorder.YELLOW,
-                viewBinding.toggleCyan to Settings.ColorOfBorder.CYAN,
-                viewBinding.toggleGreen to Settings.ColorOfBorder.GREEN,
-                viewBinding.togglePurple to Settings.ColorOfBorder.PURPLE,
-                viewBinding.toggleBlack to Settings.ColorOfBorder.BLACK,
-                viewBinding.toggleWhite to Settings.ColorOfBorder.WHITE,
-                viewBinding.toggleOrange to Settings.ColorOfBorder.ORANGE,
-            )
-        toggleButtons.forEach { (button, color) ->
-            bindOneColorToggleButton(button, color)
+    /**
+     * Converts a ColorOfBorder enum value to a corresponding Android color integer.
+     * @return the Android color integer.
+     */
+    private fun getAndroidColor(color: Settings.ColorOfBorder): Int {
+        return when (color) {
+            Settings.ColorOfBorder.RED -> Color.RED
+            Settings.ColorOfBorder.GREEN -> Color.GREEN
+            Settings.ColorOfBorder.BLUE -> Color.BLUE
+            Settings.ColorOfBorder.YELLOW -> Color.YELLOW
+            Settings.ColorOfBorder.ORANGE -> "#FFA500".toColorInt()
+            Settings.ColorOfBorder.PURPLE -> "#800080".toColorInt()
+            Settings.ColorOfBorder.CYAN -> Color.CYAN
+            Settings.ColorOfBorder.BLACK -> Color.BLACK
+            Settings.ColorOfBorder.WHITE -> Color.WHITE
+            else -> Color.GRAY
         }
     }
 }

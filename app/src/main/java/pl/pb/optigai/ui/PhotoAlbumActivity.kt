@@ -1,7 +1,10 @@
 package pl.pb.optigai.ui
+
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -26,6 +29,9 @@ class PhotoAlbumActivity : AppCompatActivity() {
     private lateinit var viewBinding: PhotoAlbumBinding
     private lateinit var imageList: List<Image>
 
+    /**
+     * Initializes the activity, sets up view binding, handles permissions, and loads images.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoAlbumBinding.inflate(layoutInflater)
@@ -37,25 +43,26 @@ class PhotoAlbumActivity : AppCompatActivity() {
             loadImages()
         }
 
-        viewBinding.headerTitle.text = getString(R.string.analysis_header_shared)
-        viewBinding.backButton.setOnClickListener {
+        val headerTitle: TextView = findViewById(R.id.headerTitle)
+        headerTitle.text = getString(R.string.gallery_header_shared)
+        val backButton: View = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
             finish()
         }
 
-        viewBinding.layoutButton.setOnClickListener {
-            lifecycleScope.launch {
-                val isGridView = getIsGridView()
-                viewModel.setIsGridView(!isGridView)
-                updateRecyclerView()
-            }
-        }
     }
 
+    /**
+     * Called when the activity resumes. Reloads images to reflect any changes.
+     */
     override fun onResume() {
         super.onResume()
         loadImages()
     }
 
+    /**
+     * Loads images from the device's storage on a background thread.
+     */
     private fun loadImages() {
         lifecycleScope.launch {
             imageList =
@@ -66,19 +73,24 @@ class PhotoAlbumActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun getIsGridView(): Boolean = viewModel.isGridView.first()
+    /**
+     * Retrieves the preferred number of grid columns from the ViewModel.
+     * @return The number of columns as an integer.
+     */
+    private suspend fun getGridColumns(): Int = viewModel.gridColumns.first()
 
+    /**
+     * Sets the layout manager for the RecyclerView based on the number of grid columns.
+     */
     private fun updateRecyclerView() {
         if (!::imageList.isInitialized) return
 
         lifecycleScope.launch {
-            val isGridView = getIsGridView()
-            if (isGridView) {
-                viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, 2)
-                viewBinding.layoutButton.text = "2"
-            } else {
+            val gridColumns = getGridColumns()
+            if (gridColumns == 1) {
                 viewBinding.recyclerView.layoutManager = LinearLayoutManager(this@PhotoAlbumActivity)
-                viewBinding.layoutButton.text = "1"
+            } else {
+                viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, gridColumns)
             }
         }
 
@@ -105,6 +117,9 @@ class PhotoAlbumActivity : AppCompatActivity() {
         const val RELATIVE_PICTURES_PATH = "Pictures/OptigAI/"
     }
 
+    /**
+     * Registers a callback for handling permission request results.
+     */
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             var permissionGranted = true

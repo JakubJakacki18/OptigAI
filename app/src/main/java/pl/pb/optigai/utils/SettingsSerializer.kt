@@ -17,10 +17,14 @@ object SettingsSerializer : Serializer<Settings> {
             .setIsPhotoSaving(true)
             .addAllColor(
                 listOf(
-                    Settings.ColorOfBorder.BLUE,
+                    Settings.ColorOfBorder.RED,
+                    Settings.ColorOfBorder.ORANGE,
                     Settings.ColorOfBorder.YELLOW,
-                    Settings.ColorOfBorder.PURPLE,
+                    Settings.ColorOfBorder.GREEN,
                     Settings.ColorOfBorder.CYAN,
+                    Settings.ColorOfBorder.BLUE,
+                    Settings.ColorOfBorder.PURPLE,
+                    Settings.ColorOfBorder.BLACK,
                     Settings.ColorOfBorder.WHITE,
                 ),
             ).build()

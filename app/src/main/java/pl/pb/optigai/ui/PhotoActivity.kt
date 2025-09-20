@@ -15,6 +15,10 @@ class PhotoActivity : AppCompatActivity() {
     private var currentIndex: Int = 0
     private lateinit var viewBinding: PhotoPreviewBinding
 
+    /**
+     * Called when the activity is first created. Initializes the view, loads images,
+     * and sets up click listeners for navigation and analysis.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoPreviewBinding.inflate(layoutInflater)
@@ -53,11 +57,19 @@ class PhotoActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Updates the ImageView with the current image and refreshes the navigation button states.
+     */
     private fun updateImage() {
         val currentImage = images[currentIndex]
         viewBinding.previewImageView.setImageURI(currentImage.uri)
         updateNavigationButtons()
     }
+
+    /**
+     * Enables or disables the navigation arrows based on the current image index.
+     * The left arrow is disabled at the first image, and the right arrow at the last.
+     */
     private fun updateNavigationButtons() {
         viewBinding.leftArrow.isEnabled = currentIndex > 0
         viewBinding.rightArrow.isEnabled = currentIndex < images.size - 1

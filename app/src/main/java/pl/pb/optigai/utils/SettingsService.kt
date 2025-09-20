@@ -6,6 +6,7 @@ import androidx.datastore.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import pl.pb.optigai.Settings
+import android.util.Log
 
 private val Context.settingsDataStore: DataStore<Settings> by dataStore(
     fileName = "settings.optigai",
@@ -16,9 +17,6 @@ class SettingsService private constructor(
     private val dataStore: DataStore<Settings>,
 ) {
     val settingsFlow: Flow<Settings> = dataStore.data
-
-    val isGridView: Flow<Boolean> =
-        settingsFlow.map { it.isGridView }
 
     val gridColumns: Flow<Int> =
         settingsFlow.map { it.gridColumns }
@@ -34,15 +32,6 @@ class SettingsService private constructor(
 
     val colors: Flow<List<Settings.ColorOfBorder>> =
         settingsFlow.map { it.colorList }
-
-    suspend fun updateIsGridView(isGridView: Boolean) {
-        dataStore.updateData { current ->
-            current
-                .toBuilder()
-                .setIsGridView(isGridView)
-                .build()
-        }
-    }
 
     suspend fun updateGridColumns(columns: Int) {
         dataStore.updateData { current ->
@@ -81,22 +70,16 @@ class SettingsService private constructor(
     }
 
     suspend fun toggleColorOfBorder(color: Settings.ColorOfBorder) {
+        Log.d("SettingsService", "Toggling color: $color")
         dataStore.updateData { settings ->
-            if (settings.colorList == listOf(color)) {
-                settings
-            } else if (color in settings.colorList) {
-                val updated = settings.colorList.filter { it != color }
-                settings
-                    .toBuilder()
-                    .clearColor()
-                    .addAllColor(updated)
-                    .build()
+            val currentColors = settings.colorList.toMutableList()
+            if (currentColors.contains(color)) {
+                currentColors.remove(color)
             } else {
-                settings
-                    .toBuilder()
-                    .addColor(color)
-                    .build()
+                currentColors.add(color)
             }
+            Log.d("SettingsService", "New color list: $currentColors")
+            settings.toBuilder().clearColor().addAllColor(currentColors).build()
         }
     }
 

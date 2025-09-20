@@ -15,7 +15,20 @@ import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
 import pl.pb.optigai.R
 
+/**
+ * A Fragment that displays a loading screen with a custom animation.
+ * This fragment uses Jetpack Compose to render its UI.
+ */
 class LoadingFragment : Fragment() {
+    /**
+     * Called to create the view hierarchy associated with the fragment.
+     * It sets up a ComposeView to display a full-screen loading animation.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate any views.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

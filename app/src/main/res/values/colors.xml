@@ -26,7 +26,7 @@
     <color name="green_toggle_transparent">#8000FF00</color>
     <color name="purple_toggle">#FF00FF</color>
     <color name="purple_toggle_transparent">#80FF00FF</color>
-
+    <color name="line_color">#CCCCCC</color>
 
 
 </resources>

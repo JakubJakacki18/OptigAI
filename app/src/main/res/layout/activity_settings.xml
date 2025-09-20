@@ -3,189 +3,202 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2174AB">
 
-    <include layout="@layout/navbar" />
-
-
-    <TextView
-        android:id="@+id/settingsTitle"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/headerLayout"
+        layout="@layout/navbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/chosen_gallery_view"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/resultScrollView"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_height="0dp"
+        android:background="@drawable/analysis_result_box"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <RadioGroup
-        android:id="@+id/viewRadioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/settingsTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <RadioButton
-            android:id="@+id/gridRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/grid_view"
-            android:layout_marginEnd="16dp"/>
+            <!-- Section 1: Grid Columns -->
+            <TextView
+                android:id="@+id/settingsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/chosen_gallery_view"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_gravity="center_horizontal"/>
 
-        <RadioButton
-            android:id="@+id/listRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/list_view"/>
-    </RadioGroup>
 
-    <TextView
-        android:id="@+id/isPhotoSavingOptionTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/is_photo_saving_option_title"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/viewRadioGroup"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
-    <RadioGroup
-        android:id="@+id/isPhotoSavingRadioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/isPhotoSavingOptionTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+            <com.google.android.material.slider.Slider
+                android:id="@+id/gridColumnsSlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="1"
+                android:valueTo="3"
+                android:stepSize="1.0"
+                app:labelBehavior="withinBounds"
+                app:trackColor="@color/light_blue"
+                app:thumbColor="@color/onyx"
+                app:tickColor="@color/onyx"
+                app:tickVisible="true"/>
 
-        <RadioButton
-            android:id="@+id/yesIsPhotoSavingRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/yes"
-            android:layout_marginEnd="16dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
 
-        <RadioButton
-            android:id="@+id/noIsPhotoSavingRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no"/>
-    </RadioGroup>
+            <!-- Section 2: Photo Saving Option -->
+            <TextView
+                android:id="@+id/isPhotoSavingOptionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/is_photo_saving_option_title"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
 
-    <TextView
-        android:id="@+id/colorToggleTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/is_photo_saving_option_title"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/isPhotoSavingRadioGroup"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
-    <GridLayout
-        android:id="@+id/colorToggleGrid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnCount="3"
-        android:rowCount="3"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/colorToggleTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
 
-        <ToggleButton
-            android:id="@+id/toggle_red"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_red_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_red_on"
-            android:textOff="@string/toggle_button_color_red_off"
-            />
-        <ToggleButton
-        android:id="@+id/toggle_blue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/toggle_border_color_blue_bg"
-        android:layout_columnWeight="1"
-        android:textOn="@string/toggle_button_color_blue_on"
-        android:textOff="@string/toggle_button_color_blue_off"
-        />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
 
-        <ToggleButton
-            android:id="@+id/toggle_green"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_green_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_green_on"
-            android:textOff="@string/toggle_button_color_green_off"
-            />
-        <ToggleButton
-            android:id="@+id/toggle_yellow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_yellow_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_yellow_on"
-            android:textOff="@string/toggle_button_color_yellow_off"
-            />        <ToggleButton
-            android:id="@+id/toggle_orange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_orange_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_orange_on"
-            android:textOff="@string/toggle_button_color_orange_off"
-            />
-        <ToggleButton
-            android:id="@+id/toggle_purple"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_purple_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_purple_on"
-            android:textOff="@string/toggle_button_color_purple_off"
-            />
-        <ToggleButton
-            android:id="@+id/toggle_cyan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_cyan_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_gray_on"
-            android:textOff="@string/toggle_button_color_gray_off"
-            />
-        <ToggleButton
-            android:id="@+id/toggle_black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_black_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_black_on"
-            android:textOff="@string/toggle_button_color_black_off"
-            />
-        <ToggleButton
-            android:id="@+id/toggle_white"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/toggle_border_color_white_bg"
-            android:layout_columnWeight="1"
-            android:textOn="@string/toggle_button_color_white_on"
-            android:textOff="@string/toggle_button_color_white_off"
-            />
-    </GridLayout>
+                <!-- Label -->
+                <TextView
+                    android:id="@+id/saveAutomaticallyLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/save_automatically"
+                    android:textSize="20sp"
+                    android:textColor="@color/onyx"
+                    android:fontFamily="@font/signikasb"
+                    />
+
+                <!-- Enlarged switch -->
+                <Switch
+                    android:id="@+id/isPhotoSavingToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumbTint="@color/switch_thumb_selector"
+                    android:trackTint="@color/switch_track_selector"
+                    app:trackHeight="40dp"
+                    android:padding="8dp"
+                    android:scaleX="1.5"
+                    android:scaleY="1.5"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
+            <!-- Section 3: Color Selection -->
+            <TextView
+                android:id="@+id/colorToggleTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_colors"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+
+            <GridLayout
+                android:id="@+id/colorToggleGrid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:columnCount="3"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center_horizontal"
+                android:useDefaultMargins="true"
+                android:alignmentMode="alignMargins"
+                android:padding="12dp">
+
+                <!-- Rainbow colors -->
+                <include
+                    android:id="@+id/color_red"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#FF0000"/>
+                <include
+                    android:id="@+id/color_orange"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#FF7F00"/>
+                <include
+                    android:id="@+id/color_yellow"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#FFFF00"/>
+                <include
+                    android:id="@+id/color_green"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#00FF00"/>
+                <include
+                    android:id="@+id/color_cyan"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#00FFFF"/>
+                <include
+                    android:id="@+id/color_blue"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#0000FF"/>
+                <include
+                    android:id="@+id/color_purple"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#8B00FF"/>
+                <include
+                    android:id="@+id/color_black"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#000000"/>
+                <include
+                    android:id="@+id/color_white"
+                    layout="@layout/item_color_circle"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:backgroundTint="#FFFFFF"/>
+            </GridLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

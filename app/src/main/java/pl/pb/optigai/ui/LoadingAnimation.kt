@@ -23,6 +23,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+/**
+ * A composable function that displays a bouncing loading animation with three circles.
+ *
+ * @param modifier The modifier to be applied to the animation container.
+ * @param circleSize The size of each bouncing circle.
+ * @param circleColor The color of the circles.
+ * @param spaceBetween The horizontal space between the circles.
+ * @param travelDistance The vertical distance each circle travels during the animation.
+ */
 @Composable
 fun LoadingAnimation(
     modifier: Modifier = Modifier,
@@ -77,5 +86,4 @@ fun LoadingAnimation(
             )
         }
     }
-
 }

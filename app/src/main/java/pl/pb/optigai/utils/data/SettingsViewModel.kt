@@ -12,8 +12,8 @@ class SettingsViewModel(
 ) : AndroidViewModel(application) {
     private val settingsService = SettingsService.getInstance(application)
 
+    // Only use gridColumns to manage the number of columns
     val gridColumns = settingsService.gridColumns
-    val isGridView = settingsService.isGridView
     val language = settingsService.language
     val defaultSaveLocation = settingsService.defaultSaveLocation
     val isPhotoSaving = settingsService.isPhotoSaving
@@ -25,11 +25,6 @@ class SettingsViewModel(
         }
     }
 
-    fun setIsGridView(isGridView: Boolean) {
-        viewModelScope.launch {
-            settingsService.updateIsGridView(isGridView)
-        }
-    }
 
     fun setIsPhotoSaving(isPhotoSaving: Boolean) {
         viewModelScope.launch {
