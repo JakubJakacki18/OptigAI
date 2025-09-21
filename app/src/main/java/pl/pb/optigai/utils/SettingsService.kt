@@ -17,9 +17,6 @@ class SettingsService private constructor(
 ) {
     val settingsFlow: Flow<Settings> = dataStore.data
 
-    val isGridView: Flow<Boolean> =
-        settingsFlow.map { it.isGridView }
-
     val gridColumns: Flow<Int> =
         settingsFlow.map { it.gridColumns }
 
@@ -32,14 +29,8 @@ class SettingsService private constructor(
     val isPhotoSaving: Flow<Boolean> =
         settingsFlow.map { it.isPhotoSaving }
 
-    suspend fun updateIsGridView(isGridView: Boolean) {
-        dataStore.updateData { current ->
-            current
-                .toBuilder()
-                .setIsGridView(isGridView)
-                .build()
-        }
-    }
+    val colors: Flow<List<Settings.ColorOfBorder>> =
+        settingsFlow.map { it.colorList }
 
     suspend fun updateGridColumns(columns: Int) {
         dataStore.updateData { current ->
@@ -73,6 +64,24 @@ class SettingsService private constructor(
             current
                 .toBuilder()
                 .setIsPhotoSaving(enabled)
+                .build()
+        }
+    }
+
+    suspend fun toggleColorOfBorder(color: Settings.ColorOfBorder) {
+        AppLogger.d("Toggling color: $color")
+        dataStore.updateData { settings ->
+            val updatedColors =
+                settings.colorList
+                    .toMutableList()
+                    .apply {
+                        if (!remove(color)) add(color)
+                    }
+            AppLogger.d("New color list: $updatedColors")
+            settings
+                .toBuilder()
+                .clearColor()
+                .addAllColor(updatedColors)
                 .build()
         }
     }

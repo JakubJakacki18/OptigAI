@@ -1,35 +1,36 @@
 package pl.pb.optigai.ui
 
-import android.content.ContentUris
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoAlbumBinding
 import pl.pb.optigai.utils.PermissionHandler
+import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
-import pl.pb.optigai.R
 
 class PhotoAlbumActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels()
     private lateinit var viewBinding: PhotoAlbumBinding
     private lateinit var imageList: List<Image>
 
+    /**
+     * Initializes the activity, sets up view binding, handles permissions, and loads images.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoAlbumBinding.inflate(layoutInflater)
@@ -41,55 +42,56 @@ class PhotoAlbumActivity : AppCompatActivity() {
             loadImages()
         }
 
-        viewBinding.headerTitle.text = getString(R.string.analysis_header_shared)
-        viewBinding.backButton.setOnClickListener {
-            finish()
-        }
+        val headerTitle: TextView = viewBinding.headerLayout.headerTitle
+        headerTitle.text = getString(R.string.gallery_header_shared)
 
-        viewBinding.layoutButton.setOnClickListener {
-            lifecycleScope.launch {
-                val isGridView = getIsGridView()
-                viewModel.setIsGridView(!isGridView)
-                updateRecyclerView()
-            }
+        val backButton: View = viewBinding.headerLayout.headerTitle
+        backButton.setOnClickListener {
+            finish()
         }
     }
 
+    /**
+     * Called when the activity resumes. Reloads images to reflect any changes.
+     */
     override fun onResume() {
         super.onResume()
         loadImages()
     }
 
+    /**
+     * Loads images from the device's storage on a background thread.
+     */
     private fun loadImages() {
         lifecycleScope.launch {
             imageList =
                 withContext(Dispatchers.IO) {
-                    imageReader(this@PhotoAlbumActivity)
+                    PhotoUtils.imageReader(this@PhotoAlbumActivity)
                 }
             updateRecyclerView()
         }
     }
 
-    private suspend fun getIsGridView(): Boolean = viewModel.isGridView.first()
+    /**
+     * Retrieves the preferred number of grid columns from the ViewModel.
+     * @return The number of columns as an integer.
+     */
+    private suspend fun getGridColumns(): Int = viewModel.gridColumns.first()
 
+    /**
+     * Sets the layout manager for the RecyclerView based on the number of grid columns.
+     */
     private fun updateRecyclerView() {
         if (!::imageList.isInitialized) return
 
         lifecycleScope.launch {
-            val isGridView = getIsGridView()
-            if (isGridView) {
-                viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, 2)
-                viewBinding.layoutButton.text = "2"
-            } else {
-                viewBinding.recyclerView.layoutManager = LinearLayoutManager(this@PhotoAlbumActivity)
-                viewBinding.layoutButton.text = "1"
-            }
+            val gridColumns = getGridColumns()
+            viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, gridColumns)
         }
 
         val adapter =
             ImageAdapter(imageList) { position ->
                 val intent = Intent(this, PhotoActivity::class.java)
-                intent.putExtra("images", ArrayList(imageList))
                 intent.putExtra("position", position)
                 startActivity(intent)
             }
@@ -110,6 +112,9 @@ class PhotoAlbumActivity : AppCompatActivity() {
         const val RELATIVE_PICTURES_PATH = "Pictures/OptigAI/"
     }
 
+    /**
+     * Registers a callback for handling permission request results.
+     */
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             var permissionGranted = true
@@ -124,46 +129,4 @@ class PhotoAlbumActivity : AppCompatActivity() {
                 loadImages()
             }
         }
-
-    //    fun imageReader(): List<Image> {
-//        val listAllFiles = picturesPath.listFiles()
-//        return listAllFiles
-//            ?.filter { it.name.endsWith(".jpg", ignoreCase = true) }
-//            ?.map { file -> Image(Uri.fromFile(file)) }
-//            ?: emptyList()
-    //    }
-    fun imageReader(context: Context): List<Image> {
-        val images = mutableListOf<Image>()
-        val projection =
-            arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.DISPLAY_NAME,
-            )
-        val selection = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND ${MediaStore.Images.Media.SIZE} > 0"
-        val selectionArgs = arrayOf(RELATIVE_PICTURES_PATH)
-
-        val query =
-            context.contentResolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                selectionArgs,
-                "${MediaStore.Images.Media.DATE_ADDED} DESC",
-            )
-
-        query?.use { cursor ->
-            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            while (cursor.moveToNext()) {
-                val id = cursor.getLong(idColumn)
-                val contentUri =
-                    ContentUris.withAppendedId(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        id,
-                    )
-                images.add(Image(contentUri))
-            }
-        }
-        Log.d("PhotoAlbumActivity", "Found ${images.size} images")
-        return images
-    }
 }

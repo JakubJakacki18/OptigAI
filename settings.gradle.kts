@@ -16,9 +16,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Correct syntax for adding a Maven repository in Kotlin Script
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "OptigAI"
 include(":app")
- 

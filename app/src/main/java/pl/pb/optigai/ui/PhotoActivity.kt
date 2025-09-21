@@ -1,60 +1,47 @@
 package pl.pb.optigai.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import pl.pb.optigai.R
+import pl.pb.optigai.databinding.PhotoPreviewBinding
+import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 
 class PhotoActivity : AppCompatActivity() {
     private lateinit var images: List<Image>
     private var currentIndex: Int = 0
+    private lateinit var viewBinding: PhotoPreviewBinding
 
-    private lateinit var previewImageView: ImageView
-    private lateinit var leftArrow: ImageView
-    private lateinit var rightArrow: ImageView
-    private lateinit var middleButton: ImageView
-    private lateinit var backButton: ImageView // Add this line
-
+    /**
+     * Called when the activity is first created. Initializes the view, loads images,
+     * and sets up click listeners for navigation and analysis.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.photo_preview)
-
-        previewImageView = findViewById(R.id.previewImageView)
-        leftArrow = findViewById(R.id.leftArrow)
-        rightArrow = findViewById(R.id.rightArrow)
-        middleButton = findViewById(R.id.middleButton)
-        backButton = findViewById(R.id.backButton) // Find the back button
-
-        images =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableArrayListExtra("images", Image::class.java) ?: emptyList()
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableArrayListExtra("images") ?: emptyList()
-            }
+        viewBinding = PhotoPreviewBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
+        images = PhotoUtils.imageReader(this@PhotoActivity)
         currentIndex = intent.getIntExtra("position", 0)
 
         updateImage()
 
-        leftArrow.setOnClickListener {
+        viewBinding.leftArrow.setOnClickListener {
             if (currentIndex > 0) {
                 currentIndex--
                 updateImage()
             }
         }
 
-        rightArrow.setOnClickListener {
+        viewBinding.rightArrow.setOnClickListener {
             if (currentIndex < images.size - 1) {
                 currentIndex++
                 updateImage()
             }
         }
-        middleButton.setOnClickListener {
+        viewBinding.middleButton.setOnClickListener {
             val currentImage = images[currentIndex]
             val intent = Intent(this@PhotoActivity, AnalysisActivity::class.java)
             intent.putExtra("IMAGE_URI", currentImage.uri.toString())
@@ -70,14 +57,21 @@ class PhotoActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Updates the ImageView with the current image and refreshes the navigation button states.
+     */
     private fun updateImage() {
         val currentImage = images[currentIndex]
-        previewImageView.setImageURI(currentImage.uri)
+        viewBinding.previewImageView.setImageURI(currentImage.uri)
         updateNavigationButtons()
     }
 
+    /**
+     * Enables or disables the navigation arrows based on the current image index.
+     * The left arrow is disabled at the first image, and the right arrow at the last.
+     */
     private fun updateNavigationButtons() {
-        leftArrow.isEnabled = currentIndex > 0
-        rightArrow.isEnabled = currentIndex < images.size - 1
+        viewBinding.leftArrow.isEnabled = currentIndex > 0
+        viewBinding.rightArrow.isEnabled = currentIndex < images.size - 1
     }
 }

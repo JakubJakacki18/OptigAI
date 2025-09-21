@@ -7,7 +7,7 @@
     <string name="content_description_previous_image">Previous image button</string>
     <string name="content_description_next_image">Next image button</string>
     <string name="content_description_zoom_button">Toggle zoom on image</string>
-    <string name="empty_result_fragment_analysis_result">Something went wrong</string>
+    <string name="error_result_fragment_analysis_result">Something went wrong</string>
     <string name="analise_text_fragment_analysis_selector">ANALYZE TEXT</string>
     <string name="analise_braille_fragment_analysis_selector">ANALYZE BRAILLE</string>
     <string name="analise_item_fragment_analysis_selector">ANALYZE ITEM</string>
@@ -22,13 +22,17 @@
     <string name="background_photo_description">Background Photo for Analysis</string>
     <string name="open_camera">Open Camera</string>
     <string name="open_gallery">Open Gallery</string>
-    <string name="chosen_gallery_view">Choose your preferred gallery view:</string>
+    <string name="chosen_gallery_view">Gallery View Columns</string>
     <string name="grid_view">Grid View</string>
     <string name="list_view">List View</string>
     <string name="number2">2</string>
     <string name="settings_header">SETTINGS</string>
-    <string name="is_photo_saving_option_title">Would you like to save the photos you take?</string>
+    <string name="is_photo_saving_option_title">Save Photos</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="empty_result_fragment_analysis_result">Nothing was detected. Try with another photo.</string>
 
+    <string name="select_colors">Select Colors</string>
+    <string name="save_automatically">Save automatically</string>
+    <string name="checkmark">✓</string>
 </resources>

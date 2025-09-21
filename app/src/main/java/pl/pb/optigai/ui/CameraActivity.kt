@@ -185,7 +185,7 @@ class CameraActivity : AppCompatActivity() {
         val intent = Intent(this, AnalysisActivity::class.java)
         when (data) {
             is Uri -> intent.putExtra("IMAGE_URI", data.toString())
-            is Bitmap -> intent.putExtra("IS_BITMAP_PASSED", true)
+            is Bitmap -> Unit
             else -> throw IllegalArgumentException("Unsupported data type")
         }
         startActivity(intent)

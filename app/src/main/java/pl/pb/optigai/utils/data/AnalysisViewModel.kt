@@ -9,8 +9,11 @@ class AnalysisViewModel : ViewModel() {
     private val _photoUri = MutableLiveData<Uri>()
     val photoUri: LiveData<Uri> get() = _photoUri
 
-    private val _analysisResult = MutableLiveData<String>()
-    val analysisResult: LiveData<String> get() = _analysisResult
+    private val _analysisDetectionResults = MutableLiveData<List<DetectionResult>>()
+    val analysisDetectionResults: LiveData<List<DetectionResult>> get() = _analysisDetectionResults
+
+    private val _analysisSummaryTextResult = MutableLiveData<String>()
+    val analysisSummaryTextResult: LiveData<String> get() = _analysisSummaryTextResult
 
     val isBitmapPassed = MutableLiveData(false)
 
@@ -20,7 +23,11 @@ class AnalysisViewModel : ViewModel() {
         }
     }
 
-    fun setResult(result: String) {
-        _analysisResult.value = result
+    fun setDetectionResult(result: List<DetectionResult>) {
+        _analysisDetectionResults.value = result
+    }
+
+    fun setSummaryTextResult(result: String) {
+        _analysisSummaryTextResult.value = result
     }
 }

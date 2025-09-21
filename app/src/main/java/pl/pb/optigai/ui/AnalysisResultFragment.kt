@@ -10,15 +10,21 @@ import android.widget.TextView
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
+import pl.pb.optigai.utils.data.ColorMap
+import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
 
 class AnalysisResultFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -28,17 +34,23 @@ class AnalysisResultFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_analysis_result, container, false)
         val imageView: ImageView = view.findViewById(R.id.analyzedPhoto)
-        viewModel.photoUri.observe(viewLifecycleOwner) { uri ->
-            AnalyseUtils.updateImageView(imageView, uri, null)
+        val overlay: DetectionOverlay = view.findViewById(R.id.overlay)
+
+        AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
+
+        val summaryResultText: TextView = view.findViewById(R.id.summaryResultText)
+        viewModel.analysisDetectionResults.observe(viewLifecycleOwner) { result ->
+            lifecycleScope.launch {
+                settingsViewModel.colors.collect { colorEnums ->
+                    val availableColorsResId = colorEnums.map { ColorMap.getColorRes(it) }
+                    val availableColors = availableColorsResId.map { requireContext().getColor(it) }
+                    overlay.setAvailableColors(availableColors)
+                    overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
+                }
+            }
         }
-        viewModel.isBitmapPassed.observe(viewLifecycleOwner) { isBitmapPassed ->
-            if (!isBitmapPassed) return@observe
-            AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
-        }
-        val resultText: TextView = view.findViewById(R.id.resultText)
-        viewModel.analysisResult.observe(viewLifecycleOwner) { result ->
-            resultText.text = "Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur?\n" +
-                    "[33] At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
+        viewModel.analysisSummaryTextResult.observe(viewLifecycleOwner) { summary ->
+            summaryResultText.text = summary
         }
         val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)
         val bottomSheetBehavior = BottomSheetBehavior.from(scrollView)

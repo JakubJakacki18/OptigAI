@@ -1,6 +1,5 @@
 package pl.pb.optigai.utils
 
-import android.util.Log
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
 import pl.pb.optigai.Settings
@@ -11,17 +10,26 @@ object SettingsSerializer : Serializer<Settings> {
     override val defaultValue: Settings =
         Settings
             .newBuilder()
-            .setIsGridView(true)
             .setGridColumns(2)
             .setLanguageValue(Settings.Language.SYSTEM_DEFAULT_VALUE)
             .setIsPhotoSaving(true)
-            .build()
+            .addAllColor(
+                listOf(
+                    Settings.ColorOfBorder.RED,
+                    Settings.ColorOfBorder.ORANGE,
+                    Settings.ColorOfBorder.YELLOW,
+                    Settings.ColorOfBorder.GREEN,
+                    Settings.ColorOfBorder.CYAN,
+                    Settings.ColorOfBorder.BLUE,
+                    Settings.ColorOfBorder.PURPLE,
+                ),
+            ).build()
 
     override suspend fun readFrom(input: InputStream): Settings =
         try {
             Settings.parseFrom(input)
         } catch (e: InvalidProtocolBufferException) {
-            Log.e("SettingsSerializer", "Error reading settings", e)
+            AppLogger.e("Error reading settings", e)
             defaultValue
         }
 

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.data.Image
 
@@ -18,6 +19,10 @@ class ImageAdapter(
         val imageView: ImageView = view.findViewById(R.id.imageView)
     }
 
+    /**
+     * Called when the RecyclerView needs a new ViewHolder to represent an item.
+     * This function inflates the item layout and returns a new ImageViewHolder.
+     */
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -29,17 +34,28 @@ class ImageAdapter(
         return ImageViewHolder(view)
     }
 
+    /**
+     * Called by the RecyclerView to display the data at the specified position.
+     * This function loads the image using Glide and sets a click listener on the item.
+     */
     override fun onBindViewHolder(
         holder: ImageViewHolder,
         position: Int,
     ) {
         val image = images[position]
-        holder.imageView.setImageURI(image.uri)
-
+        Glide
+            .with(holder.itemView.context)
+            .load(image.uri)
+            .sizeMultiplier(0.5f)
+            .centerCrop()
+            .into(holder.imageView)
         holder.itemView.setOnClickListener {
             onImageClick(position)
         }
     }
 
+    /**
+     * Returns the total number of items in the data set held by the adapter.
+     */
     override fun getItemCount() = images.size
 }
