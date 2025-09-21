@@ -6,16 +6,17 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivitySettingsBinding
+import pl.pb.optigai.utils.data.ColorMap
 import pl.pb.optigai.utils.data.SettingsViewModel
-import androidx.core.graphics.toColorInt
-import androidx.core.content.ContextCompat
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
@@ -29,7 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         viewBinding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        bindGalleryViewSlider()
+        bindGalleryViewColumnsSlider()
         bindPhotoSavingToggle()
         bindColorCircles()
 
@@ -46,28 +47,24 @@ class SettingsActivity : AppCompatActivity() {
      * Binds the color circles to the ViewModel, handling color display and user selection.
      */
     private fun bindColorCircles() {
-        val colorItems = mapOf(
-            viewBinding.colorRed.colorCircle to Settings.ColorOfBorder.RED,
-            viewBinding.colorOrange.colorCircle to Settings.ColorOfBorder.ORANGE,
-            viewBinding.colorYellow.colorCircle to Settings.ColorOfBorder.YELLOW,
-            viewBinding.colorGreen.colorCircle to Settings.ColorOfBorder.GREEN,
-            viewBinding.colorCyan.colorCircle to Settings.ColorOfBorder.CYAN,
-            viewBinding.colorBlue.colorCircle to Settings.ColorOfBorder.BLUE,
-            viewBinding.colorPurple.colorCircle to Settings.ColorOfBorder.PURPLE,
-            viewBinding.colorBlack.colorCircle to Settings.ColorOfBorder.BLACK,
-            viewBinding.colorWhite.colorCircle to Settings.ColorOfBorder.WHITE
-        )
+        val colorItems =
+            mapOf(
+                viewBinding.colorRed.colorCircle to Settings.ColorOfBorder.RED,
+                viewBinding.colorOrange.colorCircle to Settings.ColorOfBorder.ORANGE,
+                viewBinding.colorYellow.colorCircle to Settings.ColorOfBorder.YELLOW,
+                viewBinding.colorGreen.colorCircle to Settings.ColorOfBorder.GREEN,
+                viewBinding.colorCyan.colorCircle to Settings.ColorOfBorder.CYAN,
+                viewBinding.colorBlue.colorCircle to Settings.ColorOfBorder.BLUE,
+                viewBinding.colorPurple.colorCircle to Settings.ColorOfBorder.PURPLE,
+                viewBinding.colorBlack.colorCircle to Settings.ColorOfBorder.BLACK,
+                viewBinding.colorWhite.colorCircle to Settings.ColorOfBorder.WHITE,
+            )
 
         colorItems.forEach { (circleView, color) ->
             val checkMark = circleView.findViewById<TextView>(R.id.checkMark)
-            val circleColorInt = getAndroidColor(color)
+            val circleColorInt = ColorMap.getColorRes(color)
 
-            // Set background color and optional border
-            circleView.setCardBackgroundColor(circleColorInt)
-            circleView.strokeColor = ContextCompat.getColor(this, R.color.dark_blue)
-            circleView.strokeWidth = 8
-            circleView.cardElevation = 0f
-
+            setBackgroundColorAndBorderForCircleView(circleView, circleColorInt)
             // Set checkmark color for contrast
             checkMark?.setTextColor(if (isColorLight(circleColorInt)) Color.BLACK else Color.WHITE)
 
@@ -87,8 +84,6 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-
-
     /**
      * Determines if a given color is light or dark to set a contrasting text color.
      * @return true if the color is light, false otherwise.
@@ -101,7 +96,7 @@ class SettingsActivity : AppCompatActivity() {
     /**
      * Binds the gallery view slider to the ViewModel to manage grid columns.
      */
-    private fun bindGalleryViewSlider() {
+    private fun bindGalleryViewColumnsSlider() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.gridColumns.collect { gridColumns ->
@@ -138,22 +133,18 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Converts a ColorOfBorder enum value to a corresponding Android color integer.
-     * @return the Android color integer.
+/**
+     * Sets the background color and border for a given circle view.
+     * @param circleView The MaterialCardView representing the color circle.
+     * @param circleColorInt The color integer to set as the background.
      */
-    private fun getAndroidColor(color: Settings.ColorOfBorder): Int {
-        return when (color) {
-            Settings.ColorOfBorder.RED -> Color.RED
-            Settings.ColorOfBorder.GREEN -> Color.GREEN
-            Settings.ColorOfBorder.BLUE -> Color.BLUE
-            Settings.ColorOfBorder.YELLOW -> Color.YELLOW
-            Settings.ColorOfBorder.ORANGE -> "#FFA500".toColorInt()
-            Settings.ColorOfBorder.PURPLE -> "#800080".toColorInt()
-            Settings.ColorOfBorder.CYAN -> Color.CYAN
-            Settings.ColorOfBorder.BLACK -> Color.BLACK
-            Settings.ColorOfBorder.WHITE -> Color.WHITE
-            else -> Color.GRAY
-        }
+    private fun setBackgroundColorAndBorderForCircleView(
+        circleView: MaterialCardView,
+        circleColorInt: Int,
+    ) {
+        circleView.setCardBackgroundColor((ContextCompat.getColor(this, circleColorInt)))
+        circleView.strokeColor = ContextCompat.getColor(this, R.color.dark_blue)
+        circleView.strokeWidth = 8
+        circleView.cardElevation = 0f
     }
 }

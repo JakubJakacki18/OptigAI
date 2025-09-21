@@ -6,7 +6,6 @@ import androidx.datastore.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import pl.pb.optigai.Settings
-import android.util.Log
 
 private val Context.settingsDataStore: DataStore<Settings> by dataStore(
     fileName = "settings.optigai",
@@ -70,16 +69,20 @@ class SettingsService private constructor(
     }
 
     suspend fun toggleColorOfBorder(color: Settings.ColorOfBorder) {
-        Log.d("SettingsService", "Toggling color: $color")
+        AppLogger.d("Toggling color: $color")
         dataStore.updateData { settings ->
-            val currentColors = settings.colorList.toMutableList()
-            if (currentColors.contains(color)) {
-                currentColors.remove(color)
-            } else {
-                currentColors.add(color)
-            }
-            Log.d("SettingsService", "New color list: $currentColors")
-            settings.toBuilder().clearColor().addAllColor(currentColors).build()
+            val updatedColors =
+                settings.colorList
+                    .toMutableList()
+                    .apply {
+                        if (!remove(color)) add(color)
+                    }
+            AppLogger.d("New color list: $updatedColors")
+            settings
+                .toBuilder()
+                .clearColor()
+                .addAllColor(updatedColors)
+                .build()
         }
     }
 

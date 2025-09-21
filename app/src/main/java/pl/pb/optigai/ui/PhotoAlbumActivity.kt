@@ -11,7 +11,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -43,13 +42,13 @@ class PhotoAlbumActivity : AppCompatActivity() {
             loadImages()
         }
 
-        val headerTitle: TextView = findViewById(R.id.headerTitle)
+        val headerTitle: TextView = viewBinding.headerLayout.headerTitle
         headerTitle.text = getString(R.string.gallery_header_shared)
-        val backButton: View = findViewById(R.id.backButton)
+
+        val backButton: View = viewBinding.headerLayout.headerTitle
         backButton.setOnClickListener {
             finish()
         }
-
     }
 
     /**
@@ -87,11 +86,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val gridColumns = getGridColumns()
-            if (gridColumns == 1) {
-                viewBinding.recyclerView.layoutManager = LinearLayoutManager(this@PhotoAlbumActivity)
-            } else {
-                viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, gridColumns)
-            }
+            viewBinding.recyclerView.layoutManager = GridLayoutManager(this@PhotoAlbumActivity, gridColumns)
         }
 
         val adapter =
