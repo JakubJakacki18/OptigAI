@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.view.View
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -7,6 +8,8 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.ScaleGestureDetector
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -37,6 +40,9 @@ class CameraActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels()
     private var imageCapture: ImageCapture? = null
     private var flashMode = ImageCapture.FLASH_MODE_AUTO
+    private lateinit var zoomSeekBar: SeekBar
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private lateinit var camera: androidx.camera.core.Camera
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +86,25 @@ class CameraActivity : AppCompatActivity() {
             }
             imageCapture?.flashMode = flashMode
         }
-
+        scaleGestureDetector = ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                if (!this@CameraActivity::camera.isInitialized) {
+                    return false
+                }
+                val zoomState = camera.cameraInfo.zoomState.value ?: return false
+                val currentZoom = zoomState.zoomRatio
+                val newZoom = currentZoom * detector.scaleFactor
+                val minZoom = zoomState.minZoomRatio
+                val maxZoom = zoomState.maxZoomRatio
+                val clampedZoom = newZoom.coerceIn(minZoom, maxZoom)
+                camera.cameraControl.setZoomRatio(clampedZoom)
+                val linearZoom = (clampedZoom - minZoom) / (maxZoom - minZoom)
+                if (this@CameraActivity::zoomSeekBar.isInitialized) {
+                    zoomSeekBar.progress = (linearZoom * 100).toInt()
+                }
+                return true
+            }
+        })
     }
 
     private val activityResultLauncher =
@@ -118,12 +142,15 @@ class CameraActivity : AppCompatActivity() {
 
         try {
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
+            camera = cameraProvider.bindToLifecycle(
                 this,
                 cameraSelector,
                 preview,
                 imageCapture,
             )
+            camera.cameraControl.setZoomRatio(1.0f)
+            setupZoomControls()
+
         } catch (exc: Exception) {
             Toast.makeText(this, "Camera initialization failed: ${exc.message}", Toast.LENGTH_LONG).show()
         }
@@ -209,7 +236,30 @@ class CameraActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
+    private fun setupZoomControls() {
+        val zoomBar = viewBinding.zoomSeekBar ?: return
+        zoomSeekBar = zoomBar
+        zoomSeekBar.visibility = View.VISIBLE
+        val zoomState = camera.cameraInfo.zoomState.value ?: return
+        val maxZoomRatio = zoomState.maxZoomRatio
+        val maxProgress = 100
+        zoomSeekBar.max = maxProgress
+        camera.cameraInfo.zoomState.observe(this) { zoomState ->
+            val linearZoom = zoomState.linearZoom
+            zoomSeekBar.progress = (linearZoom * maxProgress).toInt()
+        }
+        zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    val linearZoom = progress / maxProgress.toFloat()
+                    camera.cameraControl.setLinearZoom(linearZoom)
+                }
+            }
 
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+    }
     private fun Bitmap.rotate(degrees: Int): Bitmap {
         if (degrees == 0) return this
         val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
