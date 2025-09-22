@@ -1,201 +1,166 @@
 package pl.pb.optigai.ui
 
-import android.content.ContentValues
-import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.net.Uri
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.MediaStore
+import android.util.Log
+import android.view.ScaleGestureDetector
+import android.widget.ImageButton
+import android.widget.SeekBar
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.concurrent.futures.await
+import androidx.camera.view.PreviewView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import pl.pb.optigai.databinding.ActivityCameraBinding
-import pl.pb.optigai.utils.PermissionHandler
-import pl.pb.optigai.utils.data.BitmapCache
-import pl.pb.optigai.utils.data.SettingsViewModel
+import pl.pb.optigai.R
+import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Locale
-import kotlin.getValue
+import java.util.*
 
 class CameraActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityCameraBinding
-    private val viewModel: SettingsViewModel by viewModels()
-    private var imageCapture: ImageCapture? = null
+
+    private lateinit var previewView: PreviewView
+    private lateinit var flashButton: ImageButton
+    private lateinit var takePhotoButton: ImageButton
+    private lateinit var zoomSeekBar: SeekBar
+
+    private lateinit var camera: Camera
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+
+    companion object {
+        private const val TAG = "CameraActivity"
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityCameraBinding.inflate(layoutInflater)
-        setContentView(viewBinding.root)
+        setContentView(R.layout.activity_camera)
 
-        if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
-            activityResultLauncher.launch(REQUIRED_PERMISSIONS)
+        previewView = findViewById(R.id.cameraPreviewView)
+        flashButton = findViewById(R.id.flashToggleButton)
+        takePhotoButton = findViewById(R.id.takePhotoButton)
+        zoomSeekBar = findViewById(R.id.zoomSeekBar)
+
+        if (allPermissionsGranted()) {
+            startCamera()
         } else {
-            lifecycleScope.launch {
-                startCamera()
-            }
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
-        viewBinding.openGalleryButton.setOnClickListener {
-            val intent = Intent(this, PhotoAlbumActivity::class.java)
-            startActivity(intent)
-        }
-        viewBinding.openSettingsButton.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+        setupPinchToZoom()
+        setupZoomSeekBar()
+        setupFlashToggle()
+        setupTakePhoto()
+    }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                cameraProvider.unbindAll()
+                camera = cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview
+                )
+            } catch (exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
+
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupPinchToZoom() {
+        scaleGestureDetector = ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                val currentZoom = camera.cameraInfo.zoomState.value?.zoomRatio ?: 1f
+                camera.cameraControl.setZoomRatio(currentZoom * detector.scaleFactor)
+                updateZoomSeekBar()
+                return true
+            }
+        })
+
+        previewView.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            true
         }
     }
 
-    private val activityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            var permissionGranted = true
-            permissions.entries.forEach {
-                if (it.key in REQUIRED_PERMISSIONS && !it.value) {
-                    permissionGranted = false
-                }
+    private fun setupZoomSeekBar() {
+        zoomSeekBar.max = 100
+        zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val zoomState = camera.cameraInfo.zoomState.value ?: return
+                val zoom = zoomState.minZoomRatio + (zoomState.maxZoomRatio - zoomState.minZoomRatio) * (progress / 100f)
+                camera.cameraControl.setZoomRatio(zoom)
             }
-            if (!permissionGranted) {
-                Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
-            } else {
-                lifecycleScope.launch {
-                    startCamera()
-                }
-            }
-        }
-
-    companion object {
-        const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private val REQUIRED_PERMISSIONS =
-            mutableListOf(
-                android.Manifest.permission.CAMERA,
-            ).toTypedArray()
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
     }
 
-    private suspend fun startCamera() {
-        val cameraProvider = ProcessCameraProvider.getInstance(this).await()
-        val preview = Preview.Builder().build()
-        preview.surfaceProvider = viewBinding.cameraPreviewView.surfaceProvider
-        imageCapture = ImageCapture.Builder().build()
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        try {
-            cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture,
+    private fun updateZoomSeekBar() {
+        val zoomState = camera.cameraInfo.zoomState.value ?: return
+        val zoom = camera.cameraInfo.zoomState.value?.zoomRatio ?: 1f
+        val progress = ((zoom - zoomState.minZoomRatio) / (zoomState.maxZoomRatio - zoomState.minZoomRatio) * 100).toInt()
+        zoomSeekBar.progress = progress
+    }
+
+    private fun setupFlashToggle() {
+        flashButton.setOnClickListener {
+            val currentTorch = camera.cameraInfo.torchState.value
+            camera.cameraControl.enableTorch(currentTorch != TorchState.ON)
+        }
+    }
+
+    private fun setupTakePhoto() {
+        takePhotoButton.setOnClickListener {
+            val imageCapture = ImageCapture.Builder().build()
+            val photoFile = File(
+                externalMediaDirs.first(),
+                SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis()) + ".jpg"
             )
-        } catch (exc: Exception) {
-            Toast.makeText(this, "Camera initialization failed: ${exc.message}", Toast.LENGTH_LONG).show()
-        }
-    }
+            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-    private fun takePhoto() {
-        lifecycleScope.launch {
-            if (getIsSavingPhoto()) {
-                takePhotoAndSaveToExternalStorage()
-            } else {
-                takePhotoAndSaveToTemporaryBitmap()
-            }
-        }
-    }
-
-    private fun getOutputFileOptions(): ImageCapture.OutputFileOptions {
-        val locale = Locale.getDefault()
-        val name =
-            SimpleDateFormat(
-                FILENAME_FORMAT,
-                locale,
-            ).format(System.currentTimeMillis())
-
-        val contentValues =
-            ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OptigAI")
-            }
-
-        return ImageCapture.OutputFileOptions
-            .Builder(
-                contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues,
-            ).build()
-    }
-
-    private fun takePhotoAndSaveToExternalStorage() {
-        imageCapture?.takePicture(
-            getOutputFileOptions(),
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exception: ImageCaptureException) {
-                    Toast
-                        .makeText(
-                            this@CameraActivity,
-                            "Photo capture failed: ${exception.message}",
-                            Toast.LENGTH_LONG,
-                        ).show()
-                }
-
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = outputFileResults.savedUri
-                    if (savedUri != null) {
-                        startAnalysis(savedUri)
-                    } else {
-                        Toast.makeText(this@CameraActivity, "Error saving photo", Toast.LENGTH_SHORT).show()
+            imageCapture.takePicture(
+                outputOptions,
+                ContextCompat.getMainExecutor(this),
+                object : ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                        Toast.makeText(baseContext, "Photo saved: ${photoFile.absolutePath}", Toast.LENGTH_SHORT).show()
+                    }
+                    override fun onError(exception: ImageCaptureException) {
+                        Log.e(TAG, "Photo capture failed: ${exception.message}", exception)
                     }
                 }
-            },
-        )
-    }
-
-    private fun takePhotoAndSaveToTemporaryBitmap() {
-        imageCapture?.takePicture(
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageCapturedCallback() {
-                override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                    val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-                    val bitmap = imageProxy.toBitmap().rotate(rotationDegrees)
-                    imageProxy.close()
-                    BitmapCache.bitmap = bitmap
-                    startAnalysis(bitmap)
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(this@CameraActivity, "Photo capture failed: ${exception.message}", Toast.LENGTH_LONG).show()
-                }
-            },
-        )
-    }
-
-    private fun startAnalysis(data: Any) {
-        val intent = Intent(this, AnalysisActivity::class.java)
-        when (data) {
-            is Uri -> intent.putExtra("IMAGE_URI", data.toString())
-            is Bitmap -> Unit
-            else -> throw IllegalArgumentException("Unsupported data type")
+            )
         }
-        startActivity(intent)
     }
 
-    private fun Bitmap.rotate(degrees: Int): Bitmap {
-        if (degrees == 0) return this
-        val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
-        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                startCamera()
+            } else {
+                Toast.makeText(this, "Permissions not granted.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
-
-    private suspend fun getIsSavingPhoto(): Boolean = viewModel.isPhotoSaving.first()
 }

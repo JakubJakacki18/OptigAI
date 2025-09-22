@@ -35,4 +35,5 @@
     <string name="select_colors">Select Colors</string>
     <string name="save_automatically">Save automatically</string>
     <string name="checkmark">✓</string>
+    <string name="flash_toggle_description">flash</string>
 </resources>

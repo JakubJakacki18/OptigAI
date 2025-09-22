@@ -9,6 +9,7 @@
     android:background="@color/light_blue"
     tools:context=".ui.CameraActivity">
 
+    <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/cameraPreviewView"
         android:layout_width="0dp"
@@ -19,6 +20,25 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <!-- Flash Toggle Button -->
+    <ImageButton
+        android:id="@+id/flashToggleButton"
+        android:layout_width="82dp"
+        android:layout_height="82dp"
+        android:src="@drawable/ic_flash_auto"
+        android:background="@color/dark_blue"
+        android:contentDescription="@string/flash_toggle_description"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:padding="12dp"
+        android:stateListAnimator="@animator/scale_animator"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/cameraPreviewView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <!-- Camera Control Layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cameraControlLayout"
         android:layout_width="0dp"
@@ -68,4 +88,16 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Optional Zoom Slider -->
+    <SeekBar
+        android:id="@+id/zoomSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0"
+        android:thumb="@drawable/ic_zoom_thumb"
+        app:layout_constraintBottom_toTopOf="@id/cameraControlLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
