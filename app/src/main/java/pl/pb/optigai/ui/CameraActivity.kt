@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.content.ContentValues
 import android.content.Intent
@@ -44,6 +45,7 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private lateinit var camera: androidx.camera.core.Camera
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
@@ -105,6 +107,10 @@ class CameraActivity : AppCompatActivity() {
                 return true
             }
         })
+        viewBinding.cameraPreviewView.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            return@setOnTouchListener true
+        }
     }
 
     private val activityResultLauncher =
@@ -132,7 +138,7 @@ class CameraActivity : AppCompatActivity() {
     private suspend fun startCamera() {
         val cameraProvider = ProcessCameraProvider.getInstance(this).await()
         val preview = Preview.Builder().build()
-        preview.setSurfaceProvider(viewBinding.cameraPreviewView.surfaceProvider)
+        preview.surfaceProvider = viewBinding.cameraPreviewView.surfaceProvider
 
         imageCapture = ImageCapture.Builder()
             .setFlashMode(flashMode)
@@ -240,8 +246,6 @@ class CameraActivity : AppCompatActivity() {
         val zoomBar = viewBinding.zoomSeekBar ?: return
         zoomSeekBar = zoomBar
         zoomSeekBar.visibility = View.VISIBLE
-        val zoomState = camera.cameraInfo.zoomState.value ?: return
-        val maxZoomRatio = zoomState.maxZoomRatio
         val maxProgress = 100
         zoomSeekBar.max = maxProgress
         camera.cameraInfo.zoomState.observe(this) { zoomState ->
