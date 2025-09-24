@@ -26,4 +26,12 @@ message Settings {
     string default_save_location = 4;
     bool is_photo_saving = 5;
     repeated ColorOfBorder color = 6;
+
+    enum ZoomSeekBarMode {
+            ALWAYS_OFF = 0;
+            AUTO = 1;
+            ALWAYS_ON = 2;
+    }
+
+    ZoomSeekBarMode zoom_seek_bar_mode = 10;
 }

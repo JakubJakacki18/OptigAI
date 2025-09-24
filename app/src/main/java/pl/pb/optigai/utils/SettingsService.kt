@@ -31,7 +31,8 @@ class SettingsService private constructor(
 
     val colors: Flow<List<Settings.ColorOfBorder>> =
         settingsFlow.map { it.colorList }
-
+    val zoomSeekBarMode: Flow<Settings.ZoomSeekBarMode> =
+        settingsFlow.map { it.zoomSeekBarMode }
     suspend fun updateGridColumns(columns: Int) {
         dataStore.updateData { current ->
             current
@@ -82,6 +83,15 @@ class SettingsService private constructor(
                 .toBuilder()
                 .clearColor()
                 .addAllColor(updatedColors)
+                .build()
+        }
+    }
+
+
+    suspend fun updateZoomSeekBarMode(mode: Settings.ZoomSeekBarMode) {
+        dataStore.updateData { current ->
+            current.toBuilder()
+                .setZoomSeekBarMode(mode)
                 .build()
         }
     }

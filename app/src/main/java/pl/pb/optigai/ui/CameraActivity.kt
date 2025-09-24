@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import pl.pb.optigai.R
+import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivityCameraBinding
 import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.BitmapCache
@@ -68,6 +69,26 @@ class CameraActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+        lifecycleScope.launch {
+            viewModel.zoomSeekBarMode.collect { mode ->
+                when (mode) {
+                    Settings.ZoomSeekBarMode.ALWAYS_ON -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.VISIBLE
+                    }
+                    Settings.ZoomSeekBarMode.ALWAYS_OFF -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                    }
+                    Settings.ZoomSeekBarMode.AUTO -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                    }
+                    Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
+
 
         val flashButton = viewBinding.flashToggleButton!!
 
@@ -88,25 +109,31 @@ class CameraActivity : AppCompatActivity() {
             }
             imageCapture?.flashMode = flashMode
         }
-        scaleGestureDetector = ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            override fun onScale(detector: ScaleGestureDetector): Boolean {
-                if (!this@CameraActivity::camera.isInitialized) {
-                    return false
-                }
-                val zoomState = camera.cameraInfo.zoomState.value ?: return false
-                val currentZoom = zoomState.zoomRatio
-                val newZoom = currentZoom * detector.scaleFactor
-                val minZoom = zoomState.minZoomRatio
-                val maxZoom = zoomState.maxZoomRatio
-                val clampedZoom = newZoom.coerceIn(minZoom, maxZoom)
-                camera.cameraControl.setZoomRatio(clampedZoom)
-                val linearZoom = (clampedZoom - minZoom) / (maxZoom - minZoom)
-                if (this@CameraActivity::zoomSeekBar.isInitialized) {
+        scaleGestureDetector = ScaleGestureDetector(this,
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    val zoomState = camera.cameraInfo.zoomState.value ?: return false
+                    val currentZoom = zoomState.zoomRatio
+                    val newZoom = (currentZoom * detector.scaleFactor)
+                        .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
+
+                    camera.cameraControl.setZoomRatio(newZoom)
+
+                    val linearZoom = (newZoom - zoomState.minZoomRatio) /
+                            (zoomState.maxZoomRatio - zoomState.minZoomRatio)
                     zoomSeekBar.progress = (linearZoom * 100).toInt()
+
+                    lifecycleScope.launch {
+                        if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
+                            zoomSeekBar.visibility = View.VISIBLE
+                            zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
+                            zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                        }
+                    }
+                    return true
                 }
-                return true
-            }
-        })
+            })
+
         viewBinding.cameraPreviewView.setOnTouchListener { _, event ->
             scaleGestureDetector.onTouchEvent(event)
             return@setOnTouchListener true
@@ -242,21 +269,29 @@ class CameraActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
+    private val hideZoomBarRunnable = Runnable {
+        viewBinding.zoomSeekBar!!.visibility = View.GONE
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupZoomControls() {
-        val zoomBar = viewBinding.zoomSeekBar ?: return
-        zoomSeekBar = zoomBar
-        zoomSeekBar.visibility = View.VISIBLE
-        val maxProgress = 100
-        zoomSeekBar.max = maxProgress
-        camera.cameraInfo.zoomState.observe(this) { zoomState ->
-            val linearZoom = zoomState.linearZoom
-            zoomSeekBar.progress = (linearZoom * maxProgress).toInt()
-        }
+        val zoomSeekBar = viewBinding.zoomSeekBar!!  // non-null
+
+        zoomSeekBar.max = 100
         zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    val linearZoom = progress / maxProgress.toFloat()
-                    camera.cameraControl.setLinearZoom(linearZoom)
+                if (!fromUser) return
+                val zoomState = camera.cameraInfo.zoomState.value ?: return
+                val zoomRatio = zoomState.minZoomRatio +
+                        (zoomState.maxZoomRatio - zoomState.minZoomRatio) * (progress / 100f)
+                camera.cameraControl.setZoomRatio(zoomRatio)
+
+                lifecycleScope.launch {
+                    if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
+                        zoomSeekBar.visibility = View.VISIBLE
+                        zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
+                        zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                    }
                 }
             }
 
@@ -264,6 +299,7 @@ class CameraActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
+
     private fun Bitmap.rotate(degrees: Int): Bitmap {
         if (degrees == 0) return this
         val matrix = Matrix().apply { postRotate(degrees.toFloat()) }

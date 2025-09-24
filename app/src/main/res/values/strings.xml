@@ -36,4 +36,8 @@
     <string name="save_automatically">Save automatically</string>
     <string name="checkmark">✓</string>
     <string name="flash_toggle_description">flash</string>
+    <string name="zoom_slider">Zoom Slider Visibility</string>
+    <string name="off">Always Off</string>
+    <string name="auto">Auto</string>
+    <string name="on">Always On</string>
 </resources>
