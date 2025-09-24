@@ -45,7 +45,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
         val headerTitle: TextView = viewBinding.headerLayout.headerTitle
         headerTitle.text = getString(R.string.gallery_header_shared)
 
-        val backButton: View = viewBinding.headerLayout.headerTitle
+        val backButton: View = viewBinding.headerLayout.backButton
         backButton.setOnClickListener {
             finish()
         }
