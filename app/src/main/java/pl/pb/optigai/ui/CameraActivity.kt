@@ -1,7 +1,6 @@
 package pl.pb.optigai.ui
 
 import android.annotation.SuppressLint
-import android.view.View
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -10,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.ScaleGestureDetector
+import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,7 +37,6 @@ import java.util.Locale
 import kotlin.getValue
 
 class CameraActivity : AppCompatActivity() {
-
     private lateinit var viewBinding: ActivityCameraBinding
     private val viewModel: SettingsViewModel by viewModels()
     private var imageCapture: ImageCapture? = null
@@ -82,58 +81,62 @@ class CameraActivity : AppCompatActivity() {
                     Settings.ZoomSeekBarMode.AUTO -> {
                         viewBinding.zoomSeekBar!!.visibility = View.GONE
                     }
-                    Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
+                    else -> {
                         viewBinding.zoomSeekBar!!.visibility = View.GONE
                     }
                 }
             }
         }
 
-
-
         val flashButton = viewBinding.flashToggleButton!!
 
         flashButton.setOnClickListener {
-            flashMode = when (flashMode) {
-                ImageCapture.FLASH_MODE_AUTO -> {
-                    flashButton.setImageResource(R.drawable.ic_flash_on)
-                    ImageCapture.FLASH_MODE_ON
+            flashMode =
+                when (flashMode) {
+                    ImageCapture.FLASH_MODE_AUTO -> {
+                        flashButton.setImageResource(R.drawable.ic_flash_on)
+                        ImageCapture.FLASH_MODE_ON
+                    }
+                    ImageCapture.FLASH_MODE_ON -> {
+                        flashButton.setImageResource(R.drawable.ic_flash_off)
+                        ImageCapture.FLASH_MODE_OFF
+                    }
+                    else -> {
+                        flashButton.setImageResource(R.drawable.ic_flash_auto)
+                        ImageCapture.FLASH_MODE_AUTO
+                    }
                 }
-                ImageCapture.FLASH_MODE_ON -> {
-                    flashButton.setImageResource(R.drawable.ic_flash_off)
-                    ImageCapture.FLASH_MODE_OFF
-                }
-                else -> {
-                    flashButton.setImageResource(R.drawable.ic_flash_auto)
-                    ImageCapture.FLASH_MODE_AUTO
-                }
-            }
             imageCapture?.flashMode = flashMode
         }
-        scaleGestureDetector = ScaleGestureDetector(this,
-            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-                override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    val zoomState = camera.cameraInfo.zoomState.value ?: return false
-                    val currentZoom = zoomState.zoomRatio
-                    val newZoom = (currentZoom * detector.scaleFactor)
-                        .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
+        scaleGestureDetector =
+            ScaleGestureDetector(
+                this,
+                object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    override fun onScale(detector: ScaleGestureDetector): Boolean {
+                        val zoomState = camera.cameraInfo.zoomState.value ?: return false
+                        val currentZoom = zoomState.zoomRatio
+                        val newZoom =
+                            (currentZoom * detector.scaleFactor)
+                                .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
 
-                    camera.cameraControl.setZoomRatio(newZoom)
+                        camera.cameraControl.setZoomRatio(newZoom)
 
-                    val linearZoom = (newZoom - zoomState.minZoomRatio) /
-                            (zoomState.maxZoomRatio - zoomState.minZoomRatio)
-                    zoomSeekBar.progress = (linearZoom * 100).toInt()
+                        val linearZoom =
+                            (newZoom - zoomState.minZoomRatio) /
+                                (zoomState.maxZoomRatio - zoomState.minZoomRatio)
+                        zoomSeekBar.progress = (linearZoom * 100).toInt()
 
-                    lifecycleScope.launch {
-                        if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
-                            zoomSeekBar.visibility = View.VISIBLE
-                            zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
-                            zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                        lifecycleScope.launch {
+                            if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
+                                zoomSeekBar.visibility = View.VISIBLE
+                                zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
+                                zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                            }
                         }
+                        return true
                     }
-                    return true
-                }
-            })
+                },
+            )
 
         viewBinding.cameraPreviewView.setOnTouchListener { _, event ->
             scaleGestureDetector.onTouchEvent(event)
@@ -158,9 +161,10 @@ class CameraActivity : AppCompatActivity() {
 
     companion object {
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private val REQUIRED_PERMISSIONS = mutableListOf(
-            android.Manifest.permission.CAMERA,
-        ).toTypedArray()
+        private val REQUIRED_PERMISSIONS =
+            mutableListOf(
+                android.Manifest.permission.CAMERA,
+            ).toTypedArray()
     }
 
     private suspend fun startCamera() {
@@ -168,23 +172,25 @@ class CameraActivity : AppCompatActivity() {
         val preview = Preview.Builder().build()
         preview.surfaceProvider = viewBinding.cameraPreviewView.surfaceProvider
 
-        imageCapture = ImageCapture.Builder()
-            .setFlashMode(flashMode)
-            .build()
+        imageCapture =
+            ImageCapture
+                .Builder()
+                .setFlashMode(flashMode)
+                .build()
 
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
         try {
             cameraProvider.unbindAll()
-            camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture,
-            )
+            camera =
+                cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageCapture,
+                )
             camera.cameraControl.setZoomRatio(1.0f)
             setupZoomControls()
-
         } catch (exc: Exception) {
             Toast.makeText(this, "Camera initialization failed: ${exc.message}", Toast.LENGTH_LONG).show()
         }
@@ -203,11 +209,12 @@ class CameraActivity : AppCompatActivity() {
     private fun getOutputFileOptions(): ImageCapture.OutputFileOptions {
         val locale = Locale.getDefault()
         val name = SimpleDateFormat(FILENAME_FORMAT, locale).format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OptigAI")
-        }
+        val contentValues =
+            ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OptigAI")
+            }
         return ImageCapture.OutputFileOptions
             .Builder(contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             .build()
@@ -219,11 +226,12 @@ class CameraActivity : AppCompatActivity() {
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "Photo capture failed: ${exception.message}",
-                        Toast.LENGTH_LONG,
-                    ).show()
+                    Toast
+                        .makeText(
+                            this@CameraActivity,
+                            "Photo capture failed: ${exception.message}",
+                            Toast.LENGTH_LONG,
+                        ).show()
                 }
 
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
@@ -251,11 +259,12 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(
-                        this@CameraActivity,
-                        "Photo capture failed: ${exception.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast
+                        .makeText(
+                            this@CameraActivity,
+                            "Photo capture failed: ${exception.message}",
+                            Toast.LENGTH_LONG,
+                        ).show()
                 }
             },
         )
@@ -270,33 +279,43 @@ class CameraActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-    private val hideZoomBarRunnable = Runnable {
-        viewBinding.zoomSeekBar!!.visibility = View.GONE
-    }
+
+    private val hideZoomBarRunnable =
+        Runnable {
+            viewBinding.zoomSeekBar!!.visibility = View.GONE
+        }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupZoomControls() {
         zoomSeekBar.max = 100
-        zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (!fromUser) return
-                val zoomState = camera.cameraInfo.zoomState.value ?: return
-                val zoomRatio = zoomState.minZoomRatio +
-                        (zoomState.maxZoomRatio - zoomState.minZoomRatio) * (progress / 100f)
-                camera.cameraControl.setZoomRatio(zoomRatio)
+        zoomSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean,
+                ) {
+                    if (!fromUser) return
+                    val zoomState = camera.cameraInfo.zoomState.value ?: return
+                    val zoomRatio =
+                        zoomState.minZoomRatio +
+                            (zoomState.maxZoomRatio - zoomState.minZoomRatio) * (progress / 100f)
+                    camera.cameraControl.setZoomRatio(zoomRatio)
 
-                lifecycleScope.launch {
-                    if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
-                        zoomSeekBar.visibility = View.VISIBLE
-                        zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
-                        zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                    lifecycleScope.launch {
+                        if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
+                            zoomSeekBar.visibility = View.VISIBLE
+                            zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
+                            zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                        }
                     }
                 }
-            }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            },
+        )
     }
 
     private fun Bitmap.rotate(degrees: Int): Bitmap {
