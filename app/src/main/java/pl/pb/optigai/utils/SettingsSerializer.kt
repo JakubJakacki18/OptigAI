@@ -13,6 +13,7 @@ object SettingsSerializer : Serializer<Settings> {
             .setGridColumns(2)
             .setLanguageValue(Settings.Language.SYSTEM_DEFAULT_VALUE)
             .setIsPhotoSaving(true)
+            .setZoomSeekBarModeValue(Settings.ZoomSeekBarMode.AUTO_VALUE)
             .addAllColor(
                 listOf(
                     Settings.ColorOfBorder.RED,

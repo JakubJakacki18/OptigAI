@@ -41,6 +41,35 @@ class SettingsActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             finish()
         }
+        val zoomToggle = viewBinding.zoomSeekBarToggle
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.zoomSeekBarMode.collect { mode ->
+                    when (mode) {
+                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> zoomToggle.check(R.id.zoomAlwaysOff)
+                        Settings.ZoomSeekBarMode.AUTO -> zoomToggle.check(R.id.zoomAuto)
+                        Settings.ZoomSeekBarMode.ALWAYS_ON -> zoomToggle.check(R.id.zoomAlwaysOn)
+                        Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
+                            zoomToggle.clearChecked()
+                        }
+                    }
+                }
+            }
+        }
+
+
+        zoomToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val newMode = when (checkedId) {
+                    R.id.zoomAlwaysOff -> Settings.ZoomSeekBarMode.ALWAYS_OFF
+                    R.id.zoomAuto -> Settings.ZoomSeekBarMode.AUTO
+                    R.id.zoomAlwaysOn -> Settings.ZoomSeekBarMode.ALWAYS_ON
+                    else -> Settings.ZoomSeekBarMode.AUTO
+                }
+                viewModel.setZoomSeekBarMode(newMode)
+            }
+        }
+
     }
 
     /**

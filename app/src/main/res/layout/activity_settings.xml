@@ -18,10 +18,10 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/resultScrollView"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp"
-        android:layout_height="0dp"
         android:background="@drawable/analysis_result_box"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout"
@@ -33,7 +33,120 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Section 1: Grid Columns -->
+            <!-- Section 1: Photo Saving Option -->
+            <TextView
+                android:id="@+id/isPhotoSavingOptionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/is_photo_saving_option_title"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <TextView
+                    android:id="@+id/saveAutomaticallyLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/save_automatically"
+                    android:textSize="20sp"
+                    android:textColor="@color/onyx"
+                    android:fontFamily="@font/signikasb"/>
+
+                <Switch
+                    android:id="@+id/isPhotoSavingToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumbTint="@color/switch_thumb_selector"
+                    android:trackTint="@color/switch_track_selector"
+                    app:trackHeight="40dp"
+                    android:padding="8dp"
+                    android:scaleX="1.5"
+                    android:scaleY="1.5"
+                    tools:ignore="UseSwitchCompatOrMaterialXml"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
+
+            <!-- Section 2: Zoom Slider -->
+            <TextView
+                android:id="@+id/zoomSeekBarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/zoom_slider"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/zoomSeekBarToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zoomAlwaysOff"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/off"
+                    app:strokeColor="@color/creme"
+                    app:strokeWidth="2dp"
+                    android:textColor="@color/creme"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/signikab"
+                    android:backgroundTint="@color/dark_blue"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zoomAuto"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto"
+                    app:strokeColor="@color/creme"
+                    app:strokeWidth="2dp"
+                    android:textColor="@color/creme"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/signikab"
+                    android:backgroundTint="@color/dark_blue"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zoomAlwaysOn"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/on"
+                    app:strokeColor="@color/creme"
+                    app:strokeWidth="2dp"
+                    android:textColor="@color/creme"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/signikab"
+                    android:backgroundTint="@color/dark_blue"/>
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
+
+            <!-- Section 3: Gallery/Grid Columns -->
             <TextView
                 android:id="@+id/settingsTitle"
                 android:layout_width="wrap_content"
@@ -42,8 +155,6 @@
                 android:textSize="24sp"
                 android:fontFamily="@font/signikab"
                 android:layout_gravity="center_horizontal"/>
-
-
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/gridColumnsSlider"
@@ -64,61 +175,7 @@
                 android:background="@color/line_color"
                 android:layout_marginTop="12dp"/>
 
-            <!-- Section 2: Photo Saving Option -->
-            <TextView
-                android:id="@+id/isPhotoSavingOptionTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/is_photo_saving_option_title"
-                android:textSize="24sp"
-                android:fontFamily="@font/signikab"
-                android:layout_marginTop="16dp"
-                android:layout_gravity="center_horizontal"/>
-
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp">
-
-                <!-- Label -->
-                <TextView
-                    android:id="@+id/saveAutomaticallyLabel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/save_automatically"
-                    android:textSize="20sp"
-                    android:textColor="@color/onyx"
-                    android:fontFamily="@font/signikasb"
-                    />
-
-                <!-- Enlarged switch -->
-                <Switch
-                    android:id="@+id/isPhotoSavingToggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:thumbTint="@color/switch_thumb_selector"
-                    android:trackTint="@color/switch_track_selector"
-                    app:trackHeight="40dp"
-                    android:padding="8dp"
-                    android:scaleX="1.5"
-                    android:scaleY="1.5"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/line_color"
-                android:layout_marginTop="12dp"/>
-            <!-- Section 3: Color Selection -->
+            <!-- Section 4: Color Selection -->
             <TextView
                 android:id="@+id/colorToggleTitle"
                 android:layout_width="wrap_content"
@@ -128,7 +185,6 @@
                 android:fontFamily="@font/signikab"
                 android:layout_marginTop="16dp"
                 android:layout_gravity="center_horizontal"/>
-
 
             <GridLayout
                 android:id="@+id/colorToggleGrid"
@@ -195,10 +251,12 @@
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FFFFFF"/>
+                    android:backgroundTint="@color/creme"/>
             </GridLayout>
-
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

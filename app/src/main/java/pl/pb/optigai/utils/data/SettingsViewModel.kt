@@ -18,6 +18,7 @@ class SettingsViewModel(
     val defaultSaveLocation = settingsService.defaultSaveLocation
     val isPhotoSaving = settingsService.isPhotoSaving
     val colors = settingsService.colors
+    val zoomSeekBarMode = settingsService.zoomSeekBarMode
 
     fun setGridColumns(columns: Int) {
         viewModelScope.launch {
@@ -37,4 +38,12 @@ class SettingsViewModel(
             settingsService.toggleColorOfBorder(color)
         }
     }
+
+
+    fun setZoomSeekBarMode(mode: Settings.ZoomSeekBarMode) {
+        viewModelScope.launch {
+            settingsService.updateZoomSeekBarMode(mode)
+        }
+    }
+
 }
