@@ -87,7 +87,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Optional Zoom Slider -->
+    <!-- Zoom -->
     <SeekBar
         android:id="@+id/zoomSeekBar"
         android:layout_width="0dp"
@@ -100,6 +100,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="16dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
         android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

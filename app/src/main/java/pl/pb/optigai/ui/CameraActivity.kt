@@ -57,6 +57,7 @@ class CameraActivity : AppCompatActivity() {
         } else {
             lifecycleScope.launch { startCamera() }
         }
+        zoomSeekBar = viewBinding.zoomSeekBar!!
 
         viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
 
@@ -275,8 +276,6 @@ class CameraActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupZoomControls() {
-        val zoomSeekBar = viewBinding.zoomSeekBar!!  // non-null
-
         zoomSeekBar.max = 100
         zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
