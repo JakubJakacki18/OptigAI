@@ -38,10 +38,18 @@
     <string name="checkmark">✓</string>
     <string name="flash_toggle_description">flash</string>
     <string name="zoom_slider">Zoom Slider Visibility</string>
-    <string name="off">Always Off</string>
+    <string name="off">Off</string>
     <string name="auto">Auto</string>
-    <string name="on">Always On</string>
+    <string name="on">On</string>
     <string name="object_button_description">Analise object button</string>
     <string name="braille_button_description">Analyse braille button</string>
     <string name="text_button_description">Analyse text button</string>
+    <string name="current_font_size">Current Font Size</string>
+    <string name="increase_font_size">Increase font size</string>
+    <string name="decrease_font_size">Decrease font size</string>
+    <string name="minus">−</string>
+    <string name="font_size">24sp</string>
+    <string name="plus">+</string>
+    <string name="sample_text_preview">Sample Text Preview</string>
+    <string name="font_size_text">Change Result Font Size</string>
 </resources>

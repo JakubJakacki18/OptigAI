@@ -33,6 +33,12 @@ class SettingsService private constructor(
         settingsFlow.map { it.colorList }
     val zoomSeekBarMode: Flow<Settings.ZoomSeekBarMode> =
         settingsFlow.map { it.zoomSeekBarMode }
+
+    val fontSizeSp: Flow<Int> = settingsFlow.map { s ->
+        // default to 28 if the field was never set
+        if (s.fontSizeSp > 0) s.fontSizeSp else 28
+    }
+
     suspend fun updateGridColumns(columns: Int) {
         dataStore.updateData { current ->
             current
@@ -87,11 +93,18 @@ class SettingsService private constructor(
         }
     }
 
-
     suspend fun updateZoomSeekBarMode(mode: Settings.ZoomSeekBarMode) {
         dataStore.updateData { current ->
             current.toBuilder()
                 .setZoomSeekBarMode(mode)
+                .build()
+        }
+    }
+
+    suspend fun updateFontSize(sp: Int) {
+        dataStore.updateData { current ->
+            current.toBuilder()
+                .setFontSizeSp(sp)
                 .build()
         }
     }

@@ -22,7 +22,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp"
-        android:background="@drawable/analysis_result_box"
+        android:background="@drawable/settings_background"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -33,7 +33,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Section 1: Photo Saving Option -->
             <TextView
                 android:id="@+id/isPhotoSavingOptionTitle"
                 android:layout_width="wrap_content"
@@ -82,7 +81,6 @@
                 android:background="@color/line_color"
                 android:layout_marginTop="12dp"/>
 
-            <!-- Section 2: Zoom Slider -->
             <TextView
                 android:id="@+id/zoomSeekBarTitle"
                 android:layout_width="wrap_content"
@@ -95,9 +93,10 @@
 
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/zoomSeekBarToggle"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_gravity="center_horizontal"
                 app:singleSelection="true">
 
                 <com.google.android.material.button.MaterialButton
@@ -111,7 +110,8 @@
                     android:textColor="@color/creme"
                     android:textSize="16sp"
                     android:fontFamily="@font/signikab"
-                    android:backgroundTint="@color/dark_blue"/>
+                    android:backgroundTint="@color/dark_blue"
+                    app:cornerRadius="10dp"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/zoomAuto"
@@ -137,7 +137,8 @@
                     android:textColor="@color/creme"
                     android:textSize="16sp"
                     android:fontFamily="@font/signikab"
-                    android:backgroundTint="@color/dark_blue"/>
+                    android:backgroundTint="@color/dark_blue"
+                    app:cornerRadius="10dp"/>
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <View
@@ -146,9 +147,8 @@
                 android:background="@color/line_color"
                 android:layout_marginTop="12dp"/>
 
-            <!-- Section 3: Gallery/Grid Columns -->
             <TextView
-                android:id="@+id/settingsTitle"
+                android:id="@+id/GalleryTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/chosen_gallery_view"
@@ -175,7 +175,77 @@
                 android:background="@color/line_color"
                 android:layout_marginTop="12dp"/>
 
-            <!-- Section 4: Color Selection -->
+            <TextView
+                android:id="@+id/FontTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/font_size_text"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_gravity="center_horizontal"/>
+            <LinearLayout
+                android:id="@+id/fontSizeControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fontMinus"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:text="@string/minus"
+                    android:textColor="@color/creme"
+                    android:textSize="28sp"
+                    android:contentDescription="@string/decrease_font_size"
+                    android:importantForAccessibility="yes"
+                    app:backgroundTint="@color/dark_blue"
+                    app:cornerRadius="10dp" />
+
+                <TextView
+                    android:id="@+id/fontSizeValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/font_size"
+                    android:textSize="24sp"
+                    android:padding="16dp"
+                    android:layout_marginHorizontal="12dp"
+                    android:contentDescription="@string/current_font_size"
+                    android:importantForAccessibility="yes" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/fontPlus"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:text="@string/plus"
+                    android:textColor="@color/creme"
+                    android:textSize="28sp"
+                    android:contentDescription="@string/increase_font_size"
+                    android:importantForAccessibility="yes"
+                    app:backgroundTint="@color/dark_blue"
+                    app:cornerRadius="10dp" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/fontSizePreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_text_preview"
+                android:gravity="center"
+                android:padding="12dp"
+                android:fontFamily="@font/signikasb" />
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
+
             <TextView
                 android:id="@+id/colorToggleTitle"
                 android:layout_width="wrap_content"
@@ -197,7 +267,6 @@
                 android:alignmentMode="alignMargins"
                 android:padding="12dp">
 
-                <!-- Rainbow colors -->
                 <include
                     android:id="@+id/color_red"
                     layout="@layout/item_color_circle"

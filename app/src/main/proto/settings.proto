@@ -34,4 +34,5 @@ message Settings {
     }
 
     ZoomSeekBarMode zoom_seek_bar_mode = 10;
+     int32 font_size_sp = 11;
 }

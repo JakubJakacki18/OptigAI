@@ -49,6 +49,11 @@ class AnalysisResultFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            settingsViewModel.fontSizeSp.collect { sp ->
+                summaryResultText.textSize = sp.toFloat()
+            }
+        }
         viewModel.analysisSummaryTextResult.observe(viewLifecycleOwner) { summary ->
             summaryResultText.text = summary
         }

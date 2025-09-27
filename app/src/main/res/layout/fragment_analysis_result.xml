@@ -44,7 +44,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/analysis_result_box"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:ContentDescription="@string/photo_analysis_text_box">
+        app:contentDescription="@string/photo_analysis_text_box">
 
         <TextView
             android:id="@+id/summaryResultText"

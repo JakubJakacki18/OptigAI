@@ -17,11 +17,14 @@ import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivitySettingsBinding
 import pl.pb.optigai.utils.data.ColorMap
 import pl.pb.optigai.utils.data.SettingsViewModel
+import com.google.android.material.button.MaterialButton
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
-
+    private val minFont = 16
+    private val maxFont = 48
+    private val step = 4
     /**
      * Initializes the activity, sets up the view binding, and binds UI components to the ViewModel.
      */
@@ -33,7 +36,6 @@ class SettingsActivity : AppCompatActivity() {
         bindGalleryViewColumnsSlider()
         bindPhotoSavingToggle()
         bindColorCircles()
-
         val headerTitle: TextView = findViewById(R.id.headerTitle)
         headerTitle.text = getString(R.string.settings_header)
 
@@ -42,6 +44,11 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
         val zoomToggle = viewBinding.zoomSeekBarToggle
+
+        val minusBtn = viewBinding.fontMinus
+        val plusBtn = viewBinding.fontPlus
+        val valueText = viewBinding.fontSizeValue
+        val preview = viewBinding.fontSizePreview
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.zoomSeekBarMode.collect { mode ->
@@ -52,6 +59,10 @@ class SettingsActivity : AppCompatActivity() {
                         Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
                             zoomToggle.clearChecked()
                         }
+                    }
+                    viewModel.fontSizeSp.collect { sp ->
+                        valueText.text = "${sp}sp"
+                        preview.textSize = sp.toFloat()
                     }
                 }
             }
@@ -69,6 +80,30 @@ class SettingsActivity : AppCompatActivity() {
                 viewModel.setZoomSeekBarMode(newMode)
             }
         }
+        fun updateSize(delta: Int) {
+            val current = valueText.text.toString().replace("sp","").toIntOrNull() ?: minFont
+            val newSize = (current + delta).coerceIn(minFont, maxFont)
+            viewModel.setFontSize(newSize)
+
+        }
+        minusBtn.setOnClickListener { updateSize(-step) }
+        plusBtn.setOnClickListener  { updateSize(step) }
+        fun updateZoomButtonState() {
+            for (i in 0 until zoomToggle.childCount) {
+                val button = zoomToggle.getChildAt(i) as MaterialButton
+                if (button.isChecked) {
+                    // Selected state
+                    button.setBackgroundColor(ContextCompat.getColor(this, R.color.light_blue))
+                } else {
+                    // Unselected state
+                    button.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_blue))
+                }
+            }
+        }
+        zoomToggle.addOnButtonCheckedListener { _, _, _ ->
+            updateZoomButtonState()
+        }
+        updateZoomButtonState()
 
     }
 
@@ -94,15 +129,11 @@ class SettingsActivity : AppCompatActivity() {
             val circleColorInt = ColorMap.getColorRes(color)
 
             setBackgroundColorAndBorderForCircleView(circleView, circleColorInt)
-            // Set checkmark color for contrast
             checkMark?.setTextColor(if (isColorLight(circleColorInt)) Color.BLACK else Color.WHITE)
 
-            // Click listener on the circle itself
             circleView.setOnClickListener {
                 lifecycleScope.launch { viewModel.toggleColorOfBorder(color) }
             }
-
-            // Observe ViewModel for selected colors
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.colors.collect { selectedColors ->
@@ -142,7 +173,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
-
     /**
      * Binds the photo saving switch to the ViewModel to toggle photo saving.
      */
@@ -162,7 +192,9 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-/**
+
+
+    /**
      * Sets the background color and border for a given circle view.
      * @param circleView The MaterialCardView representing the color circle.
      * @param circleColorInt The color integer to set as the background.
