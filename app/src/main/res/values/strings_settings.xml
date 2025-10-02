@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="is_photo_saving_option_title">Photos</string>
+    <string name="select_colors">Annotation colors</string>
+    <string name="save_to_memory_value">Save to device memory</string>
+    <string name="checkmark">✓</string>
+    <string name="flash_toggle_description">flash</string>
+    <string name="zoom_slider">Zoom Slider Visibility</string>
+    <string name="off">Off</string>
+    <string name="auto">Auto</string>
+    <string name="on">On</string>
+    <string name="object_button_description">Analise object button</string>
+    <string name="braille_button_description">Analyse braille button</string>
+    <string name="text_button_description">Analyse text button</string>
+    <string name="current_font_size">Current Font Size</string>
+    <string name="increase_font_size">Increase font size</string>
+    <string name="decrease_font_size">Decrease font size</string>
+    <string name="minus">−</string>
+    <string name="font_size">24sp</string>
+    <string name="plus">+</string>
+    <string name="sample_text_preview">Sample Text Preview</string>
+    <string name="font_size_text">Result Font Size</string>
+    <string name="annotation_color_red_description">Red color</string>
+    <string name="annotation_color_green_description">Green color</string>
+    <string name="annotation_color_blue_description">Blue color</string>
+    <string name="annotation_color_yellow_description">Yellow color</string>
+    <string name="annotation_color_black_description">Black color</string>
+    <string name="annotation_color_white_description">White color</string>
+    <string name="annotation_color_purple_description">Purple color</string>
+    <string name="annotation_color_orange_description">Orange color</string>
+    <string name="annotation_color_cyan_description">Cyan color</string>
+
+</resources>

@@ -57,7 +57,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/save_automatically"
+                    android:text="@string/save_to_memory_value"
                     android:textSize="20sp"
                     android:textColor="@color/onyx"
                     android:fontFamily="@font/signikasb"/>
@@ -272,55 +272,64 @@
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FF0000"/>
+                    android:backgroundTint="#FF0000"
+                    android:contentDescription="@string/annotation_color_red_description"/>
                 <include
                     android:id="@+id/color_orange"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FF7F00"/>
+                    android:backgroundTint="#FF7F00"
+                    android:contentDescription="@string/annotation_color_orange_description"/>
                 <include
                     android:id="@+id/color_yellow"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FFFF00"/>
+                    android:backgroundTint="#FFFF00"
+                    android:contentDescription="@string/annotation_color_yellow_description"/>
                 <include
                     android:id="@+id/color_green"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#00FF00"/>
+                    android:backgroundTint="#00FF00"
+                    android:contentDescription="@string/annotation_color_green_description"/>
                 <include
                     android:id="@+id/color_cyan"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#00FFFF"/>
+                    android:backgroundTint="#00FFFF"
+                    android:contentDescription="@string/annotation_color_cyan_description"/>
                 <include
                     android:id="@+id/color_blue"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#0000FF"/>
+                    android:backgroundTint="#0000FF"
+                    android:contentDescription="@string/annotation_color_blue_description"/>
                 <include
                     android:id="@+id/color_purple"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#8B00FF"/>
+                    android:backgroundTint="#8B00FF"
+                    android:contentDescription="@string/annotation_color_purple_description"/>
                 <include
                     android:id="@+id/color_black"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#000000"/>
+                    android:backgroundTint="#000000"
+                    android:contentDescription="@string/annotation_color_black_description"/>
                 <include
                     android:id="@+id/color_white"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="@color/creme"/>
+                    android:backgroundTint="@color/creme"
+                    android:contentDescription="@string/annotation_color_white_description"/>
             </GridLayout>
         </LinearLayout>
 

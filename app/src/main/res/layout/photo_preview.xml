@@ -64,7 +64,7 @@
         android:layout_width="136dp"
         android:layout_height="136dp"
         android:src="@drawable/look_button"
-        android:contentDescription="@string/content_description_zoom_button"
+        android:contentDescription="@string/content_description_open_analyze_button"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="@+id/bottomBar"
         app:layout_constraintEnd_toEndOf="@+id/bottomBar"
