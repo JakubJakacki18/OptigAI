@@ -34,10 +34,10 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/isPhotoSavingOptionTitle"
+                android:id="@+id/cameraSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/is_photo_saving_option_title"
+                android:text="@string/camera_section_title_value"
                 android:textSize="24sp"
                 android:fontFamily="@font/signikab"
                 android:layout_marginTop="16dp"
@@ -53,11 +53,11 @@
                 android:layout_marginEnd="16dp">
 
                 <TextView
-                    android:id="@+id/saveAutomaticallyLabel"
+                    android:id="@+id/savePhotoToMemoryLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/save_automatically"
+                    android:text="@string/camera_save_to_memory_label_value"
                     android:textSize="20sp"
                     android:textColor="@color/onyx"
                     android:fontFamily="@font/signikasb"/>
@@ -75,24 +75,20 @@
                     tools:ignore="UseSwitchCompatOrMaterialXml"/>
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/line_color"
-                android:layout_marginTop="12dp"/>
+
 
             <TextView
-                android:id="@+id/zoomSeekBarTitle"
+                android:id="@+id/changeZoomSliderVisibilityLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/zoom_slider"
-                android:textSize="24sp"
+                android:text="@string/camera_change_zoom_slider_visibility_label_value"
+                android:textSize="20sp"
                 android:fontFamily="@font/signikab"
                 android:layout_marginTop="16dp"
                 android:layout_gravity="center_horizontal"/>
 
             <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/zoomSeekBarToggle"
+                android:id="@+id/changeZoomSliderVisibilityToggleGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -100,11 +96,11 @@
                 app:singleSelection="true">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/zoomAlwaysOff"
+                    android:id="@+id/zoomSliderVisibilityAlwaysOn"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/off"
+                    android:text="@string/zoom_slider_visibility_on_toggle_value"
                     app:strokeColor="@color/creme"
                     app:strokeWidth="2dp"
                     android:textColor="@color/creme"
@@ -114,11 +110,11 @@
                     app:cornerRadius="10dp"/>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/zoomAuto"
+                    android:id="@+id/zoomSliderVisibilityAuto"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/auto"
+                    android:text="@string/zoom_slider_visibility_auto_toggle_value"
                     app:strokeColor="@color/creme"
                     app:strokeWidth="2dp"
                     android:textColor="@color/creme"
@@ -127,11 +123,11 @@
                     android:backgroundTint="@color/dark_blue"/>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/zoomAlwaysOn"
+                    android:id="@+id/zoomSliderVisibilityAlwaysOff"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/on"
+                    android:text="@string/zoom_slider_visibility_off_toggle_value"
                     app:strokeColor="@color/creme"
                     app:strokeWidth="2dp"
                     android:textColor="@color/creme"
@@ -148,16 +144,26 @@
                 android:layout_marginTop="12dp"/>
 
             <TextView
+                android:id="@+id/gallerySectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gallery_section_title_value"
+                android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
                 android:id="@+id/GalleryTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/chosen_gallery_view"
-                android:textSize="24sp"
+                android:text="@string/gallery_set_amount_columns_title_value"
+                android:textSize="20sp"
                 android:fontFamily="@font/signikab"
                 android:layout_gravity="center_horizontal"/>
 
             <com.google.android.material.slider.Slider
-                android:id="@+id/gridColumnsSlider"
+                android:id="@+id/columnsAmountSlider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:valueFrom="1"
@@ -176,11 +182,21 @@
                 android:layout_marginTop="12dp"/>
 
             <TextView
-                android:id="@+id/FontTitle"
+                android:id="@+id/resultSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/font_size_text"
+                android:text="@string/result_section_title_value"
                 android:textSize="24sp"
+                android:fontFamily="@font/signikab"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                android:id="@+id/setFontSizeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/result_set_font_size_label_value"
+                android:textSize="20sp"
                 android:fontFamily="@font/signikab"
                 android:layout_gravity="center_horizontal"/>
             <LinearLayout
@@ -192,13 +208,13 @@
                 android:layout_marginTop="16dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/fontMinus"
+                    android:id="@+id/fontSizeDecreaseButton"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:text="@string/minus"
+                    android:text="@string/font_size_decrease_button_value"
                     android:textColor="@color/creme"
                     android:textSize="28sp"
-                    android:contentDescription="@string/decrease_font_size"
+                    android:contentDescription="@string/font_size_decrease_button_description"
                     android:importantForAccessibility="yes"
                     app:backgroundTint="@color/dark_blue"
                     app:cornerRadius="10dp" />
@@ -207,21 +223,21 @@
                     android:id="@+id/fontSizeValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/font_size"
+                    android:text="@string/current_font_size_value"
                     android:textSize="24sp"
                     android:padding="16dp"
                     android:layout_marginHorizontal="12dp"
-                    android:contentDescription="@string/current_font_size"
+                    android:contentDescription="@string/current_font_size_description"
                     android:importantForAccessibility="yes" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/fontPlus"
+                    android:id="@+id/fontSizeIncreaseButton"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:text="@string/plus"
+                    android:text="@string/font_size_increase_button_value"
                     android:textColor="@color/creme"
                     android:textSize="28sp"
-                    android:contentDescription="@string/increase_font_size"
+                    android:contentDescription="@string/font_size_increase_button_description"
                     android:importantForAccessibility="yes"
                     app:backgroundTint="@color/dark_blue"
                     app:cornerRadius="10dp" />
@@ -233,25 +249,17 @@
                 android:id="@+id/fontSizePreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sample_text_preview"
+                android:text="@string/font_size_preview_value"
                 android:gravity="center"
                 android:padding="12dp"
                 android:fontFamily="@font/signikasb" />
 
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="@color/line_color"
-                android:layout_marginTop="12dp"/>
-
             <TextView
-                android:id="@+id/colorToggleTitle"
+                android:id="@+id/selectColorAnnotationLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/select_colors"
-                android:textSize="24sp"
+                android:text="@string/result_select_color_annotation_label_value"
+                android:textSize="20sp"
                 android:fontFamily="@font/signikab"
                 android:layout_marginTop="16dp"
                 android:layout_gravity="center_horizontal"/>
@@ -272,55 +280,64 @@
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FF0000"/>
+                    android:backgroundTint="#FF0000"
+                    android:contentDescription="@string/annotation_color_red_description"/>
                 <include
                     android:id="@+id/color_orange"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FF7F00"/>
+                    android:backgroundTint="#FF7F00"
+                    android:contentDescription="@string/annotation_color_orange_description"/>
                 <include
                     android:id="@+id/color_yellow"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#FFFF00"/>
+                    android:backgroundTint="#FFFF00"
+                    android:contentDescription="@string/annotation_color_yellow_description"/>
                 <include
                     android:id="@+id/color_green"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#00FF00"/>
+                    android:backgroundTint="#00FF00"
+                    android:contentDescription="@string/annotation_color_green_description"/>
                 <include
                     android:id="@+id/color_cyan"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#00FFFF"/>
+                    android:backgroundTint="#00FFFF"
+                    android:contentDescription="@string/annotation_color_cyan_description"/>
                 <include
                     android:id="@+id/color_blue"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#0000FF"/>
+                    android:backgroundTint="#0000FF"
+                    android:contentDescription="@string/annotation_color_blue_description"/>
                 <include
                     android:id="@+id/color_purple"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#8B00FF"/>
+                    android:backgroundTint="#8B00FF"
+                    android:contentDescription="@string/annotation_color_purple_description"/>
                 <include
                     android:id="@+id/color_black"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="#000000"/>
+                    android:backgroundTint="#000000"
+                    android:contentDescription="@string/annotation_color_black_description"/>
                 <include
                     android:id="@+id/color_white"
                     layout="@layout/item_color_circle"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:backgroundTint="@color/creme"/>
+                    android:backgroundTint="@color/creme"
+                    android:contentDescription="@string/annotation_color_white_description"/>
             </GridLayout>
         </LinearLayout>
 
