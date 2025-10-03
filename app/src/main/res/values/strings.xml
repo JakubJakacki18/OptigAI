@@ -23,7 +23,6 @@
     <string name="background_photo_description">Background Photo for Analysis</string>
     <string name="open_camera">Open Camera</string>
     <string name="open_gallery">Open Gallery</string>
-    <string name="chosen_gallery_view">Gallery View Columns</string>
     <string name="grid_view">Grid View</string>
     <string name="list_view">List View</string>
     <string name="number2">2</string>
@@ -31,4 +30,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="empty_result_fragment_analysis_result">Nothing was detected. Try with another photo.</string>
+    <string name="flash_toggle_description">flash</string>
+    <string name="object_button_description">Analise object button</string>
+    <string name="braille_button_description">Analyse braille button</string>
+    <string name="text_button_description">Analyse text button</string>
 </resources>

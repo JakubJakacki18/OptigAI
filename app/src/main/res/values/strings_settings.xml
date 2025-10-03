@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="is_photo_saving_option_title">Photos</string>
-    <string name="select_colors">Annotation colors</string>
-    <string name="save_to_memory_value">Save to device memory</string>
-    <string name="checkmark">✓</string>
-    <string name="flash_toggle_description">flash</string>
-    <string name="zoom_slider">Zoom Slider Visibility</string>
-    <string name="off">Off</string>
-    <string name="auto">Auto</string>
-    <string name="on">On</string>
-    <string name="object_button_description">Analise object button</string>
-    <string name="braille_button_description">Analyse braille button</string>
-    <string name="text_button_description">Analyse text button</string>
-    <string name="current_font_size">Current Font Size</string>
-    <string name="increase_font_size">Increase font size</string>
-    <string name="decrease_font_size">Decrease font size</string>
-    <string name="minus">−</string>
-    <string name="font_size">24sp</string>
-    <string name="plus">+</string>
-    <string name="sample_text_preview">Sample Text Preview</string>
-    <string name="font_size_text">Result Font Size</string>
+    <!--Sections-->
+    <string name="camera_section_title_value">Camera</string>
+    <string name="gallery_section_title_value">Gallery</string>
+    <string name="result_section_title_value">Analysis result</string>
+
+    <!--Option titles-->
+    <string name="camera_save_to_memory_label_value">Save photo to device memory</string>
+    <string name="camera_change_zoom_slider_visibility_label_value">Set zoom slider visibility</string>
+    <string name="gallery_set_amount_columns_title_value">Set number of columns</string>
+    <string name="result_set_font_size_label_value">Set font size</string>
+    <string name="result_select_color_annotation_label_value">Select annotation colors</string>
+
+    <!--UI descriptions-->
+    <string name="current_font_size_description">Current Font Size</string>
+    <string name="font_size_increase_button_description">Increase font size</string>
+    <string name="font_size_decrease_button_description">Decrease font size</string>
+
     <string name="annotation_color_red_description">Red color</string>
     <string name="annotation_color_green_description">Green color</string>
     <string name="annotation_color_blue_description">Blue color</string>
@@ -30,4 +27,13 @@
     <string name="annotation_color_orange_description">Orange color</string>
     <string name="annotation_color_cyan_description">Cyan color</string>
 
+    <!--UI values-->
+    <string name="zoom_slider_visibility_off_toggle_value">Off</string>
+    <string name="zoom_slider_visibility_auto_toggle_value">Auto</string>
+    <string name="zoom_slider_visibility_on_toggle_value">On</string>
+    <string name="font_size_decrease_button_value">−</string>
+    <string name="current_font_size_value">24sp</string>
+    <string name="font_size_increase_button_value">+</string>
+    <string name="font_size_preview_value">Sample Text Preview</string>
+    <string name="color_annotation_checkmark_value">✓</string>
 </resources>

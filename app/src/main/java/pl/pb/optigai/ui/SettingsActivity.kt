@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import pl.pb.optigai.R
@@ -17,7 +18,6 @@ import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivitySettingsBinding
 import pl.pb.optigai.utils.data.ColorMap
 import pl.pb.optigai.utils.data.SettingsViewModel
-import com.google.android.material.button.MaterialButton
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
@@ -25,6 +25,7 @@ class SettingsActivity : AppCompatActivity() {
     private val minFont = 16
     private val maxFont = 48
     private val step = 4
+
     /**
      * Initializes the activity, sets up the view binding, and binds UI components to the ViewModel.
      */
@@ -53,9 +54,9 @@ class SettingsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.zoomSeekBarMode.collect { mode ->
                     when (mode) {
-                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> zoomToggle.check(R.id.zoomAlwaysOff)
-                        Settings.ZoomSeekBarMode.AUTO -> zoomToggle.check(R.id.zoomAuto)
-                        Settings.ZoomSeekBarMode.ALWAYS_ON -> zoomToggle.check(R.id.zoomAlwaysOn)
+                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOff)
+                        Settings.ZoomSeekBarMode.AUTO -> zoomToggle.check(R.id.zoomSliderVisibilityAuto)
+                        Settings.ZoomSeekBarMode.ALWAYS_ON -> zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOn)
                         Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
                             zoomToggle.clearChecked()
                         }
@@ -68,26 +69,31 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-
         zoomToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
-                val newMode = when (checkedId) {
-                    R.id.zoomAlwaysOff -> Settings.ZoomSeekBarMode.ALWAYS_OFF
-                    R.id.zoomAuto -> Settings.ZoomSeekBarMode.AUTO
-                    R.id.zoomAlwaysOn -> Settings.ZoomSeekBarMode.ALWAYS_ON
-                    else -> Settings.ZoomSeekBarMode.AUTO
-                }
+                val newMode =
+                    when (checkedId) {
+                        R.id.zoomSliderVisibilityAlwaysOff -> Settings.ZoomSeekBarMode.ALWAYS_OFF
+                        R.id.zoomSliderVisibilityAuto -> Settings.ZoomSeekBarMode.AUTO
+                        R.id.zoomSliderVisibilityAlwaysOn -> Settings.ZoomSeekBarMode.ALWAYS_ON
+                        else -> Settings.ZoomSeekBarMode.AUTO
+                    }
                 viewModel.setZoomSeekBarMode(newMode)
             }
         }
+
         fun updateSize(delta: Int) {
-            val current = valueText.text.toString().replace("sp","").toIntOrNull() ?: minFont
+            val current =
+                valueText.text
+                    .toString()
+                    .replace("sp", "")
+                    .toIntOrNull() ?: minFont
             val newSize = (current + delta).coerceIn(minFont, maxFont)
             viewModel.setFontSize(newSize)
-
         }
         minusBtn.setOnClickListener { updateSize(-step) }
-        plusBtn.setOnClickListener  { updateSize(step) }
+        plusBtn.setOnClickListener { updateSize(step) }
+
         fun updateZoomButtonState() {
             for (i in 0 until zoomToggle.childCount) {
                 val button = zoomToggle.getChildAt(i) as MaterialButton
@@ -104,7 +110,6 @@ class SettingsActivity : AppCompatActivity() {
             updateZoomButtonState()
         }
         updateZoomButtonState()
-
     }
 
     /**
@@ -173,6 +178,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
+
     /**
      * Binds the photo saving switch to the ViewModel to toggle photo saving.
      */
@@ -191,8 +197,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     /**
      * Sets the background color and border for a given circle view.
