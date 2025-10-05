@@ -38,10 +38,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/camera_section_title_value"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:fontFamily="@font/signikab"
-                android:layout_marginTop="16dp"
-                android:layout_gravity="center_horizontal"/>
+                android:textColor="@android:color/darker_gray"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -148,9 +149,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/gallery_section_title_value"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:fontFamily="@font/signikab"
-                android:layout_marginTop="16dp"
+                android:textColor="@android:color/darker_gray"
                 android:layout_gravity="center_horizontal"/>
 
             <TextView
@@ -186,10 +187,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/result_section_title_value"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:fontFamily="@font/signikab"
-                android:layout_marginTop="16dp"
-                android:layout_gravity="center_horizontal"/>
+                android:textColor="@android:color/darker_gray"
+                android:layout_gravity="center_horizontal" />
 
             <TextView
                 android:id="@+id/setFontSizeLabel"

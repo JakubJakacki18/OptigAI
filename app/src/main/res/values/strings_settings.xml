@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--Sections-->
-    <string name="camera_section_title_value">Camera</string>
-    <string name="gallery_section_title_value">Gallery</string>
-    <string name="result_section_title_value">Analysis result</string>
+    <string name="camera_section_title_value">CAMERA</string>
+    <string name="gallery_section_title_value">GALLERY</string>
+    <string name="result_section_title_value">ANALYSIS RESULT</string>
 
     <!--Option titles-->
     <string name="camera_save_to_memory_label_value">Save photo to device memory</string>
