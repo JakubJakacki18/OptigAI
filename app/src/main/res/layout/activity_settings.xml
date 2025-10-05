@@ -77,7 +77,11 @@
             </LinearLayout>
 
 
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
             <TextView
                 android:id="@+id/changeZoomSliderVisibilityLabel"
                 android:layout_width="wrap_content"
@@ -140,7 +144,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="6dp"
                 android:background="@color/line_color"
                 android:layout_marginTop="12dp"/>
 
@@ -178,7 +182,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="6dp"
                 android:background="@color/line_color"
                 android:layout_marginTop="12dp"/>
 
@@ -254,7 +258,11 @@
                 android:gravity="center"
                 android:padding="12dp"
                 android:fontFamily="@font/signikasb" />
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/line_color"
+                android:layout_marginTop="12dp"/>
             <TextView
                 android:id="@+id/selectColorAnnotationLabel"
                 android:layout_width="wrap_content"

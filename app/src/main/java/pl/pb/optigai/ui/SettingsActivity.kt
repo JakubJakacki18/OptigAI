@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -29,6 +30,7 @@ class SettingsActivity : AppCompatActivity() {
     /**
      * Initializes the activity, sets up the view binding, and binds UI components to the ViewModel.
      */
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySettingsBinding.inflate(layoutInflater)
@@ -44,10 +46,10 @@ class SettingsActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             finish()
         }
-        val zoomToggle = viewBinding.zoomSeekBarToggle
+        val zoomToggle = viewBinding.changeZoomSliderVisibilityToggleGroup
 
-        val minusBtn = viewBinding.fontMinus
-        val plusBtn = viewBinding.fontPlus
+        val minusBtn = viewBinding.fontSizeDecreaseButton
+        val plusBtn = viewBinding.fontSizeIncreaseButton
         val valueText = viewBinding.fontSizeValue
         val preview = viewBinding.fontSizePreview
         lifecycleScope.launch {
@@ -165,18 +167,27 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.gridColumns.collect { gridColumns ->
-                    viewBinding.gridColumnsSlider.value = gridColumns.toFloat()
+                    viewBinding.columnsAmountSlider.value = gridColumns.toFloat()
                 }
             }
         }
 
-        viewBinding.gridColumnsSlider.addOnChangeListener { slider, value, fromUser ->
+        viewBinding.columnsAmountSlider.addOnChangeListener { slider, value, fromUser ->
             if (fromUser) {
                 lifecycleScope.launch {
                     viewModel.setGridColumns(value.toInt())
                 }
             }
         }
+        viewBinding.columnsAmountSlider.setLabelFormatter { value ->
+            val intValue = value.toInt()
+            if (intValue == 1) {
+                "1 column"
+            } else {
+                "$intValue columns"
+            }
+        }
+
     }
 
     /**
