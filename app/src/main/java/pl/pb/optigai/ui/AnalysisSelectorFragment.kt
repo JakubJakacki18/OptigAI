@@ -67,8 +67,10 @@ class AnalysisSelectorFragment : Fragment() {
             showLoadingFragment()
             viewModel.setDetectionResult(emptyList())
             lifecycleScope.launch {
-                val resultOfAnalysis = analyseService.analyseBraille(BitmapCache.bitmap!!)
-                viewModel.setSummaryTextResult((resultOfAnalysis))
+                val (summaryText, detectionResults) = analyseService.analyseBraille(BitmapCache.bitmap!!)
+                viewModel.setDetectionResult(detectionResults)
+                viewModel.setSummaryTextResult(summaryText)
+
                 parentFragmentManager.popBackStack()
                 showResultFragment()
             }

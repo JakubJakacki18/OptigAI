@@ -35,7 +35,7 @@ object PhotoUtils {
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         id,
                     )
-                images.add(Image(contentUri))
+                images.add(Image(uri = contentUri, originalUri = contentUri))
             }
         }
         AppLogger.i("Found ${images.size} images")

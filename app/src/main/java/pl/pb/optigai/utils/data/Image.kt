@@ -12,4 +12,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Image(
     val uri: Uri,
+    val originalUri: Uri
 ) : Parcelable

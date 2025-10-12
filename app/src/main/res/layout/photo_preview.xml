@@ -13,7 +13,11 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.8" />
-    <include layout="@layout/navbar" />
+
+    <include
+        android:id="@+id/headerLayout"
+        layout="@layout/navbar" />
+
     <FrameLayout
         android:id="@+id/imageContainer"
         android:layout_width="0dp"
@@ -33,6 +37,33 @@
             android:contentDescription="@string/content_description_preview_image"
             tools:src="@drawable/photo1" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/editButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="@string/content_description_edit_image"
+            app:fabSize="mini"
+            app:backgroundTint="@color/dark_blue"
+            app:tint="@color/creme"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/undoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ic_undo"
+            android:contentDescription="@string/content_description_undo_changes"
+            app:fabSize="mini"
+            app:backgroundTint="@color/dark_blue"
+            app:tint="@color/creme"/>
     </FrameLayout>
 
     <View

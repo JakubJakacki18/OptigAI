@@ -1,4 +1,5 @@
 package pl.pb.optigai.utils
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
@@ -19,7 +20,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileOutputStream
-
 class AnalyseService(
     private val context: Context,
 ) {
@@ -82,7 +82,7 @@ class AnalyseService(
 //        return result
 //    }
 
-    suspend fun analyseBraille(bitmap: Bitmap): String {
+    suspend fun analyseBraille(bitmap: Bitmap): Pair<String, List<DetectionResult>> { // Return summary text and detection results
         try {
             val tempFile = File.createTempFile("braille", ".jpg")
             FileOutputStream(tempFile).use { out ->
@@ -94,8 +94,7 @@ class AnalyseService(
             val client = OkHttpClient()
 
             val retrofit =
-                Retrofit
-                    .Builder()
+                Retrofit.Builder()
                     .baseUrl(brailleModelUrl)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -106,19 +105,29 @@ class AnalyseService(
             if (response.isSuccessful) {
                 val result = response.body()
                 AppLogger.d("Braille raw response: $result")
-                val sentence = BrailleActivity.decode(result?.predictions ?: emptyList())
+                val predictions = result?.predictions ?: emptyList()
+                val sentence = BrailleActivity.decode(predictions)
                 AppLogger.d("Braille sentence: $sentence")
-                return sentence
+
+                val detectionResults = predictions.map { brailleChar ->
+                    val left = brailleChar.x - brailleChar.width / 2
+                    val top = brailleChar.y - brailleChar.height / 2
+                    val right = brailleChar.x + brailleChar.width / 2
+                    val bottom = brailleChar.y + brailleChar.height / 2
+                    val rectF = RectF(left, top, right, bottom)
+                    DetectionResult(brailleChar.clazz, rectF, null)
+                }
+
+                return Pair(sentence, detectionResults) // Return both
             } else {
                 AppLogger.e("BrailleError: HTTP ${response.code()} ${response.errorBody()}")
-                return "Error: ${response.code()}"
+                return Pair("Error: ${response.code()}", emptyList())
             }
         } catch (e: Exception) {
             AppLogger.e("BrailleException: ${e.message}")
-            return "Error creating temp file or bitmap: ${e.message}"
+            return Pair("Error creating temp file or bitmap: ${e.message}", emptyList())
         }
     }
-
     fun analyseItem(bitmap: Bitmap): List<DetectionResult> {
         // Step 1: Create TFLite's TensorImage object
         val image = TensorImage.fromBitmap(bitmap)

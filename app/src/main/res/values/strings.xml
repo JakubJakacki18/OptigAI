@@ -47,4 +47,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="empty_result_fragment_analysis_result">Nothing was detected. Try with another photo.</string>
+    <string name="content_description_edit_image">Edit Photo Button</string>
+    <string name="rotate_left">rotate left\n</string>
+    <string name="content_description_undo_changes">Undo changes done to the photo button\n</string>
 </resources>

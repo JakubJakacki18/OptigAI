@@ -8,4 +8,6 @@ data class BrailleChar(
     @SerializedName("class")
     val clazz: String,
     val height: Float,
+    val width: Float
 )
+
