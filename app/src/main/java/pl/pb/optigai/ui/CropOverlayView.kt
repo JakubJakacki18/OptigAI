@@ -33,9 +33,9 @@ class CropOverlayView @JvmOverloads constructor(
 
     private var imageBounds = RectF(0f, 0f, 0f, 0f)
     private var cropRect = RectF()
-    private val tempRect = RectF() // Used for updateCropRect logic
-    private val initialBounds = RectF() // Used for clamping calculation inside calculateInitialCropRect
-    private val fallbackBounds = RectF() // Used for uninitialized bounds fallback in onDraw
+    private val tempRect = RectF()
+    private val initialBounds = RectF()
+    private val fallbackBounds = RectF()
     private var lastX = 0f
     private var lastY = 0f
     private var activeHandle = Handle.NONE
@@ -85,7 +85,6 @@ class CropOverlayView @JvmOverloads constructor(
         if (currentCropRatio != ratio) {
             currentCropRatio = ratio
             if (imageBounds.width() > 0 && imageBounds.height() > 0) {
-                // Call modified function to write into cropRect
                 calculateInitialCropRect(imageBounds, ratio, cropRect)
                 invalidate()
             }
@@ -102,12 +101,10 @@ class CropOverlayView @JvmOverloads constructor(
                 if (imageBounds.width() > 0) {
                     sourceBounds = imageBounds
                 } else {
-                    // Use pre-allocated fallbackBounds instead of allocating new RectF
                     fallbackBounds.set(0f, 0f, width.toFloat(), height.toFloat())
                     sourceBounds = fallbackBounds
                 }
 
-                // Write result into cropRect directly, no allocation
                 calculateInitialCropRect(sourceBounds, currentCropRatio, cropRect)
             } else {
                 return
@@ -166,7 +163,6 @@ class CropOverlayView @JvmOverloads constructor(
 
     override fun performClick(): Boolean {
         super.performClick()
-        // No custom click action needed as this view is purely for drag/resize
         return true
     }
 
@@ -190,11 +186,9 @@ class CropOverlayView @JvmOverloads constructor(
         return sqrt((x - centerX).pow(2) + (y - centerY).pow(2)) <= touchTolerance
     }
 
-    // Modified to write results into outRect instead of returning a new one.
     private fun calculateInitialCropRect(bounds: RectF, ratio: CropRatio, outRect: RectF) {
         val margin = 50f
 
-        // Use pre-allocated initialBounds instead of allocating new RectF
         initialBounds.set(bounds.left + margin, bounds.top + margin, bounds.right - margin, bounds.bottom - margin)
         val clampedBounds = initialBounds
 
@@ -283,14 +277,12 @@ class CropOverlayView @JvmOverloads constructor(
         val currentWidth = rect.width()
         val currentHeight = rect.height()
 
-        // Determine if width change is the primary driver (Corners, Left, Right)
         val constrainByWidth = when(handle) {
             Handle.LEFT, Handle.RIGHT, Handle.TOP_LEFT, Handle.BOTTOM_LEFT, Handle.TOP_RIGHT, Handle.BOTTOM_RIGHT -> true
-            else -> false // Handle.TOP, Handle.BOTTOM
+            else -> false
         }
 
         if (constrainByWidth) {
-            // Constrain by Width: Calculate required Height
             val newHeight = (currentWidth / ratio).coerceAtLeast(minSize)
             when (handle) {
                 Handle.TOP_LEFT, Handle.TOP_RIGHT -> rect.top = rect.bottom - newHeight
@@ -298,16 +290,13 @@ class CropOverlayView @JvmOverloads constructor(
                 else -> { /* LEFT/RIGHT only modify horizontal dimension, vertical position is fixed */ }
             }
         } else {
-            // Constrain by Height: Calculate required Width (Handles TOP/BOTTOM)
             val newWidth = (currentHeight * ratio).coerceAtLeast(minSize)
 
-            // Adjust horizontal edges symmetrically based on the new constrained width
             val centerX = rect.centerX()
             rect.left = centerX - newWidth / 2
             rect.right = centerX + newWidth / 2
         }
 
-        // Final re-enforce min size just in case the ratio caused a shrinkage
         if (rect.width() < minSize) {
             rect.right = rect.left + minSize
             if (currentCropRatio.ratio > 0) rect.bottom = rect.top + minSize / currentCropRatio.ratio

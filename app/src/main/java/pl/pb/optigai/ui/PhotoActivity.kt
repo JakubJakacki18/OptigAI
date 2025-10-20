@@ -26,7 +26,6 @@ class PhotoActivity : AppCompatActivity() {
         val initialImages = PhotoUtils.imageReader(this@PhotoActivity)
         images =
             initialImages.map {
-                // Initialize both URIs to the original location
                 Image(uri = it.uri, originalUri = it.uri)
             }
         currentIndex = intent.getIntExtra("position", 0)
@@ -53,14 +52,8 @@ class PhotoActivity : AppCompatActivity() {
                 if (resultUriString != null) {
                     val resultUri = resultUriString.toUri()
                     val currentImage = images[currentIndex]
-                    // The 'originalUri' is correctly maintained here, pointing to the un-cropped photo.
 
-                    // NON-DESTRUCTIVE SAVE:
-                    // 1. We assume ImageEditorActivity saved the cropped content to the temp file at resultUri.
-                    // 2. We update the current 'uri' to point to this cropped temporary file,
-                    //    but keep 'originalUri' pointing to the original media.
                     try {
-                        // Update in-app URI to the CROPPED result URI and refresh preview
                         val updatedImage = currentImage.copy(uri = resultUri)
                         images = images.toMutableList().also { it[currentIndex] = updatedImage }
 
@@ -70,11 +63,10 @@ class PhotoActivity : AppCompatActivity() {
 
                         AppLogger.d("✅ Cropped image loaded from temp URI: $resultUri")
                     } catch (e: Exception) {
-                        // This catch block mainly serves to log errors during the update/refresh process
-                        AppLogger.e("❌ Failed to update image URI after crop: ${e.message}")
+                        AppLogger.e( "Failed to update image URI after crop: ${e.message}")
                     }
                 } else {
-                    AppLogger.e("❌ No cropped URI returned.")
+                    AppLogger.e("No cropped URI returned.")
                 }
             }
         }
@@ -93,8 +85,6 @@ class PhotoActivity : AppCompatActivity() {
 
     private fun revertImageChanges() {
         val currentImage = images[currentIndex]
-
-        // Use the stored originalUri to revert the changes
         if (currentImage.uri != currentImage.originalUri) {
             val revertedImage = currentImage.copy(uri = currentImage.originalUri)
 
