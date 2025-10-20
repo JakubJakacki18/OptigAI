@@ -19,8 +19,6 @@ import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
 import java.lang.IllegalArgumentException
 
-
-@Suppress("DEPRECATION")
 class AnalysisActivity : AppCompatActivity() {
     private val analysisViewModel: AnalysisViewModel by viewModels()
 
@@ -39,7 +37,6 @@ class AnalysisActivity : AppCompatActivity() {
         } else {
             val uriString = intent.getStringExtra("IMAGE_URI")
             uri = uriString?.toUri()
-
         }
 
         uri?.let {

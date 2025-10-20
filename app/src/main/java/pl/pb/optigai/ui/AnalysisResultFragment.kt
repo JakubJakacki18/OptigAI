@@ -26,7 +26,6 @@ class AnalysisResultFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
 
-    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
