@@ -51,6 +51,10 @@
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".ui.ImageEditorActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

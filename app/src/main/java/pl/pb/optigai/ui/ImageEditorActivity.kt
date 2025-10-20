@@ -1,0 +1,192 @@
+package pl.pb.optigai.ui
+
+import android.content.Intent
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
+import android.os.Bundle
+import android.view.View
+import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import coil.load
+import pl.pb.optigai.databinding.ActivityImageEditorBinding
+import java.io.File
+import java.io.FileOutputStream
+
+class ImageEditorActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityImageEditorBinding
+    private lateinit var imageUri: Uri
+    private var currentRotation = 0f
+
+    enum class EditorMode { CROP, ROTATE }
+    private var currentMode = EditorMode.CROP
+
+    private val rotationStep = 15f
+    private val maxRotationValue = 360f
+    private val maxSeekBarProgress = (maxRotationValue / rotationStep).toInt() * 2
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityImageEditorBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        imageUri = intent.getStringExtra("IMAGE_URI")!!.toUri()
+        binding.photoView.load(imageUri) {
+            listener(onSuccess = { _, _ -> setupPhotoViewBoundsListener() })
+        }
+
+        binding.photoView.maximumScale = 6f
+        binding.photoView.minimumScale = 1f
+        binding.rotationSeekBar.max = maxSeekBarProgress
+        binding.rotationSeekBar.progress = maxSeekBarProgress / 2
+
+        setupCropListeners()
+        setupRotationListeners()
+        setupModeListeners()
+        setEditorMode(EditorMode.CROP)
+
+        binding.btnCrop.setOnClickListener { cropVisibleArea() }
+        binding.btnCancel.setOnClickListener {
+            setResult(RESULT_CANCELED)
+            finish()
+        }
+    }
+
+    private fun setupCropListeners() {
+        val free = CropOverlayView.CropRatio.FREE
+        val square = CropOverlayView.CropRatio.SQUARE
+        val r43 = CropOverlayView.CropRatio.R_4_3
+        val r169 = CropOverlayView.CropRatio.R_16_9
+
+        val ratioClickListener: (CropOverlayView.CropRatio) -> View.OnClickListener = { ratio ->
+            View.OnClickListener { binding.cropOverlay.setCropRatio(ratio) }
+        }
+
+        binding.btnRatioFree.setOnClickListener(ratioClickListener(free))
+        binding.btnRatio11.setOnClickListener(ratioClickListener(square))
+        binding.btnRatio43.setOnClickListener(ratioClickListener(r43))
+        binding.btnRatio169.setOnClickListener(ratioClickListener(r169))
+    }
+
+    private fun setupRotationListeners() {
+        binding.btnRotateLeft.setOnClickListener { rotateBy(currentRotation - 90f) }
+        binding.btnRotateRight.setOnClickListener { rotateBy(currentRotation + 90f) }
+    }
+
+    private fun setupModeListeners() {
+        binding.btnToggleMode.setOnClickListener {
+            val newMode = if (currentMode == EditorMode.CROP) EditorMode.ROTATE else EditorMode.CROP
+            setEditorMode(newMode)
+        }
+    }
+
+    private fun setEditorMode(mode: EditorMode) {
+        currentMode = mode
+
+        binding.cropRatioControls.visibility = if (mode == EditorMode.CROP) View.VISIBLE else View.GONE
+        binding.rotationControls.visibility = if (mode == EditorMode.ROTATE) View.VISIBLE else View.GONE
+        binding.btnToggleMode.text = if (mode == EditorMode.CROP) "Rotate Mode" else "Crop Mode"
+
+        if (mode == EditorMode.CROP) {
+            binding.cropOverlay.visibility = View.VISIBLE
+            binding.photoView.isZoomable = true
+        } else {
+            binding.cropOverlay.visibility = View.INVISIBLE
+            binding.photoView.isZoomable = false
+        }
+    }
+
+    private fun rotateBy(newRotation: Float) {
+        var normalizedRotation = newRotation % 360
+        if (normalizedRotation > 180) normalizedRotation -= 360
+        if (normalizedRotation <= -180) normalizedRotation += 360
+
+        val targetProgressFloat = (normalizedRotation / rotationStep) + (maxSeekBarProgress / 2)
+        val targetProgress = targetProgressFloat.toInt().coerceIn(0, maxSeekBarProgress)
+
+        binding.rotationSeekBar.progress = targetProgress
+    }
+
+    private fun setupPhotoViewBoundsListener() {
+        binding.photoView.post {
+            binding.photoView.displayRect?.let { rect ->
+                binding.cropOverlay.setImageBounds(RectF(rect))
+                binding.cropOverlay.setCropRatio(CropOverlayView.CropRatio.FREE)
+            }
+        }
+
+        binding.photoView.setOnMatrixChangeListener { rect ->
+            binding.cropOverlay.setImageBounds(
+                rect
+            )
+        }
+
+        binding.rotationSeekBar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val discreteProgress = progress - (maxSeekBarProgress / 2)
+                currentRotation = discreteProgress * rotationStep
+
+                binding.photoView.rotation = currentRotation
+
+                binding.photoView.postDelayed({
+                    binding.photoView.displayRect?.let { rect ->
+                        binding.cropOverlay.setImageBounds(RectF(rect))
+                    }
+                }, 50)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val targetProgress = (currentRotation / rotationStep).toInt() + (maxSeekBarProgress / 2)
+                seekBar?.progress = targetProgress.coerceIn(0, maxSeekBarProgress)
+            }
+        })
+    }
+
+    private fun cropVisibleArea() {
+        val drawable = binding.photoView.drawable ?: return
+        val bitmap = (drawable as BitmapDrawable).bitmap
+
+        val matrix = Matrix().apply { postRotate(currentRotation) }
+        val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+
+        val displayRect = binding.photoView.displayRect
+        val cropRect = binding.cropOverlay.getCropRect()
+
+        val offsetX = displayRect.left
+        val offsetY = displayRect.top
+        val viewScaleX = displayRect.width() / rotatedBitmap.width.toFloat()
+        val viewScaleY = displayRect.height() / rotatedBitmap.height.toFloat()
+
+        val unTranslatedLeft = cropRect.left - offsetX
+        val unTranslatedTop = cropRect.top - offsetY
+        val unTranslatedRight = cropRect.right - offsetX
+        val unTranslatedBottom = cropRect.bottom - offsetY
+
+        val left = (unTranslatedLeft / viewScaleX).toInt().coerceIn(0, rotatedBitmap.width)
+        val top = (unTranslatedTop / viewScaleY).toInt().coerceIn(0, rotatedBitmap.height)
+        val right = (unTranslatedRight / viewScaleX).toInt().coerceIn(0, rotatedBitmap.width)
+        val bottom = (unTranslatedBottom / viewScaleY).toInt().coerceIn(0, rotatedBitmap.height)
+
+        val width = (right - left).coerceAtLeast(0)
+        val height = (bottom - top).coerceAtLeast(0)
+
+        val finalWidth = width.coerceAtMost(rotatedBitmap.width - left)
+        val finalHeight = height.coerceAtMost(rotatedBitmap.height - top)
+
+        if (finalWidth <= 0 || finalHeight <= 0) return
+
+        val cropped = Bitmap.createBitmap(rotatedBitmap, left, top, finalWidth, finalHeight)
+
+        val file = File(cacheDir, "cropped_${System.currentTimeMillis()}.jpg")
+        FileOutputStream(file).use { cropped.compress(Bitmap.CompressFormat.JPEG, 90, it) }
+
+        val resultUri = Uri.fromFile(file)
+        val intent = Intent().apply { putExtra("CROPPED_URI", resultUri.toString()) }
+        setResult(RESULT_OK, intent)
+        finish()
+    }
+}

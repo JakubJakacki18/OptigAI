@@ -3,19 +3,15 @@ package pl.pb.optigai.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.yalantis.ucrop.UCrop
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoPreviewBinding
 import pl.pb.optigai.utils.AppLogger
 import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
-import java.io.File
+import androidx.core.net.toUri
 
 class PhotoActivity : AppCompatActivity() {
     private lateinit var images: List<Image>
@@ -30,6 +26,7 @@ class PhotoActivity : AppCompatActivity() {
         val initialImages = PhotoUtils.imageReader(this@PhotoActivity)
         images =
             initialImages.map {
+                // Initialize both URIs to the original location
                 Image(uri = it.uri, originalUri = it.uri)
             }
         currentIndex = intent.getIntExtra("position", 0)
@@ -41,33 +38,44 @@ class PhotoActivity : AppCompatActivity() {
     }
 
     /**
-     * Launcher for the cropping activity.
+     * Launcher for the custom image editor activity.
      */
+    private fun startCustomEditor(sourceUri: Uri) {
+        val intent = Intent(this, ImageEditorActivity::class.java)
+        intent.putExtra("IMAGE_URI", sourceUri.toString())
+        cropImageLauncher.launch(intent)
+    }
+
     private val cropImageLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val resultUri = result.data?.let { UCrop.getOutput(it) }
-
-                if (resultUri != null) {
+                val resultUriString = result.data?.getStringExtra("CROPPED_URI")
+                if (resultUriString != null) {
+                    val resultUri = resultUriString.toUri()
                     val currentImage = images[currentIndex]
-                    val newImage = currentImage.copy(uri = resultUri)
+                    // The 'originalUri' is correctly maintained here, pointing to the un-cropped photo.
 
-                    images =
-                        images
-                            .toMutableList()
-                            .also {
-                                it[currentIndex] = newImage
-                            }.toList()
+                    // NON-DESTRUCTIVE SAVE:
+                    // 1. We assume ImageEditorActivity saved the cropped content to the temp file at resultUri.
+                    // 2. We update the current 'uri' to point to this cropped temporary file,
+                    //    but keep 'originalUri' pointing to the original media.
+                    try {
+                        // Update in-app URI to the CROPPED result URI and refresh preview
+                        val updatedImage = currentImage.copy(uri = resultUri)
+                        images = images.toMutableList().also { it[currentIndex] = updatedImage }
 
-                    viewBinding.previewImageView.setImageURI(resultUri)
-                    updateUndoButtonState()
-                    AppLogger.d("Image cropped and list updated. New URI: $resultUri")
+                        viewBinding.previewImageView.setImageURI(null)
+                        viewBinding.previewImageView.setImageURI(resultUri)
+                        updateUndoButtonState()
+
+                        AppLogger.d("✅ Cropped image loaded from temp URI: $resultUri")
+                    } catch (e: Exception) {
+                        // This catch block mainly serves to log errors during the update/refresh process
+                        AppLogger.e("❌ Failed to update image URI after crop: ${e.message}")
+                    }
+                } else {
+                    AppLogger.e("❌ No cropped URI returned.")
                 }
-            } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                val cropError = result.data?.let { UCrop.getError(it) }
-                AppLogger.e("UCrop Error: ${cropError?.message}")
             }
         }
 
@@ -105,7 +113,6 @@ class PhotoActivity : AppCompatActivity() {
 
     /**
      * Toggles the state of the undo button based on whether the image has been cropped.
-     * Assumes 'undoButton' is an ID in your PhotoPreviewBinding.
      */
     private fun updateUndoButtonState() {
         val currentImage = images[currentIndex]
@@ -115,8 +122,10 @@ class PhotoActivity : AppCompatActivity() {
     }
 
     /**
-     * Starts the UCrop activity for the given image URI with custom styling.
+     * NOTE: This method is not currently used, but is left for reference.
+     * It was using UCrop, which has been replaced by ImageEditorActivity.
      */
+    /*
     private fun startCropActivity(sourceUri: Uri) {
         val outputFileName = "cropped_image_${System.currentTimeMillis()}.jpg"
         val destinationUri = Uri.fromFile(File(cacheDir, outputFileName))
@@ -140,6 +149,7 @@ class PhotoActivity : AppCompatActivity() {
 
         cropImageLauncher.launch(uCrop.getIntent(this))
     }
+    */
 
     private fun bindHeaderLayout() {
         viewBinding.headerLayout.headerTitle.text = getString(R.string.preview_header_shared)
@@ -173,8 +183,9 @@ class PhotoActivity : AppCompatActivity() {
 
     private fun bindCropperButtons() {
         viewBinding.editButton.setOnClickListener {
-            startCropActivity(images[currentIndex].uri)
+            startCustomEditor(images[currentIndex].uri)
         }
+
         viewBinding.undoButton.setOnClickListener {
             revertImageChanges()
         }
