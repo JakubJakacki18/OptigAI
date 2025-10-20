@@ -50,4 +50,12 @@
     <string name="content_description_edit_image">Edit Photo Button</string>
     <string name="rotate_left">rotate left\n</string>
     <string name="content_description_undo_changes">Undo changes done to the photo button\n</string>
+    <string name="Rotate_right">⟳ 90°</string>
+    <string name="Rotate_left">⟲ 90°</string>
+    <string name="apply">APPLY</string>
+    <string name="cancel">CANCEL</string>
+    <string name="ratio_43">4:3</string>
+    <string name="ratio_169">16:9</string>
+    <string name="ratio_11">1:1</string>
+    <string name="free">FREE</string>
 </resources>

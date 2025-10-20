@@ -86,7 +86,7 @@ class ImageEditorActivity : AppCompatActivity() {
 
         binding.cropRatioControls.visibility = if (mode == EditorMode.CROP) View.VISIBLE else View.GONE
         binding.rotationControls.visibility = if (mode == EditorMode.ROTATE) View.VISIBLE else View.GONE
-        binding.btnToggleMode.text = if (mode == EditorMode.CROP) "Rotate Mode" else "Crop Mode"
+        binding.btnToggleMode.text = if (mode == EditorMode.CROP) "ROTATE" else "CROP"
 
         if (mode == EditorMode.CROP) {
             binding.cropOverlay.visibility = View.VISIBLE

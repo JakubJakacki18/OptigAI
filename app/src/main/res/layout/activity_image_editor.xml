@@ -4,14 +4,55 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:background="#2174AB"
     tools:context=".ui.ImageEditorActivity">
+
+    <LinearLayout
+        android:id="@+id/top_controls_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#2174AB"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:layout_marginEnd="8dp"
+            app:cornerRadius="8dp"
+            android:textSize="20sp"
+            android:fontFamily="@font/signikab"
+            app:backgroundTint="#0F4C74"
+            android:textColor="#FEFAEC"
+            app:strokeWidth="4dp"
+            app:strokeColor="#FEFAEC"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCrop"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/apply"
+            app:cornerRadius="8dp"
+            android:textSize="20sp"
+            android:fontFamily="@font/signikab"
+            app:backgroundTint="#0F4C74"
+            android:textColor="#FEFAEC"
+            app:strokeWidth="4dp"
+            app:strokeColor="#FEFAEC"/>
+    </LinearLayout>
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/photoView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_controls_bar"
         app:layout_constraintBottom_toTopOf="@+id/bottom_controls_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -30,7 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@android:color/darker_gray"
+        android:background="#2174AB"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,10 +92,60 @@
                 android:visibility="visible"
                 tools:visibility="visible">
 
-                <Button android:id="@+id/btnRatioFree" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Free" android:layout_marginEnd="8dp"/>
-                <Button android:id="@+id/btnRatio1_1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="1:1" android:layout_marginEnd="8dp"/>
-                <Button android:id="@+id/btnRatio4_3" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="4:3" android:layout_marginEnd="8dp"/>
-                <Button android:id="@+id/btnRatio16_9" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="16:9"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRatioFree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:text="@string/free"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="8dp"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/signikab"
+                    app:backgroundTint="#0F4C74"
+                    android:textColor="#FEFAEC"
+                    app:strokeWidth="4dp"
+                    app:strokeColor="#FEFAEC"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRatio1_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:text="@string/ratio_11"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="8dp"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/signikab"
+                    app:backgroundTint="#0F4C74"
+                    android:textColor="#FEFAEC"
+                    app:strokeWidth="4dp"
+                    app:strokeColor="#FEFAEC"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRatio4_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:text="@string/ratio_43"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="8dp"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/signikab"
+                    app:backgroundTint="#0F4C74"
+                    android:textColor="#FEFAEC"
+                    app:strokeWidth="4dp"
+                    app:strokeColor="#FEFAEC"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRatio16_9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:text="@string/ratio_169"
+                    app:cornerRadius="8dp"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/signikab"
+                    app:backgroundTint="#0F4C74"
+                    android:textColor="#FEFAEC"
+                    app:strokeWidth="4dp"
+                    app:strokeColor="#FEFAEC"/>
             </LinearLayout>
 
             <LinearLayout
@@ -62,18 +153,60 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:visibility="gone"
                 tools:visibility="gone">
 
-                <Button android:id="@+id/btnRotateLeft" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⟲ 90°" android:layout_marginEnd="8dp"/>
-                <Button android:id="@+id/btnRotateRight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="90° ⟳" android:layout_marginEnd="16dp"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRotateLeft"
+                    android:layout_width="72dp"
+                    android:layout_height="64dp"
+                    android:text="@string/Rotate_left"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="8dp"
+                    android:textSize="24sp"
+                    android:fontFamily="@font/signikab"
+                    android:padding="2dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:backgroundTint="#0F4C74"
+                    android:textColor="#FEFAEC"
+                    app:strokeWidth="4dp"
+                    app:strokeColor="#FEFAEC"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRotateRight"
+                    android:layout_width="72dp"
+                    android:layout_height="64dp"
+                    android:text="@string/Rotate_right"
+                    android:layout_marginEnd="16dp"
+                    app:cornerRadius="8dp"
+                    android:textSize="24sp"
+                    android:fontFamily="@font/signikab"
+                    android:padding="2dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:backgroundTint="#0F4C74"
+                    android:textColor="#FEFAEC"
+                    app:strokeWidth="4dp"
+                    app:strokeColor="#FEFAEC"/>
 
                 <SeekBar
                     android:id="@+id/rotationSeekBar"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="64dp"
+                    android:progressDrawable="@drawable/seekbar_track"
+                    android:thumb="@drawable/seekbar_thumb"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="24dp"
+                    android:paddingBottom="24dp"/>
+
             </LinearLayout>
 
         </FrameLayout>
@@ -85,27 +218,19 @@
             android:gravity="center_vertical"
             android:paddingTop="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnToggleMode"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Rotate Mode" />
+                app:cornerRadius="8dp"
+                android:textSize="20sp"
+                android:fontFamily="@font/signikab"
+                app:backgroundTint="#0F4C74"
+                android:textColor="#FEFAEC"
+                app:strokeWidth="4dp"
+                app:strokeColor="#FEFAEC"/>
 
-            <Button
-                android:id="@+id/btnCancel"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Cancel"
-                android:layout_marginHorizontal="8dp"/>
-
-            <Button
-                android:id="@+id/btnCrop"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Apply" />
         </LinearLayout>
     </LinearLayout>
 
