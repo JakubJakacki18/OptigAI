@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.ucrop)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.snakeyaml)
 }
 
 protobuf {

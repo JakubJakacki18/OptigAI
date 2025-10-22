@@ -7,19 +7,20 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.task.vision.detector.ObjectDetector
 import pl.pb.optigai.R
 import pl.pb.optigai.ui.BrailleActivity
 import pl.pb.optigai.utils.api.IBrailleApi
 import pl.pb.optigai.utils.data.DetectionData
 import pl.pb.optigai.utils.data.DetectionResult
+import pl.pb.optigai.utils.data.const.YoloModelPathsStorage
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -102,35 +103,52 @@ class AnalyseService(
     }
 
     suspend fun analyseItem(bitmap: Bitmap): DetectionData =
-        withContext(Dispatchers.Default) {
-            // Step 1: Create TFLite's TensorImage object
-            val image = TensorImage.fromBitmap(bitmap)
-            // Step 2: Initialize the detector object
-            val options =
-                ObjectDetector.ObjectDetectorOptions
-                    .builder()
-                    .setMaxResults(5)
-                    .setScoreThreshold(0.3f)
-                    .build()
+        coroutineScope {
+//            // Step 1: Create TFLite's TensorImage object
+//            val image = TensorImage.fromBitmap(bitmap)
+//            // Step 2: Initialize the detector object
+//            val options =
+//                ObjectDetector.ObjectDetectorOptions
+//                    .builder()
+//                    .setMaxResults(5)
+//                    .setScoreThreshold(0.3f)
+//                    .build()
+//
+//            val itemDetector =
+//                ObjectDetector.createFromFileAndOptions(
+//                    context,
+//                    "item_recognition_model_edl4.tflite",
+//                    options,
+//                )
 
-            val detector =
-                ObjectDetector.createFromFileAndOptions(
-                    context,
-                    "item_recognition_model_edl4.tflite",
-                    options,
-                )
+//            val keyDetector =
+//                ObjectDetector.createFromFileAndOptions(
+//                    context,
+//                    "yolo11m_trained_v1.01_with_metadata.tflite",
+//                    options,
+//                )
+            val detectionResultsByModels =
+                YoloModelPathsStorage.paths
+                    .map { model ->
+                        async(Dispatchers.Default) {
+                            val detector = YoloDetector(context, model.modelPath, model.configPath)
+                            detector.detect(bitmap)
+                        }
+                    }.awaitAll()
             // Step 3: Feed given image to the detector
-            val results = detector.detect(image)
+//            val itemResults = YoloDetector(context, "yolo11m_float32.tflite", "coco_labels.yaml").detect(bitmap)
+//            val keyResults = YoloDetector(context, "yolo11m_trained_v1.01_with_metadata.tflite", "keys_labels.yaml").detect(bitmap)
 
             // Step 4: Parse the detection result and show it
-            val detectionResults =
-                results.map {
-                    // Get the top-1 category and craft the display text
-                    val category = it.categories.first()
-                    DetectionResult(category.label, it.boundingBox, category.score)
-                }
+//            var detectionResults =
+//                itemResults.map {
+//                    // Get the top-1 category and craft the display text
+//                    val category = it.categories.first()
+//                    DetectionResult(category.label, it.boundingBox, category.score)
+//                }
+            // val detectionResults = itemResults + keyResults
+            val detectionResults = detectionResultsByModels.flatten()
             val textResult = getResultSummaryText(detectionResults)
-
             DetectionData(textResult, detectionResults)
         }
 
@@ -140,6 +158,6 @@ class AnalyseService(
                 it.text
             }
         } else {
-            R.string.empty_result_fragment_analysis_result.toString()
+            context.getString(R.string.empty_result_fragment_analysis_result)
         }
 }
