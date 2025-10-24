@@ -26,15 +26,15 @@
         android:layout_height="82dp"
         android:src="@drawable/ic_flash_auto"
         android:background="@drawable/flash_button_background"
-    android:contentDescription="@string/flash_toggle_description"
-    android:adjustViewBounds="true"
-    android:scaleType="fitCenter"
-    android:padding="12dp"
-    android:stateListAnimator="@animator/scale_animator"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toTopOf="@id/cameraPreviewView"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"/>
+        android:contentDescription="@string/flash_toggle_description"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:padding="12dp"
+        android:stateListAnimator="@animator/scale_animator"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/cameraPreviewView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 
     <!-- Camera Control Layout -->

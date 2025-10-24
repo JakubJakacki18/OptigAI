@@ -1,6 +1,5 @@
 package pl.pb.optigai.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,8 +17,8 @@ import pl.pb.optigai.R
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
-import pl.pb.optigai.utils.data.ColorMap
 import pl.pb.optigai.utils.data.SettingsViewModel
+import pl.pb.optigai.utils.data.const.ColorMap
 import kotlin.getValue
 
 class AnalysisResultFragment : Fragment() {

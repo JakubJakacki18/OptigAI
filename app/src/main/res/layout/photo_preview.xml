@@ -60,7 +60,7 @@
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/ic_undo"
-            android:contentDescription="@string/content_description_undo_changes"
+            android:contentDescription="@string/undo_changes_cropper_description"
             app:fabSize="mini"
             app:backgroundTint="@color/dark_blue"
             app:tint="@color/creme"/>

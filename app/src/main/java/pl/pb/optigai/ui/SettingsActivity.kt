@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
 import pl.pb.optigai.R
 import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivitySettingsBinding
-import pl.pb.optigai.utils.data.ColorMap
 import pl.pb.optigai.utils.data.SettingsViewModel
+import pl.pb.optigai.utils.data.const.ColorMap
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
@@ -181,13 +181,8 @@ class SettingsActivity : AppCompatActivity() {
         }
         viewBinding.columnsAmountSlider.setLabelFormatter { value ->
             val intValue = value.toInt()
-            if (intValue == 1) {
-                "1 column"
-            } else {
-                "$intValue columns"
-            }
+            getString(R.string.gallery_slider_annotation_value, intValue)
         }
-
     }
 
     /**

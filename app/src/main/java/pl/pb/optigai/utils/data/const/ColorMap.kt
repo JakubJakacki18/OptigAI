@@ -1,4 +1,4 @@
-package pl.pb.optigai.utils.data
+package pl.pb.optigai.utils.data.const
 
 import pl.pb.optigai.R
 import pl.pb.optigai.Settings

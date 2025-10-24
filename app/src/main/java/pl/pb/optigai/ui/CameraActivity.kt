@@ -40,7 +40,7 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
     private val viewModel: SettingsViewModel by viewModels()
     private var imageCapture: ImageCapture? = null
-    private var flashMode = ImageCapture.FLASH_MODE_AUTO
+    private var flashMode: Int? = null
     private lateinit var zoomSeekBar: SeekBar
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private lateinit var camera: androidx.camera.core.Camera
@@ -88,26 +88,10 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
-        val flashButton = viewBinding.flashToggleButton!!
-
-        flashButton.setOnClickListener {
-            flashMode =
-                when (flashMode) {
-                    ImageCapture.FLASH_MODE_AUTO -> {
-                        flashButton.setImageResource(R.drawable.ic_flash_on)
-                        ImageCapture.FLASH_MODE_ON
-                    }
-                    ImageCapture.FLASH_MODE_ON -> {
-                        flashButton.setImageResource(R.drawable.ic_flash_off)
-                        ImageCapture.FLASH_MODE_OFF
-                    }
-                    else -> {
-                        flashButton.setImageResource(R.drawable.ic_flash_auto)
-                        ImageCapture.FLASH_MODE_AUTO
-                    }
-                }
-            imageCapture?.flashMode = flashMode
+        viewBinding.flashToggleButton!!.setOnClickListener {
+            setFlashMode()
         }
+        setFlashMode()
         scaleGestureDetector =
             ScaleGestureDetector(
                 this,
@@ -144,6 +128,29 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private fun setFlashMode() {
+        val flashButton = viewBinding.flashToggleButton!!
+        flashMode =
+            when (flashMode) {
+                ImageCapture.FLASH_MODE_AUTO -> {
+                    flashButton.setImageResource(R.drawable.ic_flash_on)
+                    flashButton.contentDescription = getString(R.string.flash_on_description)
+                    ImageCapture.FLASH_MODE_ON
+                }
+                ImageCapture.FLASH_MODE_ON -> {
+                    flashButton.setImageResource(R.drawable.ic_flash_off)
+                    flashButton.contentDescription = getString(R.string.flash_off_description)
+                    ImageCapture.FLASH_MODE_OFF
+                }
+                else -> {
+                    flashButton.setImageResource(R.drawable.ic_flash_auto)
+                    flashButton.contentDescription = getString(R.string.flash_auto_description)
+                    ImageCapture.FLASH_MODE_AUTO
+                }
+            }
+        imageCapture?.flashMode = flashMode!!
+    }
+
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             var permissionGranted = true
@@ -175,7 +182,7 @@ class CameraActivity : AppCompatActivity() {
         imageCapture =
             ImageCapture
                 .Builder()
-                .setFlashMode(flashMode)
+                .setFlashMode(flashMode!!)
                 .build()
 
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
