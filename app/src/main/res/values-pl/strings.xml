@@ -24,7 +24,7 @@
     <string name="object_button_description">Analiza przedmiotów przycisk</string>
     <string name="braille_button_description">Analiza tekstu braille\'a przycisk</string>
     <string name="text_button_description">Analiza tekstu przycisk</string>
-    <string name="gallery_image_description">"Obraz w galerii "</string>
+    <string name="gallery_image_default_description">"Obraz w galerii "</string>
     <string name="font_size_preview_value">Podgląd Przykładowego Tekstu</string>
     <string name="camera_section_title_value">APARAT</string>
     <string name="gallery_section_title_value">GALERIA</string>
@@ -62,4 +62,5 @@
     <string name="zoom_slider_visibility_auto_toggle_description">Automatycznie, suwak przybliżenia pojawi się po uszczypnięciu ekranu</string>
     <string name="flash_auto_description">Lampa błyskowa automatyczna</string>
     <string name="flash_on_description">Lampa błyskowa włączona</string>
+    <string name="gallery_image_description">Obraz dodany dnia %s o godzinie %s nazwany %s</string>
 </resources>

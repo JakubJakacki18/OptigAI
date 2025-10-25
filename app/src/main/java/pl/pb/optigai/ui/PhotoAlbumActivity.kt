@@ -90,7 +90,7 @@ class PhotoAlbumActivity : AppCompatActivity() {
         }
 
         val adapter =
-            ImageAdapter(imageList) { position ->
+            ImageAdapter(this, imageList) { position ->
                 val intent = Intent(this, PhotoActivity::class.java)
                 intent.putExtra("position", position)
                 startActivity(intent)

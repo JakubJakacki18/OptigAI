@@ -29,6 +29,7 @@
     <string name="object_button_description">Analise items button</string>
     <string name="braille_button_description">Analyse braille text button</string>
     <string name="text_button_description">Analyse text button</string>
+    <string name="background_photo_description">Background image for Analysis</string>
 
     <!--PhotoPreviewActivity-->
     <string name="content_description_preview_image">Image preview</string>
@@ -37,11 +38,12 @@
     <string name="content_description_open_analyze_button">Go to the analysis selector</string>
 
     <!--PhotoAlbumActivity-->
-    <string name="gallery_image_description">Image in gallery</string>
+    <string name="gallery_image_default_description">Image in gallery</string>
+    <string name="gallery_image_description">Image made on %s at %s named %s </string>
 
-<!--    <string name="item_image">Image description</string>-->
-<!--    <string name="gallery_layout_description">Change Gallery Layout</string>-->
-    <string name="background_photo_description">Background image for Analysis</string>
+    <!--Others-->
+    <!--    <string name="item_image">Image description</string>-->
+    <!--    <string name="gallery_layout_description">Change Gallery Layout</string>-->
     <string name="open_camera" translatable="false">Open Camera</string>
     <string name="open_gallery" translatable="false">Open Gallery</string>
     <string name="empty_result_fragment_analysis_result">Nothing was detected. Try with another image.</string>

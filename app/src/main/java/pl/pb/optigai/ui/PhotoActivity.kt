@@ -3,9 +3,7 @@ package pl.pb.optigai.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -27,11 +25,7 @@ class PhotoActivity : AppCompatActivity() {
         viewBinding = PhotoPreviewBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val initialImages = PhotoUtils.imageReader(this@PhotoActivity)
-        images =
-            initialImages.map {
-                Image(uri = it.uri, originalUri = it.uri)
-            }
+        images = PhotoUtils.imageReader(this@PhotoActivity)
         currentIndex = intent.getIntExtra("position", 0)
 
         updateImage()

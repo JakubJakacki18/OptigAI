@@ -19,7 +19,7 @@
             android:layout_height="0dp"
             android:layout_margin="8dp"
             android:scaleType="centerCrop"
-            android:contentDescription="@string/gallery_image_description"
+            android:contentDescription="@string/gallery_image_default_description"
             android:src="@drawable/photo1"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toTopOf="parent"
