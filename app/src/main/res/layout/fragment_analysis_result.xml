@@ -22,8 +22,11 @@
                 android:id="@+id/analyzedPhoto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/photo_analysis_description"
                 android:scaleType="centerInside"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                android:contentDescription="@null"
+
                 />
 
             <pl.pb.optigai.ui.DetectionOverlay
