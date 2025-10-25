@@ -14,6 +14,7 @@
     <string name="photo_analysis_description">Analiza obrazu</string>
     <string name="photo_analysis_text_box">Wynik analizy zdjęcia</string>
     <string name="error_result_fragment_analysis_result">Coś poszło nie tak</string>
+    <string name="detection_result_bounding_box_data_description">Wykryto %s z dokładnością na poziomie %s</string>
     <string name="analise_text_fragment_analysis_selector">TEKST</string>
     <string name="analise_braille_fragment_analysis_selector">BRAILLE</string>
     <string name="analise_item_fragment_analysis_selector">PRZEDMIOTY</string>

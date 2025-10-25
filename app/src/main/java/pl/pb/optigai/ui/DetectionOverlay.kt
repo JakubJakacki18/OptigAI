@@ -141,7 +141,7 @@ class DetectionOverlay(
             ) {
                 val detectionResult = detectionResultsAndColors.getOrNull(virtualViewId)?.first ?: return
                 val rect = mapRectToView(detectionResult.boundingBox ?: return)
-                info.contentDescription = getOverlayText(detectionResult)
+                info.contentDescription = getOverlayText(detectionResult, R.string.detection_result_bounding_box_data_description)
                 @Suppress("DEPRECATION")
                 info.setBoundsInParent(
                     Rect(
@@ -179,9 +179,12 @@ class DetectionOverlay(
 
     override fun onHoverEvent(event: MotionEvent): Boolean = accessibilityHelper.dispatchHoverEvent(event) || super.onHoverEvent(event)
 
-    private fun getOverlayText(detectionResult: DetectionResult): String =
+    private fun getOverlayText(
+        detectionResult: DetectionResult,
+        resId: Int = R.string.detection_result_bounding_box_data,
+    ): String =
         detectionResult.accuracy?.let { accuracy ->
             val percentage = String.format(Locale.getDefault(), "%.1f%%", accuracy * 100)
-            context.getString(R.string.detection_result_bounding_box_data, detectionResult.text, percentage)
+            context.getString(resId, detectionResult.text, percentage)
         } ?: ""
 }

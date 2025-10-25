@@ -22,6 +22,7 @@
     <string name="photo_analysis_text_box">Result of photo analysis</string>
     <string name="error_result_fragment_analysis_result">Something went wrong</string>
     <string name="detection_result_bounding_box_data" translatable="false">%s %s</string>
+    <string name="detection_result_bounding_box_data_description">Detected %s with %s accuracy</string>
 
     <!--AnalysisSelectorFragment-->
     <string name="analise_text_fragment_analysis_selector">TEXT</string>

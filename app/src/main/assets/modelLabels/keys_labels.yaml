@@ -3,3 +3,6 @@ model_threshold: 0.7
 max_detections_per_image: 5
 names:
   0: keys
+
+names_pl:
+  0: klucze

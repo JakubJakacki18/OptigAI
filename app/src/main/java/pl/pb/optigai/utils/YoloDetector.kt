@@ -10,6 +10,7 @@ import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
 import org.yaml.snakeyaml.Yaml
 import pl.pb.optigai.utils.data.DetectionResult
+import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
@@ -36,7 +37,7 @@ class YoloDetector(
         val data: Map<String, Any> = yaml.load(inputStream)
         inputStream.close()
 
-        labels = loadLabels(data["names"]as Map<*, *>)
+        labels = loadLabels(getNamesInProperLanguage(context, data))
         channels = data["count"] as Int + 4 // 4 is bounding box params,
         threshold = (data["model_threshold"] as Number).toFloat()
         maxAmountOfDetections = data["max_detections_per_image"] as Int
@@ -145,5 +146,17 @@ class YoloDetector(
         val unionArea = areaA + areaB - interArea
 
         return if (unionArea == 0f) 0f else interArea / unionArea
+    }
+
+    private fun getNamesInProperLanguage(
+        context: Context,
+        data: Map<String, Any>,
+    ): Map<*, *> {
+        val locale: Locale = context.resources.configuration.locales[0]
+        val languageCode = locale.language
+        return when (languageCode) {
+            "pl" -> data["names_pl"] as Map<*, *>
+            else -> data["names"] as Map<*, *>
+        }
     }
 }
