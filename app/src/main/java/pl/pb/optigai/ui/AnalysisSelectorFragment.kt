@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,7 +17,7 @@ import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
-import pl.pb.optigai.utils.data.DetectionResult
+import pl.pb.optigai.utils.data.DetectionData
 
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
@@ -50,37 +51,26 @@ class AnalysisSelectorFragment : Fragment() {
         val analyseService = AnalyseService(requireContext())
 
         buttonTextAnalysis.setOnClickListener {
-            throwExceptionIfBitmapIsNull()
-            showLoadingFragment()
-            viewModel.setDetectionResult(emptyList())
-            lifecycleScope.launch {
-                val resultOfAnalysis = analyseService.analyseText(BitmapCache.bitmap!!)
-                viewModel.setDetectionResult(resultOfAnalysis)
-                viewModel.setSummaryTextResult(getResultSummaryText(resultOfAnalysis))
-                parentFragmentManager.popBackStack()
-                showResultFragment()
-            }
+            callAnalyseFunction(analyseService::analyseText)
         }
 
         buttonBrailleAnalysis.setOnClickListener {
-            throwExceptionIfBitmapIsNull()
-            showLoadingFragment()
-            viewModel.setDetectionResult(emptyList())
-            lifecycleScope.launch {
-                val resultOfAnalysis = analyseService.analyseBraille(BitmapCache.bitmap!!)
-                viewModel.setSummaryTextResult((resultOfAnalysis))
-                parentFragmentManager.popBackStack()
-                showResultFragment()
-            }
+            callAnalyseFunction(analyseService::analyseBraille)
         }
 
         buttonItemAnalysis.setOnClickListener {
-            throwExceptionIfBitmapIsNull()
-            // showLoadingFragment()
-            val resultOfAnalysis = analyseService.analyseItem(BitmapCache.bitmap!!)
+            callAnalyseFunction(analyseService::analyseItem)
+        }
+    }
 
-            viewModel.setDetectionResult(resultOfAnalysis)
-            viewModel.setSummaryTextResult(getResultSummaryText(resultOfAnalysis))
+    private fun callAnalyseFunction(analyseFunction: suspend (bitmap: Bitmap) -> DetectionData) {
+        throwExceptionIfBitmapIsNull()
+        showLoadingFragment()
+        lifecycleScope.launch {
+            val resultOfAnalysis = analyseFunction(BitmapCache.bitmap!!)
+            viewModel.setDetectionResult(resultOfAnalysis.detectionResults)
+            viewModel.setSummaryTextResult(resultOfAnalysis.result)
+            parentFragmentManager.popBackStack()
             showResultFragment()
         }
     }
@@ -106,13 +96,4 @@ class AnalysisSelectorFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
-
-    private fun getResultSummaryText(detectionResult: List<DetectionResult>): String =
-        if (detectionResult.isNotEmpty()) {
-            detectionResult.joinToString(separator = "\n") {
-                it.text
-            }
-        } else {
-            R.string.empty_result_fragment_analysis_result.toString()
-        }
 }

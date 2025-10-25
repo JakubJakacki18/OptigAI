@@ -1,20 +1,26 @@
 package pl.pb.optigai.utils
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.task.vision.detector.ObjectDetector
+import pl.pb.optigai.R
 import pl.pb.optigai.ui.BrailleActivity
 import pl.pb.optigai.utils.api.IBrailleApi
+import pl.pb.optigai.utils.data.DetectionData
 import pl.pb.optigai.utils.data.DetectionResult
+import pl.pb.optigai.utils.data.const.YoloModelPathsStorage
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -26,63 +32,28 @@ class AnalyseService(
     private val apiKey = "nT4D3OfHfZE0E8tI4sL0"
     private val brailleModelUrl = "https://detect.roboflow.com/"
 
-    suspend fun analyseText(bitmap: Bitmap): List<DetectionResult> {
+    suspend fun analyseText(bitmap: Bitmap): DetectionData {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val image = InputImage.fromBitmap(bitmap, 0)
-        val result: MutableList<DetectionResult> = mutableListOf()
+        val detectionResults = mutableListOf<DetectionResult>()
+
         return try {
             val visionText = recognizer.process(image).await()
             for (block in visionText.textBlocks) {
-                result.add(DetectionResult(block.text, RectF(block.boundingBox), null))
+                detectionResults.add(DetectionResult(block.text, RectF(block.boundingBox), null))
                 AppLogger.i("Block text: ${block.text}")
-
-//                for (line in block.lines) {
-//                    AppLogger.i("Line text: ${line.text}")
-//                    val lineText = line.text
-//                    val lineFrame = line.boundingBox
-//                    result.add(DetectionResult(lineText, RectF(lineFrame), null))
-//                }
             }
-            result
+            DetectionData(getResultSummaryText(detectionResults), detectionResults)
         } catch (e: Exception) {
             AppLogger.e("Recognizer has error, result is unknown. ${e.message}")
-            result
+            DetectionData(
+                R.string.empty_result_fragment_analysis_result.toString(),
+                listOf(),
+            )
         }
     }
 
-//        for (block in visionText.textBlocks) {
-//            val blockText = block.text
-//            val blockCornerPoints = block.cornerPoints
-//            val blockFrame = block.boundingBox
-//            for (line in block.lines) {
-//                val lineText = line.text
-//                val lineCornerPoints = line.cornerPoints
-//                val lineFrame = line.boundingBox
-//                result.add(DetectionResult(RectF(lineFrame), lineText, 0f))
-//            }
-//        recognizer
-//            .process(image)
-//            .addOnSuccessListener { visionText ->
-//                val detectionResults: MutableList<DetectionResult> = mutableListOf()
-//                for (block in visionText.textBlocks) {
-//                    val blockText = block.text
-//                    val blockCornerPoints = block.cornerPoints
-//                    val blockFrame = block.boundingBox
-//                    for (line in block.lines) {
-//                        val lineText = line.text
-//                        val lineCornerPoints = line.cornerPoints
-//                        val lineFrame = line.boundingBox
-//                        result.add(DetectionResult(RectF(lineFrame), lineText, 0f))
-//                    }
-//                }
-//            }.addOnFailureListener { e ->
-//                AppLogger.e("Recognizer has error, result is unknown")
-//                listOf(DetectionResult(null, "Something went wrong", 0f))
-//            }
-//        return result
-//    }
-
-    suspend fun analyseBraille(bitmap: Bitmap): String {
+    suspend fun analyseBraille(bitmap: Bitmap): DetectionData {
         try {
             val tempFile = File.createTempFile("braille", ".jpg")
             FileOutputStream(tempFile).use { out ->
@@ -106,101 +77,87 @@ class AnalyseService(
             if (response.isSuccessful) {
                 val result = response.body()
                 AppLogger.d("Braille raw response: $result")
-                val sentence = BrailleActivity.decode(result?.predictions ?: emptyList())
+                val predictions = result?.predictions ?: emptyList()
+                val sentence = BrailleActivity.decode(predictions)
                 AppLogger.d("Braille sentence: $sentence")
-                return sentence
+
+                val detectionResults =
+                    predictions.map { brailleChar ->
+                        val left = brailleChar.x - brailleChar.width / 2
+                        val top = brailleChar.y - brailleChar.height / 2
+                        val right = brailleChar.x + brailleChar.width / 2
+                        val bottom = brailleChar.y + brailleChar.height / 2
+                        val rectF = RectF(left, top, right, bottom)
+                        DetectionResult(brailleChar.clazz, rectF, null)
+                    }
+
+                return DetectionData(sentence, detectionResults) // Return both
             } else {
                 AppLogger.e("BrailleError: HTTP ${response.code()} ${response.errorBody()}")
-                return "Error: ${response.code()}"
+                return DetectionData("Error: ${response.code()}", emptyList())
             }
         } catch (e: Exception) {
             AppLogger.e("BrailleException: ${e.message}")
-            return "Error creating temp file or bitmap: ${e.message}"
+            return DetectionData("Error creating temp file or bitmap: ${e.message}", emptyList())
         }
     }
 
-    fun analyseItem(bitmap: Bitmap): List<DetectionResult> {
-        // Step 1: Create TFLite's TensorImage object
-        val image = TensorImage.fromBitmap(bitmap)
-        // Step 2: Initialize the detector object
-        val options =
-            ObjectDetector.ObjectDetectorOptions
-                .builder()
-                .setMaxResults(5)
-                .setScoreThreshold(0.3f)
-                .build()
+    suspend fun analyseItem(bitmap: Bitmap): DetectionData =
+        coroutineScope {
+//            // Step 1: Create TFLite's TensorImage object
+//            val image = TensorImage.fromBitmap(bitmap)
+//            // Step 2: Initialize the detector object
+//            val options =
+//                ObjectDetector.ObjectDetectorOptions
+//                    .builder()
+//                    .setMaxResults(5)
+//                    .setScoreThreshold(0.3f)
+//                    .build()
+//
+//            val itemDetector =
+//                ObjectDetector.createFromFileAndOptions(
+//                    context,
+//                    "item_recognition_model_edl4.tflite",
+//                    options,
+//                )
 
-        val detector =
-            ObjectDetector.createFromFileAndOptions(
-                context,
-                "item_recognition_model_edl4.tflite",
-                options,
-            )
-        // Step 3: Feed given image to the detector
-        val results = detector.detect(image)
+//            val keyDetector =
+//                ObjectDetector.createFromFileAndOptions(
+//                    context,
+//                    "yolo11m_trained_v1.01_with_metadata.tflite",
+//                    options,
+//                )
+            val detectionResultsByModels =
+                YoloModelPathsStorage.paths
+                    .map { model ->
+                        async(Dispatchers.Default) {
+                            val detector = YoloDetector(context, model.modelPath, model.configPath)
+                            detector.detect(bitmap)
+                        }
+                    }.awaitAll()
+            // Step 3: Feed given image to the detector
+//            val itemResults = YoloDetector(context, "yolo11m_float32.tflite", "coco_labels.yaml").detect(bitmap)
+//            val keyResults = YoloDetector(context, "yolo11m_trained_v1.01_with_metadata.tflite", "keys_labels.yaml").detect(bitmap)
 
-        // Step 4: Parse the detection result and show it
-        val resultToDisplay =
-            results.map {
-                // Get the top-1 category and craft the display text
-                val category = it.categories.first()
-                // val text = "${category.label}, ${category.score.times(100).toInt()}%"
+            // Step 4: Parse the detection result and show it
+//            var detectionResults =
+//                itemResults.map {
+//                    // Get the top-1 category and craft the display text
+//                    val category = it.categories.first()
+//                    DetectionResult(category.label, it.boundingBox, category.score)
+//                }
+            // val detectionResults = itemResults + keyResults
+            val detectionResults = detectionResultsByModels.flatten()
+            val textResult = getResultSummaryText(detectionResults)
+            DetectionData(textResult, detectionResults)
+        }
 
-                // Create a data object to display the detection result
-                DetectionResult(category.label, it.boundingBox, category.score)
+    private fun getResultSummaryText(detectionResult: List<DetectionResult>): String =
+        if (detectionResult.isNotEmpty()) {
+            detectionResult.joinToString(separator = "\n") {
+                it.text
             }
-
-//        // Draw the detection result on the bitmap and show it.
-//        val imgWithResult = drawDetectionResult(bitmap, resultToDisplay)
-//        runOnUiThread {
-//            inputImageView.setImageBitmap(imgWithResult)
-//        }
-        return resultToDisplay
-    }
-
-//    private fun drawDetectionResult(
-//        bitmap: Bitmap,
-//        detectionResults: List<DetectionResult>,
-//    ): Bitmap {
-//        val outputBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-//        val canvas = Canvas(outputBitmap)
-//        val pen = Paint()
-//
-//        @Suppress("ktlint:standard:property-naming")
-//        val MAX_FONT_SIZE = 96F
-//        pen.textAlign = Paint.Align.LEFT
-//
-//        detectionResults.forEach {
-//            // draw bounding box
-//            pen.color = Color.RED
-//            pen.strokeWidth = 8F
-//            pen.style = Paint.Style.STROKE
-//            val box = it.boundingBox
-//            canvas.drawRect(box, pen)
-//
-//            val tagSize = Rect(0, 0, 0, 0)
-//
-//            // calculate the right font size
-//            pen.style = Paint.Style.FILL_AND_STROKE
-//            pen.color = Color.YELLOW
-//            pen.strokeWidth = 2F
-//
-//            pen.textSize = MAX_FONT_SIZE
-//            pen.getTextBounds(it.text, 0, it.text.length, tagSize)
-//            val fontSize: Float = pen.textSize * box.width() / tagSize.width()
-//
-//            // adjust the font size so texts are inside the bounding box
-//            if (fontSize < pen.textSize) pen.textSize = fontSize
-//
-//            var margin = (box.width() - tagSize.width()) / 2.0F
-//            if (margin < 0F) margin = 0F
-//            canvas.drawText(
-//                it.text,
-//                box.left + margin,
-//                box.top + tagSize.height().times(1F),
-//                pen,
-//            )
-//        }
-//        return outputBitmap
-//    }
+        } else {
+            context.getString(R.string.empty_result_fragment_analysis_result)
+        }
 }

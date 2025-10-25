@@ -22,8 +22,11 @@
                 android:id="@+id/analyzedPhoto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/photo_analysis_description"
                 android:scaleType="centerInside"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                android:contentDescription="@null"
+
                 />
 
             <pl.pb.optigai.ui.DetectionOverlay
@@ -43,7 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/analysis_result_box"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:contentDescription="@string/photo_analysis_text_box">
 
         <TextView
             android:id="@+id/summaryResultText"

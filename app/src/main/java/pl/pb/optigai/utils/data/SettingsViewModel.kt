@@ -12,12 +12,13 @@ class SettingsViewModel(
 ) : AndroidViewModel(application) {
     private val settingsService = SettingsService.getInstance(application)
 
-    // Only use gridColumns to manage the number of columns
     val gridColumns = settingsService.gridColumns
     val language = settingsService.language
     val defaultSaveLocation = settingsService.defaultSaveLocation
     val isPhotoSaving = settingsService.isPhotoSaving
     val colors = settingsService.colors
+    val zoomSeekBarMode = settingsService.zoomSeekBarMode
+    val fontSizeSp = settingsService.fontSizeSp
 
     fun setGridColumns(columns: Int) {
         viewModelScope.launch {
@@ -37,4 +38,17 @@ class SettingsViewModel(
             settingsService.toggleColorOfBorder(color)
         }
     }
+
+
+    fun setZoomSeekBarMode(mode: Settings.ZoomSeekBarMode) {
+        viewModelScope.launch {
+            settingsService.updateZoomSeekBarMode(mode)
+        }
+    }
+    fun setFontSize(sp: Int) {
+        viewModelScope.launch {
+            settingsService.updateFontSize(sp)
+        }
+    }
+
 }

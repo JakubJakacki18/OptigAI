@@ -1,6 +1,5 @@
 package pl.pb.optigai.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,15 +17,14 @@ import pl.pb.optigai.R
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
-import pl.pb.optigai.utils.data.ColorMap
 import pl.pb.optigai.utils.data.SettingsViewModel
+import pl.pb.optigai.utils.data.const.ColorMap
 import kotlin.getValue
 
 class AnalysisResultFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
 
-    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,6 +45,11 @@ class AnalysisResultFragment : Fragment() {
                     overlay.setAvailableColors(availableColors)
                     overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
                 }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            settingsViewModel.fontSizeSp.collect { sp ->
+                summaryResultText.textSize = sp.toFloat()
             }
         }
         viewModel.analysisSummaryTextResult.observe(viewLifecycleOwner) { summary ->

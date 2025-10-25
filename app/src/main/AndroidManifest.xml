@@ -48,6 +48,9 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:exported="true" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

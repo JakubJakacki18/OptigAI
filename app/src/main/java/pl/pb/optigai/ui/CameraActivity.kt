@@ -1,5 +1,6 @@
 package pl.pb.optigai.ui
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -7,6 +8,9 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.ScaleGestureDetector
+import android.view.View
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -22,6 +26,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import pl.pb.optigai.R
+import pl.pb.optigai.Settings
 import pl.pb.optigai.databinding.ActivityCameraBinding
 import pl.pb.optigai.utils.PermissionHandler
 import pl.pb.optigai.utils.data.BitmapCache
@@ -34,7 +40,12 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
     private val viewModel: SettingsViewModel by viewModels()
     private var imageCapture: ImageCapture? = null
+    private var flashMode: Int? = null
+    private lateinit var zoomSeekBar: SeekBar
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private lateinit var camera: androidx.camera.core.Camera
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
@@ -43,20 +54,101 @@ class CameraActivity : AppCompatActivity() {
         if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
             activityResultLauncher.launch(REQUIRED_PERMISSIONS)
         } else {
-            lifecycleScope.launch {
-                startCamera()
-            }
+            lifecycleScope.launch { startCamera() }
         }
+        zoomSeekBar = viewBinding.zoomSeekBar!!
 
         viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
+
         viewBinding.openGalleryButton.setOnClickListener {
             val intent = Intent(this, PhotoAlbumActivity::class.java)
             startActivity(intent)
         }
+
         viewBinding.openSettingsButton.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+        lifecycleScope.launch {
+            viewModel.zoomSeekBarMode.collect { mode ->
+                when (mode) {
+                    Settings.ZoomSeekBarMode.ALWAYS_ON -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.VISIBLE
+                    }
+                    Settings.ZoomSeekBarMode.ALWAYS_OFF -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                    }
+                    Settings.ZoomSeekBarMode.AUTO -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                    }
+                    else -> {
+                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
+        viewBinding.flashToggleButton!!.setOnClickListener {
+            setFlashMode()
+        }
+        setFlashMode()
+        scaleGestureDetector =
+            ScaleGestureDetector(
+                this,
+                object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    override fun onScale(detector: ScaleGestureDetector): Boolean {
+                        val zoomState = camera.cameraInfo.zoomState.value ?: return false
+                        val currentZoom = zoomState.zoomRatio
+                        val newZoom =
+                            (currentZoom * detector.scaleFactor)
+                                .coerceIn(zoomState.minZoomRatio, zoomState.maxZoomRatio)
+
+                        camera.cameraControl.setZoomRatio(newZoom)
+
+                        val linearZoom =
+                            (newZoom - zoomState.minZoomRatio) /
+                                (zoomState.maxZoomRatio - zoomState.minZoomRatio)
+                        zoomSeekBar.progress = (linearZoom * 100).toInt()
+
+                        lifecycleScope.launch {
+                            if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
+                                zoomSeekBar.visibility = View.VISIBLE
+                                zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
+                                zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                            }
+                        }
+                        return true
+                    }
+                },
+            )
+
+        viewBinding.cameraPreviewView.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            return@setOnTouchListener true
+        }
+    }
+
+    private fun setFlashMode() {
+        val flashButton = viewBinding.flashToggleButton!!
+        flashMode =
+            when (flashMode) {
+                ImageCapture.FLASH_MODE_AUTO -> {
+                    flashButton.setImageResource(R.drawable.ic_flash_on)
+                    flashButton.contentDescription = getString(R.string.flash_on_description)
+                    ImageCapture.FLASH_MODE_ON
+                }
+                ImageCapture.FLASH_MODE_ON -> {
+                    flashButton.setImageResource(R.drawable.ic_flash_off)
+                    flashButton.contentDescription = getString(R.string.flash_off_description)
+                    ImageCapture.FLASH_MODE_OFF
+                }
+                else -> {
+                    flashButton.setImageResource(R.drawable.ic_flash_auto)
+                    flashButton.contentDescription = getString(R.string.flash_auto_description)
+                    ImageCapture.FLASH_MODE_AUTO
+                }
+            }
+        imageCapture?.flashMode = flashMode!!
     }
 
     private val activityResultLauncher =
@@ -70,9 +162,7 @@ class CameraActivity : AppCompatActivity() {
             if (!permissionGranted) {
                 Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
             } else {
-                lifecycleScope.launch {
-                    startCamera()
-                }
+                lifecycleScope.launch { startCamera() }
             }
         }
 
@@ -88,16 +178,26 @@ class CameraActivity : AppCompatActivity() {
         val cameraProvider = ProcessCameraProvider.getInstance(this).await()
         val preview = Preview.Builder().build()
         preview.surfaceProvider = viewBinding.cameraPreviewView.surfaceProvider
-        imageCapture = ImageCapture.Builder().build()
+
+        imageCapture =
+            ImageCapture
+                .Builder()
+                .setFlashMode(flashMode!!)
+                .build()
+
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
         try {
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture,
-            )
+            camera =
+                cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageCapture,
+                )
+            camera.cameraControl.setZoomRatio(1.0f)
+            setupZoomControls()
         } catch (exc: Exception) {
             Toast.makeText(this, "Camera initialization failed: ${exc.message}", Toast.LENGTH_LONG).show()
         }
@@ -115,25 +215,16 @@ class CameraActivity : AppCompatActivity() {
 
     private fun getOutputFileOptions(): ImageCapture.OutputFileOptions {
         val locale = Locale.getDefault()
-        val name =
-            SimpleDateFormat(
-                FILENAME_FORMAT,
-                locale,
-            ).format(System.currentTimeMillis())
-
+        val name = SimpleDateFormat(FILENAME_FORMAT, locale).format(System.currentTimeMillis())
         val contentValues =
             ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, name)
                 put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/OptigAI")
             }
-
         return ImageCapture.OutputFileOptions
-            .Builder(
-                contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues,
-            ).build()
+            .Builder(contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            .build()
     }
 
     private fun takePhotoAndSaveToExternalStorage() {
@@ -175,7 +266,12 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(this@CameraActivity, "Photo capture failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                    Toast
+                        .makeText(
+                            this@CameraActivity,
+                            "Photo capture failed: ${exception.message}",
+                            Toast.LENGTH_LONG,
+                        ).show()
                 }
             },
         )
@@ -189,6 +285,44 @@ class CameraActivity : AppCompatActivity() {
             else -> throw IllegalArgumentException("Unsupported data type")
         }
         startActivity(intent)
+    }
+
+    private val hideZoomBarRunnable =
+        Runnable {
+            viewBinding.zoomSeekBar!!.visibility = View.GONE
+        }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupZoomControls() {
+        zoomSeekBar.max = 100
+        zoomSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean,
+                ) {
+                    if (!fromUser) return
+                    val zoomState = camera.cameraInfo.zoomState.value ?: return
+                    val zoomRatio =
+                        zoomState.minZoomRatio +
+                            (zoomState.maxZoomRatio - zoomState.minZoomRatio) * (progress / 100f)
+                    camera.cameraControl.setZoomRatio(zoomRatio)
+
+                    lifecycleScope.launch {
+                        if (viewModel.zoomSeekBarMode.first() == Settings.ZoomSeekBarMode.AUTO) {
+                            zoomSeekBar.visibility = View.VISIBLE
+                            zoomSeekBar.removeCallbacks(hideZoomBarRunnable)
+                            zoomSeekBar.postDelayed(hideZoomBarRunnable, 1000)
+                        }
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            },
+        )
     }
 
     private fun Bitmap.rotate(degrees: Int): Bitmap {

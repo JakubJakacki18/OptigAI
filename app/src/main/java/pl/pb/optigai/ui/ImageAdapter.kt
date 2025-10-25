@@ -7,9 +7,11 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import pl.pb.optigai.R
+import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 
 class ImageAdapter(
+    private val context: android.content.Context,
     private val images: List<Image>,
     private val onImageClick: (position: Int) -> Unit,
 ) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
@@ -52,6 +54,14 @@ class ImageAdapter(
         holder.itemView.setOnClickListener {
             onImageClick(position)
         }
+        val dateAndTime = PhotoUtils.extractDateAndTime(image.dateAddedTimeStamp)
+        holder.itemView.contentDescription =
+            context.getString(
+                R.string.gallery_image_description,
+                dateAndTime.first,
+                dateAndTime.second,
+                image.fileName,
+            )
     }
 
     /**
