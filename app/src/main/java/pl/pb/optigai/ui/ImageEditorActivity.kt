@@ -33,7 +33,12 @@ class ImageEditorActivity : AppCompatActivity() {
 
         imageUri = intent.getStringExtra("IMAGE_URI")!!.toUri()
         binding.photoView.load(imageUri) {
-            listener(onSuccess = { _, _ -> setupPhotoViewBoundsListener() })
+            // Optionally ensure PhotoView starts with a default fit scale
+            // Note: PhotoView usually defaults to FIT_CENTER, which is fine,
+            // but ensure you aren't doing any conflicting initial setup.
+            listener(onSuccess = { _, _ ->
+                setupPhotoViewBoundsListener()
+            })
         }
 
         binding.photoView.maximumScale = 6f
@@ -60,9 +65,15 @@ class ImageEditorActivity : AppCompatActivity() {
         val r169 = CropOverlayView.CropRatio.R_16_9
 
         val ratioClickListener: (CropOverlayView.CropRatio) -> View.OnClickListener = { ratio ->
-            View.OnClickListener { binding.cropOverlay.setCropRatio(ratio) }
-        }
+            View.OnClickListener {
+                binding.cropOverlay.setCropRatio(ratio)
 
+                // Immediately force the new ratio to fit inside the photo boundaries
+                binding.photoView.displayRect?.let { bounds ->
+                    binding.cropOverlay.scaleToFitBounds(bounds)
+                }
+            }
+        }
         binding.btnRatioFree.setOnClickListener(ratioClickListener(free))
         binding.btnRatio11.setOnClickListener(ratioClickListener(square))
         binding.btnRatio43.setOnClickListener(ratioClickListener(r43))
@@ -70,6 +81,7 @@ class ImageEditorActivity : AppCompatActivity() {
     }
 
     private fun setupRotationListeners() {
+        // These now call rotateBy(), which updates the seek bar and triggers the core logic.
         binding.btnRotateLeft.setOnClickListener { rotateBy(currentRotation - 90f) }
         binding.btnRotateRight.setOnClickListener { rotateBy(currentRotation + 90f) }
     }
@@ -89,12 +101,13 @@ class ImageEditorActivity : AppCompatActivity() {
         binding.btnToggleMode.text = if (mode == EditorMode.CROP) "ROTATE" else "CROP"
 
         if (mode == EditorMode.CROP) {
-            binding.cropOverlay.visibility = View.VISIBLE
             binding.photoView.isZoomable = true
         } else {
-            binding.cropOverlay.visibility = View.INVISIBLE
             binding.photoView.isZoomable = false
         }
+
+        binding.cropOverlay.visibility = View.VISIBLE
+
     }
 
     private fun rotateBy(newRotation: Float) {
@@ -109,17 +122,18 @@ class ImageEditorActivity : AppCompatActivity() {
     }
 
     private fun setupPhotoViewBoundsListener() {
+        // Initial setup (called once)
         binding.photoView.post {
             binding.photoView.displayRect?.let { rect ->
                 binding.cropOverlay.setImageBounds(RectF(rect))
                 binding.cropOverlay.setCropRatio(CropOverlayView.CropRatio.FREE)
+                fitPhotoInCropBounds() // Initial fit
             }
         }
 
+        // PhotoView updates cropOverlay's imageBounds whenever its matrix changes (zoom/pan/rotate)
         binding.photoView.setOnMatrixChangeListener { rect ->
-            binding.cropOverlay.setImageBounds(
-                rect
-            )
+            binding.cropOverlay.setImageBounds(rect)
         }
 
         binding.rotationSeekBar.setOnSeekBarChangeListener(object :
@@ -130,12 +144,14 @@ class ImageEditorActivity : AppCompatActivity() {
 
                 binding.photoView.rotation = currentRotation
 
-                binding.photoView.postDelayed({
-                    binding.photoView.displayRect?.let { rect ->
-                        binding.cropOverlay.setImageBounds(RectF(rect))
-                    }
-                }, 50)
+                // Skalujemy croppera natychmiast, aby zawsze mieścił się w obracanym zdjęciu
+                binding.photoView.post {
+                    scaleCropToFitImage()
+                }
             }
+
+
+
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
@@ -189,4 +205,41 @@ class ImageEditorActivity : AppCompatActivity() {
         setResult(RESULT_OK, intent)
         finish()
     }
+    // In ImageEditorActivity.kt
+
+    private fun fitPhotoInCropBounds() {
+        val cropRect = binding.cropOverlay.getCropRect()
+        val displayRect = binding.photoView.displayRect ?: return
+
+        val scaleX = cropRect.width() / displayRect.width()
+        val scaleY = cropRect.height() / displayRect.height()
+        val scale = maxOf(scaleX, scaleY) // Use maxOf to COVER the crop
+
+        val currentScale = binding.photoView.scale
+        val newScale = (currentScale * scale)
+            .coerceIn(binding.photoView.minimumScale, binding.photoView.maximumScale)
+
+        val matrix = Matrix(binding.photoView.imageMatrix)
+        matrix.postScale(newScale / currentScale, newScale / currentScale, displayRect.centerX(), displayRect.centerY())
+
+        val newDisplayRect = RectF(displayRect)
+        matrix.mapRect(newDisplayRect)
+
+        val dx = cropRect.centerX() - newDisplayRect.centerX()
+        val dy = cropRect.centerY() - newDisplayRect.centerY()
+        matrix.postTranslate(dx, dy)
+
+        binding.photoView.setDisplayMatrix(matrix)
+    }
+    private fun scaleCropToFitImage() {
+        val bounds = binding.photoView.displayRect ?: return
+
+        // Używamy getterów CropOverlayView
+        val ratioValue = binding.cropOverlay.getCurrentCropRatio().ratio
+        if (ratioValue == 0f) return // FREE ratio — nic nie zmieniamy
+
+        binding.cropOverlay.scaleToFitBounds(bounds)
+    }
+
+
 }
