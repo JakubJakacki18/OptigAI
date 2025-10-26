@@ -87,6 +87,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.snakeyaml)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v262) // do animacji
 }
 
 protobuf {
