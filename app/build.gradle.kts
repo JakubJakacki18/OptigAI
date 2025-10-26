@@ -83,10 +83,10 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx.v162)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.ucrop)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.snakeyaml)
+    implementation(libs.jakubjakacki18.ucrop)
     implementation(libs.androidx.lifecycle.runtime.ktx.v262) // do animacji
 }
 
