@@ -82,7 +82,7 @@
         android:layout_width="86dp"
         android:layout_height="86dp"
         android:layout_marginStart="16dp"
-        android:background="@drawable/next_prev_button"
+        android:background="@drawable/button_dim"
         android:src="@drawable/ic_back_button"
         android:contentDescription="@string/content_description_previous_image"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
@@ -107,11 +107,13 @@
         android:layout_width="86dp"
         android:layout_height="86dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/next_prev_button"
+        android:background="@drawable/button_dim"
         android:src="@drawable/ic_next_button"
         android:contentDescription="@string/content_description_next_image"
         app:layout_constraintBottom_toBottomOf="@+id/bottomBar"
         app:layout_constraintEnd_toEndOf="@+id/bottomBar"
-        app:layout_constraintTop_toTopOf="@+id/bottomBar" />
+        app:layout_constraintTop_toTopOf="@+id/bottomBar"
+        android:stateListAnimator="@animator/scale_animator"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -73,9 +73,16 @@ class PhotoActivity : AppCompatActivity() {
     }
 
     private fun updateNavigationButtons() {
-        viewBinding.leftArrow.isEnabled = currentIndex > 0
-        viewBinding.rightArrow.isEnabled = currentIndex < images.size - 1
+        val leftArrow = viewBinding.leftArrow
+        val rightArrow = viewBinding.rightArrow
+
+        leftArrow.isEnabled = currentIndex > 0
+        rightArrow.isEnabled = currentIndex < images.size - 1
+
+        leftArrow.alpha = if (leftArrow.isEnabled) 1f else 0.4f
+        rightArrow.alpha = if (rightArrow.isEnabled) 1f else 0.4f
     }
+
 
     private fun revertImageChanges() {
         val currentImage = images[currentIndex]
