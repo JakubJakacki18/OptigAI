@@ -1,83 +1,134 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ui.AnalysisSelectorFragment">
+    tools:context="ui.AnalysisSelectorFragment"
+    android:background="@color/light_blue">
 
-    <ImageView
-        android:id="@+id/analyzedPhoto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/background_photo_description"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        android:alpha="0.5" />
+    <!-- Horizontal guideline for bottom section -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+    <!-- Image container like PhotoActivity -->
+    <FrameLayout
+        android:id="@+id/imageContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/analysisTextButton"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/analysis_selector_button"
-            android:text="@string/analise_text_fragment_analysis_selector"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/signikab"
-            android:textColor="@color/onyx"
-            android:textSize="32sp"
-            android:stateListAnimator="@animator/scale_animator"
-            android:contentDescription="@string/text_button_description" />
+        <ImageView
+            android:id="@+id/analyzedPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/background_photo_description"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:alpha="0.5"
+            tools:src="@drawable/photo1" />
 
-        <TextView
-            android:id="@+id/analysisBrailleButton"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/analysis_selector_button"
-            android:text="@string/analise_braille_fragment_analysis_selector"
-            android:layout_marginTop="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/signikab"
-            android:textColor="@color/onyx"
-            android:textSize="32sp"
-            android:stateListAnimator="@animator/scale_animator"
-            android:contentDescription="@string/braille_button_description" />
+        <!-- Analysis Buttons stacked in the center -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/analysisItemButton"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/analysis_selector_button"
-            android:text="@string/analise_item_fragment_analysis_selector"
-            android:layout_marginTop="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/signikab"
-            android:textColor="@color/onyx"
-            android:textSize="32sp"
-            android:stateListAnimator="@animator/scale_animator"
-            android:contentDescription="@string/object_button_description" />
+            <TextView
+                android:id="@+id/analysisTextButton"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/analysis_selector_button"
+                android:text="@string/analise_text_fragment_analysis_selector"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/signikab"
+                android:textColor="@color/onyx"
+                android:textSize="32sp"
+                android:stateListAnimator="@animator/scale_animator"
+                android:contentDescription="@string/text_button_description"
+                tools:ignore="PrivateResource" />
 
-    </LinearLayout>
-</FrameLayout>
+            <TextView
+                android:id="@+id/analysisBrailleButton"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/analysis_selector_button"
+                android:text="@string/analise_braille_fragment_analysis_selector"
+                android:layout_marginTop="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/signikab"
+                android:textColor="@color/onyx"
+                android:textSize="32sp"
+                android:stateListAnimator="@animator/scale_animator"
+                android:contentDescription="@string/braille_button_description"
+                tools:ignore="PrivateResource" />
+
+            <TextView
+                android:id="@+id/analysisItemButton"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/analysis_selector_button"
+                android:text="@string/analise_item_fragment_analysis_selector"
+                android:layout_marginTop="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/signikab"
+                android:textColor="@color/onyx"
+                android:textSize="32sp"
+                android:stateListAnimator="@animator/scale_animator"
+                android:contentDescription="@string/object_button_description"
+                tools:ignore="PrivateResource" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="0dp"
+        android:layout_height="136dp"
+        android:layout_marginBottom="16dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:stateListAnimator="@animator/scale_animator">
+
+        <ImageView
+            android:id="@+id/SelectorEditButton"
+            android:layout_width="136dp"
+            android:layout_height="136dp"
+            android:src="@drawable/edit_button"
+            android:contentDescription="@string/content_description_open_analyze_button"
+            android:layout_gravity="center"
+            android:stateListAnimator="@animator/scale_animator" />
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

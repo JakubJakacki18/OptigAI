@@ -27,7 +27,6 @@
             app:cardCornerRadius="32dp"
             app:strokeWidth="4dp"
             app:strokeColor="@color/dark_blue"
-            app:checkable="true"
             android:contentDescription="@{contentDescription}">
 
             <TextView
