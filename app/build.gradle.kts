@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.core)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,13 +93,13 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // --- TESTY JEDNOSTKOWE ---
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.10")
-    testImplementation("org.robolectric:robolectric:4.10.3")
+    testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.14.6")
+    testImplementation("org.robolectric:robolectric:4.16")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
 // --- ANDROID INSTRUMENTATION TESTS ---
-    androidTestImplementation("androidx.test:core:1.6.0")
+    androidTestImplementation(libs.androidx.core)
     androidTestImplementation("androidx.test:runner:1.6.0")
     androidTestImplementation("androidx.test:rules:1.6.0")
 
@@ -107,6 +108,9 @@ dependencies {
 
 // Espresso Intents (testowanie startActivity)
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation ("org.hamcrest:hamcrest-library:2.2")
+
 
 // ActivityScenarioRule
     androidTestImplementation("androidx.test.ext:junit:1.2.0")
@@ -119,6 +123,7 @@ dependencies {
 
 // Test coroutine w AndroidTest
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    implementation(kotlin("test"))
 
 }
 
