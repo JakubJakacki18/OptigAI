@@ -89,6 +89,37 @@ dependencies {
     implementation(libs.snakeyaml)
     implementation(libs.jakubjakacki18.ucrop)
     implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    testImplementation(kotlin("test"))
+
+    // --- TESTY JEDNOSTKOWE ---
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.robolectric:robolectric:4.10.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+// --- ANDROID INSTRUMENTATION TESTS ---
+    androidTestImplementation("androidx.test:core:1.6.0")
+    androidTestImplementation("androidx.test:runner:1.6.0")
+    androidTestImplementation("androidx.test:rules:1.6.0")
+
+// Espresso podstawowe
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.0")
+
+// Espresso Intents (testowanie startActivity)
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.0")
+
+// ActivityScenarioRule
+    androidTestImplementation("androidx.test.ext:junit:1.2.0")
+
+// RecyclerViewActions
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.0") {
+        exclude(group = "org.checkerframework")
+    }
+
+
+// Test coroutine w AndroidTest
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
 }
 
 protobuf {
