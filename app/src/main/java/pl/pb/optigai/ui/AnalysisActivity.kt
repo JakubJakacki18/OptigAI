@@ -1,8 +1,6 @@
 package pl.pb.optigai.ui
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.AppLogger
+import pl.pb.optigai.utils.PhotoUtils.convertUriToBitmap
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
 import java.lang.IllegalArgumentException
@@ -28,7 +27,7 @@ class AnalysisActivity : AppCompatActivity() {
 
         uri?.let { uri ->
             analysisViewModel.initPhotoUri(uri)
-            BitmapCache.bitmap = convertUriToBitmap(uri)
+            BitmapCache.bitmap = convertUriToBitmap(this, uri)
         }
 
         handleBitmapCacheIsNull()
@@ -85,11 +84,5 @@ class AnalysisActivity : AppCompatActivity() {
         if (BitmapCache.bitmap == null) {
             AppLogger.e("bitmap is null", IllegalArgumentException())
         }
-    }
-
-    private fun convertUriToBitmap(uri: Uri): Bitmap {
-        val source = ImageDecoder.createSource(contentResolver, uri)
-        val loadedBitmap = ImageDecoder.decodeBitmap(source)
-        return loadedBitmap.copy(Bitmap.Config.ARGB_8888, false)
     }
 }

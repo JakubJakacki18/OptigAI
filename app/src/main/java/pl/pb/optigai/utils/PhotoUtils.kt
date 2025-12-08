@@ -2,9 +2,14 @@ package pl.pb.optigai.utils
 
 import android.content.ContentUris
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.provider.MediaStore
 import pl.pb.optigai.ui.PhotoAlbumActivity.Companion.RELATIVE_PICTURES_PATH
 import pl.pb.optigai.utils.data.Image
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,5 +67,25 @@ object PhotoUtils {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         val formattedTime = timeFormat.format(date)
         return formattedDate to formattedTime
+    }
+
+    fun convertUriToBitmap(
+        context: Context,
+        uri: Uri,
+    ): Bitmap {
+        val source = ImageDecoder.createSource(context.contentResolver, uri)
+        val loadedBitmap = ImageDecoder.decodeBitmap(source)
+        return loadedBitmap.copy(Bitmap.Config.ARGB_8888, false)
+    }
+
+    fun convertBitmapToUri(
+        context: Context,
+        bitmap: Bitmap,
+    ): Uri {
+        val file = File(context.cacheDir, "temp_${System.currentTimeMillis()}.jpg")
+        FileOutputStream(file).use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+        return Uri.fromFile(file)
     }
 }

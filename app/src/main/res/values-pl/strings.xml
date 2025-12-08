@@ -56,8 +56,8 @@
     <string name="undo_changes_cropper_description">Przywróć zmiany</string>
     <string name="content_description_edit_image">Edytuj obraz</string>
     <string name="empty_result_fragment_analysis_result">Nic nie zostało wykryte. Spróbuj z innym obrazem.</string>
-    <string name="camera_save_to_memory_on_value">Włączono, zapisz zdjęcie do pamięci urządzenia</string>
-    <string name="camera_save_to_memory_off_value">Wyłączono, nie zapisuj zdjęcia do pamięci urządzenia</string>
+    <string name="camera_save_to_memory_on_value">Zapisz zdjęcie do pamięci urządzenia</string>
+    <string name="camera_save_to_memory_off_value">Nie zapisuj zdjęcia do pamięci urządzenia</string>
     <string name="background_photo_description">Obraz w tle do analizy</string>
     <string name="zoom_slider_visibility_off_toggle_description">Wyłączono, suwak przybliżenie nie zostanie wyświetlony</string>
     <string name="zoom_slider_visibility_auto_toggle_description">Automatycznie, suwak przybliżenia pojawi się po uszczypnięciu ekranu</string>
