@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.launch
 import pl.pb.optigai.R
+import pl.pb.optigai.Settings
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
@@ -33,15 +34,19 @@ class AnalysisResultFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_analysis_result, container, false)
         val imageView: ImageView = view.findViewById(R.id.analyzedPhoto)
         val overlay: DetectionOverlay = view.findViewById(R.id.overlay)
+        val summaryResultText: TextView = view.findViewById(R.id.summaryResultText)
+        val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(scrollView)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior.peekHeight = 700
 
         AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
 
-        val summaryResultText: TextView = view.findViewById(R.id.summaryResultText)
         viewModel.analysisDetectionResults.observe(viewLifecycleOwner) { result ->
             lifecycleScope.launch {
                 settingsViewModel.colors.collect { colorEnums ->
-                    val availableColorsResId = colorEnums.map { ColorMap.getColorRes(it) }
-                    val availableColors = availableColorsResId.map { requireContext().getColor(it) }
+                    val availableColors = getAvailableColors(colorEnums)
                     overlay.setAvailableColors(availableColors)
                     overlay.setDetections(result, BitmapCache.bitmap!!.width, BitmapCache.bitmap!!.height, imageView)
                 }
@@ -55,11 +60,12 @@ class AnalysisResultFragment : Fragment() {
         viewModel.analysisSummaryTextResult.observe(viewLifecycleOwner) { summary ->
             summaryResultText.text = summary
         }
-        val scrollView = view.findViewById<NestedScrollView>(R.id.resultScrollView)
-        val bottomSheetBehavior = BottomSheetBehavior.from(scrollView)
-
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        bottomSheetBehavior.peekHeight = 700
         return view
+    }
+
+    private fun getAvailableColors(colorEnums: List<Settings.ColorOfBorder>): List<Int?> {
+        val availableColorsResId = colorEnums.map { ColorMap.getColorRes(it) }
+        val availableColors = availableColorsResId.map { requireContext().getColor(it) }
+        return availableColors
     }
 }
