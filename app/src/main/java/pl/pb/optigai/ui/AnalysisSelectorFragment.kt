@@ -32,30 +32,22 @@ class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
     private lateinit var viewBinding: FragmentAnalysisSelectorBinding
 
-    /**
-     * UCrop result launcher
-     */
     private val cropImageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val resultUri = result.data?.let { UCrop.getOutput(it) }
                 if (resultUri != null) {
                     Log.d("AnalysisSelector", "Image cropped: $resultUri")
-
-                    // Update ImageView
-                    viewBinding.analyzedPhoto.setImageURI(resultUri)
-
-                    // Convert the URI to a bitmap and cache it properly
                     val newBitmap = uriToBitmap(requireContext(), resultUri)
                     if (newBitmap != null) {
                         BitmapCache.bitmap = newBitmap
                         BitmapCache.lastUri = resultUri
+                        viewBinding.analyzedPhoto.setImageBitmap(null)
+                        viewBinding.analyzedPhoto.setImageBitmap(newBitmap)
                     } else {
                         Log.e("AnalysisSelector", "Failed to decode bitmap from cropped URI")
                     }
                 }
-
-
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
                 val cropError = result.data?.let { UCrop.getError(it) }
                 AppLogger.e("UCrop Error: ${cropError?.message}")
@@ -95,28 +87,26 @@ class AnalysisSelectorFragment : Fragment() {
             callAnalyseFunction(analyseService::analyseItem)
         }
 
-        // ✅ Launch UCrop when edit button is clicked
         viewBinding.SelectorEditButton.setOnClickListener {
-            if (BitmapCache.lastUri == null && BitmapCache.bitmap != null) {
-                val file = File(requireContext().cacheDir, "temp_image.jpg")
-                FileOutputStream(file).use {
-                    BitmapCache.bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, it)
-                }
-                BitmapCache.lastUri = Uri.fromFile(file)
+            val bitmap = BitmapCache.bitmap
+            if (bitmap == null) {
+                AppLogger.e("Cannot crop: bitmap is null")
+                return@setOnClickListener
             }
-
-            val currentUri = BitmapCache.lastUri
-            if (currentUri != null) {
-                startCropActivity(currentUri)
-            } else {
-                AppLogger.e("Cannot crop: no image URI found in BitmapCache.")
-            }
+            val freshUri = createUriFromBitmap(bitmap)
+            BitmapCache.lastUri = freshUri
+            startCropActivity(freshUri)
         }
     }
 
-    /**
-     * Starts UCrop for the given source URI.
-     */
+    private fun createUriFromBitmap(bitmap: Bitmap): Uri {
+        val file = File(requireContext().cacheDir, "temp_${System.currentTimeMillis()}.jpg")
+        FileOutputStream(file).use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+        return Uri.fromFile(file)
+    }
+
     private fun startCropActivity(sourceUri: Uri) {
         val outputFileName = "cropped_image_${System.currentTimeMillis()}.jpg"
         val destinationUri = Uri.fromFile(File(requireContext().cacheDir, outputFileName))
