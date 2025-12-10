@@ -2,9 +2,7 @@ package pl.pb.optigai.ui
 
 import android.graphics.Bitmap
 import android.net.Uri
-import pl.pb.optigai.utils.data.uriToBitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,11 +20,11 @@ import pl.pb.optigai.databinding.FragmentAnalysisSelectorBinding
 import pl.pb.optigai.utils.AnalyseService
 import pl.pb.optigai.utils.AnalyseUtils
 import pl.pb.optigai.utils.AppLogger
+import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
 import pl.pb.optigai.utils.data.DetectionData
 import java.io.File
-import java.io.FileOutputStream
 
 class AnalysisSelectorFragment : Fragment() {
     private val viewModel: AnalysisViewModel by activityViewModels()
@@ -37,15 +35,15 @@ class AnalysisSelectorFragment : Fragment() {
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 val resultUri = result.data?.let { UCrop.getOutput(it) }
                 if (resultUri != null) {
-                    Log.d("AnalysisSelector", "Image cropped: $resultUri")
-                    val newBitmap = uriToBitmap(requireContext(), resultUri)
+                    AppLogger.d("Image cropped: $resultUri")
+                    val newBitmap = PhotoUtils.convertUriToBitmap(requireContext(), resultUri)
                     if (newBitmap != null) {
                         BitmapCache.bitmap = newBitmap
                         BitmapCache.lastUri = resultUri
                         viewBinding.analyzedPhoto.setImageBitmap(null)
                         viewBinding.analyzedPhoto.setImageBitmap(newBitmap)
                     } else {
-                        Log.e("AnalysisSelector", "Failed to decode bitmap from cropped URI")
+                        AppLogger.e("Failed to decode bitmap from cropped URI")
                     }
                 }
             } else if (result.resultCode == UCrop.RESULT_ERROR) {
@@ -63,14 +61,17 @@ class AnalysisSelectorFragment : Fragment() {
 
         val imageView: ImageView = viewBinding.analyzedPhoto
         imageView.post {
-            Log.d("AnalysisSelector", "ImageView size: ${imageView.width} x ${imageView.height}")
+            AppLogger.d("ImageView size: ${imageView.width} x ${imageView.height}")
             AnalyseUtils.updateImageView(imageView, null, BitmapCache.bitmap)
         }
 
         return viewBinding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         val analyseService = AnalyseService(requireContext())
@@ -93,18 +94,10 @@ class AnalysisSelectorFragment : Fragment() {
                 AppLogger.e("Cannot crop: bitmap is null")
                 return@setOnClickListener
             }
-            val freshUri = createUriFromBitmap(bitmap)
+            val freshUri = PhotoUtils.convertBitmapToUri(requireContext(), bitmap)
             BitmapCache.lastUri = freshUri
             startCropActivity(freshUri)
         }
-    }
-
-    private fun createUriFromBitmap(bitmap: Bitmap): Uri {
-        val file = File(requireContext().cacheDir, "temp_${System.currentTimeMillis()}.jpg")
-        FileOutputStream(file).use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
-        return Uri.fromFile(file)
     }
 
     private fun startCropActivity(sourceUri: Uri) {
@@ -126,11 +119,14 @@ class AnalysisSelectorFragment : Fragment() {
         cropImageLauncher.launch(uCrop.getIntent(requireContext()))
     }
 
-    private fun callAnalyseFunction(analyseFunction: suspend (bitmap: Bitmap) -> DetectionData) {
+    private fun throwExceptionIfBitmapIsNull() {
         if (BitmapCache.bitmap == null) {
             throw IllegalStateException("BitmapCache.bitmap is null")
         }
+    }
 
+    private fun callAnalyseFunction(analyseFunction: suspend (bitmap: Bitmap) -> DetectionData) {
+        throwExceptionIfBitmapIsNull()
         showLoadingFragment()
         lifecycleScope.launch {
             val resultOfAnalysis = analyseFunction(BitmapCache.bitmap!!)

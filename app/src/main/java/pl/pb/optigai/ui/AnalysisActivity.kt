@@ -1,12 +1,9 @@
 package pl.pb.optigai.ui
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -15,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import pl.pb.optigai.R
 import pl.pb.optigai.utils.AppLogger
+import pl.pb.optigai.utils.PhotoUtils.convertUriToBitmap
 import pl.pb.optigai.utils.data.AnalysisViewModel
 import pl.pb.optigai.utils.data.BitmapCache
 import java.lang.IllegalArgumentException
@@ -25,30 +23,15 @@ class AnalysisActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_analysis)
-        var uri: Uri?
-        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
-            uri =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra(Intent.EXTRA_STREAM)
-                }
-        } else {
-            val uriString = intent.getStringExtra("IMAGE_URI")
-            uri = uriString?.toUri()
+        val uri = getUriOrNull()
+
+        uri?.let { uri ->
+            analysisViewModel.initPhotoUri(uri)
+            BitmapCache.bitmap = convertUriToBitmap(this, uri)
         }
 
-        uri?.let {
-            analysisViewModel.initPhotoUri(it)
-            val source = ImageDecoder.createSource(contentResolver, it)
-            val loadedBitmap = ImageDecoder.decodeBitmap(source)
-            val convertedBitmap = loadedBitmap.copy(Bitmap.Config.ARGB_8888, true)
-            BitmapCache.bitmap = convertedBitmap
-        }
-        if (BitmapCache.bitmap == null) {
-            AppLogger.e("bitmap is null", IllegalArgumentException())
-        }
+        handleBitmapCacheIsNull()
+
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
@@ -78,5 +61,28 @@ class AnalysisActivity : AppCompatActivity() {
         super.onDestroy()
         BitmapCache.bitmap = null
         AppLogger.i("onDestroy: Bitmap cleared from cache")
+    }
+
+    private fun getUriOrNull(): Uri? {
+        val uri: Uri?
+        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+            uri =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(Intent.EXTRA_STREAM)
+                }
+        } else {
+            val uriString = intent.getStringExtra("IMAGE_URI")
+            uri = uriString?.toUri()
+        }
+        return uri
+    }
+
+    private fun handleBitmapCacheIsNull() {
+        if (BitmapCache.bitmap == null) {
+            AppLogger.e("bitmap is null", IllegalArgumentException())
+        }
     }
 }
