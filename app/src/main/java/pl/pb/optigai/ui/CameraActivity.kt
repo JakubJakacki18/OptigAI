@@ -160,7 +160,7 @@ class CameraActivity : AppCompatActivity() {
                 }
             }
             if (!permissionGranted) {
-                Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, R.string.permission_denied_toast, Toast.LENGTH_LONG).show()
             } else {
                 lifecycleScope.launch { startCamera() }
             }
@@ -205,6 +205,10 @@ class CameraActivity : AppCompatActivity() {
 
     private fun takePhoto() {
         lifecycleScope.launch {
+            if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
+                Toast.makeText(baseContext, R.string.permission_not_granted_toast, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
             if (getIsSavingPhoto()) {
                 takePhotoAndSaveToExternalStorage()
             } else {

@@ -11,6 +11,7 @@
     <string name="open_settings_description">Ustawienia</string>
     <string name="take_photo_description">Zrób zdjęcie</string>
     <string name="open_gallery_description">Galeria</string>
+    <string name="permission_not_granted_toast">Wymagane uprawnienia nie zostały przyznane</string>
     <string name="photo_analysis_description">Analiza obrazu</string>
     <string name="photo_analysis_text_box">Wynik analizy zdjęcia</string>
     <string name="error_result_fragment_analysis_result">Coś poszło nie tak</string>
@@ -65,4 +66,5 @@
     <string name="flash_on_description">Lampa błyskowa włączona</string>
     <string name="gallery_image_description">Obraz dodany dnia %s o godzinie %s nazwany %s</string>
     <string name="eye_animation">Animacja oka</string>
+    <string name="permission_denied_toast">Uprawnienie odmówione</string>
 </resources>
