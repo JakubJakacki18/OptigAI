@@ -133,10 +133,11 @@ class SettingsActivity : AppCompatActivity() {
 
         colorItems.forEach { (circleView, color) ->
             val checkMark = circleView.findViewById<TextView>(R.id.checkMark)
-            val circleColorInt = ColorMap.getColorRes(color)
+            val circleColorRes = ColorMap.getColorRes(color)
+            val realColorInt = ContextCompat.getColor(this, circleColorRes)
 
-            setBackgroundColorAndBorderForCircleView(circleView, circleColorInt)
-            checkMark?.setTextColor(if (isColorLight(circleColorInt)) Color.BLACK else Color.WHITE)
+            setBackgroundColorAndBorderForCircleView(circleView, circleColorRes)
+            checkMark?.setTextColor(if (isColorLight(realColorInt)) Color.BLACK else Color.WHITE)
 
             circleView.setOnClickListener {
                 lifecycleScope.launch { viewModel.toggleColorOfBorder(color) }
