@@ -52,4 +52,16 @@ class PermissionHandlerTest {
             assertFalse(result)
         }
     }
+    @Test
+    fun `hasPermissions returns true when permission list is empty`() {
+        val context = mock(Context::class.java)
+
+        val result = PermissionHandler.hasPermissions(
+            context,
+            emptyArray()
+        )
+
+        assertTrue(result)
+    }
+
 }

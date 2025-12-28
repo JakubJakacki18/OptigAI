@@ -53,6 +53,7 @@
             android:id="@+id/summaryResultText"
             android:layout_margin="15dp"
             android:textSize="28sp"
+            android:textColor="@color/onyx"
             android:fontFamily="@font/signikasb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

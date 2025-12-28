@@ -17,6 +17,13 @@ class BrailleActivityTest {
 
         assertEquals("ABC", result)
     }
+    @Test
+    fun `decode returns empty string for empty input`() {
+        val result = BrailleActivity.decode(emptyList())
+
+        assertEquals("", result)
+    }
+
 }
 
 

@@ -96,6 +96,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/camera_change_zoom_slider_visibility_label_value"
+                    android:textColor="@color/onyx"
                     android:textSize="20sp"
                     android:fontFamily="@font/signikab"
                     android:layout_marginTop="16dp"
@@ -176,6 +177,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/gallery_set_amount_columns_title_value"
                     android:textSize="20sp"
+                    android:textColor="@color/onyx"
                     android:fontFamily="@font/signikab"
                     android:layout_gravity="center_horizontal"/>
 
@@ -212,6 +214,7 @@
                     android:id="@+id/setFontSizeLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/onyx"
                     android:text="@string/result_set_font_size_label_value"
                     android:textSize="20sp"
                     android:fontFamily="@font/signikab"
@@ -266,6 +269,7 @@
                     android:id="@+id/fontSizePreview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/onyx"
                     android:text="@string/font_size_preview_value"
                     android:gravity="center"
                     android:padding="12dp"
@@ -282,6 +286,7 @@
                     android:text="@string/result_select_color_annotation_label_value"
                     android:textSize="20sp"
                     android:fontFamily="@font/signikab"
+                    android:textColor="@color/onyx"
                     android:layout_marginTop="16dp"
                     android:layout_gravity="center_horizontal"/>
 

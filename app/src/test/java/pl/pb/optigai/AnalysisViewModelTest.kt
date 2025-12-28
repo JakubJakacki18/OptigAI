@@ -41,4 +41,15 @@ class AnalysisViewModelTest {
 
         assertEquals(text, viewModel.analysisSummaryTextResult.value)
     }
+    @Test
+    fun initPhotoUri_doesNotOverrideExistingValue() {
+        val viewModel = AnalysisViewModel()
+        val firstUri = mock(Uri::class.java)
+
+        viewModel.initPhotoUri(firstUri)
+        viewModel.initPhotoUri(mock(Uri::class.java))
+
+        assertEquals(firstUri, viewModel.photoUri.value)
+    }
+
 }
