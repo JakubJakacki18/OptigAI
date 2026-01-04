@@ -1,3 +1,9 @@
+/**
+ * Utility object for working with photos on the device.
+ *
+ * Provides functions to read images from storage, extract metadata, and convert between
+ * [Bitmap] and [Uri].
+ */
 package pl.pb.optigai.utils
 
 import android.content.ContentUris
@@ -15,6 +21,13 @@ import java.util.Date
 import java.util.Locale
 
 object PhotoUtils {
+    /**
+     * Reads all images from the app-specific pictures directory (`RELATIVE_PICTURES_PATH`)
+     * and returns them as a list of [Image] objects.
+     *
+     * @param context Context used to access content resolver.
+     * @return List of [Image] objects sorted by date added in descending order.
+     */
     fun imageReader(context: Context): List<Image> {
         val images = mutableListOf<Image>()
         val projection =
@@ -57,7 +70,12 @@ object PhotoUtils {
         AppLogger.i("Found ${images.size} images")
         return images
     }
-
+    /**
+     * Extracts a formatted date and time from a Unix timestamp.
+     *
+     * @param timeStamp The timestamp in seconds.
+     * @return Pair where first is formatted date (`dd.MM.yyyy`) and second is formatted time (`HH:mm`).
+     */
     fun extractDateAndTime(timeStamp: Long): Pair<String, String> {
         val date = Date(timeStamp * 1000)
 
@@ -68,7 +86,13 @@ object PhotoUtils {
         val formattedTime = timeFormat.format(date)
         return formattedDate to formattedTime
     }
-
+    /**
+     * Converts a [Uri] pointing to an image into a [Bitmap].
+     *
+     * @param context Context used to access content resolver.
+     * @param uri The [Uri] of the image.
+     * @return A [Bitmap] in ARGB_8888 config.
+     */
     fun convertUriToBitmap(
         context: Context,
         uri: Uri,
@@ -77,7 +101,13 @@ object PhotoUtils {
         val loadedBitmap = ImageDecoder.decodeBitmap(source)
         return loadedBitmap.copy(Bitmap.Config.ARGB_8888, false)
     }
-
+    /**
+     * Converts a [Bitmap] into a [Uri] by saving it temporarily in the cache directory.
+     *
+     * @param context Context used to access cache directory.
+     * @param bitmap The [Bitmap] to convert.
+     * @return A [Uri] pointing to the saved temporary JPEG file.
+     */
     fun convertBitmapToUri(
         context: Context,
         bitmap: Bitmap,

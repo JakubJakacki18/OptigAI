@@ -1,3 +1,25 @@
+/**
+ * AnalysisResultFragment
+ *
+ * Fragment responsible for displaying the results of an image analysis.
+ * This includes showing the analyzed image, overlaying detected objects with bounding boxes,
+ * and presenting a textual summary of the detection results.
+ *
+ * Features:
+ * - Displays the analyzed image from [BitmapCache].
+ * - Observes detection results from [AnalysisViewModel] and renders them on [DetectionOverlay].
+ * - Uses user settings from [SettingsViewModel] to customize font size and bounding box colors.
+ * - Supports a BottomSheet to display textual analysis results.
+ * - Automatically updates overlay and summary when detection results or settings change.
+ *
+ * Collaborates with:
+ * - [AnalysisViewModel] – provides analysis detection results and summary text.
+ * - [SettingsViewModel] – provides user settings like font size and border colors.
+ * - [BitmapCache] – stores the analyzed bitmap image.
+ * - [AnalyseUtils] – helper for updating the displayed image.
+ * - [DetectionOverlay] – custom view for rendering detection bounding boxes.
+ * - [ColorMap] – maps color enums to actual color resources.
+ */
 package pl.pb.optigai.ui
 
 import android.os.Bundle
@@ -23,9 +45,24 @@ import pl.pb.optigai.utils.data.const.ColorMap
 import kotlin.getValue
 
 class AnalysisResultFragment : Fragment() {
+    /** Shared ViewModel for managing analysis data across the activity. */
     private val viewModel: AnalysisViewModel by activityViewModels()
-    private val settingsViewModel: SettingsViewModel by viewModels()
 
+    /** ViewModel for storing and observing user settings (font size, border colors). */
+    private val settingsViewModel: SettingsViewModel by viewModels()
+    /**
+     * Called to create and return the view hierarchy associated with the fragment.
+     * Sets up:
+     * - ImageView for displaying the analyzed bitmap.
+     * - DetectionOverlay for rendering detected objects.
+     * - BottomSheet for textual summary of analysis.
+     * - Observers for analysis results and user settings.
+     *
+     * @param inflater LayoutInflater to inflate fragment layout.
+     * @param container Optional parent view to attach the fragment to.
+     * @param savedInstanceState Saved state bundle.
+     * @return The root view of the fragment's layout.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,7 +99,12 @@ class AnalysisResultFragment : Fragment() {
         }
         return view
     }
-
+    /**
+     * Maps the list of user-selected color enums to actual Android color integers.
+     *
+     * @param colorEnums List of [Settings.ColorOfBorder] selected by the user.
+     * @return List of integer color values corresponding to the selected colors.
+     */
     private fun getAvailableColors(colorEnums: List<Settings.ColorOfBorder>): List<Int?> {
         val availableColorsResId = colorEnums.map { ColorMap.getColorRes(it) }
         val availableColors = availableColorsResId.map { requireContext().getColor(it) }
