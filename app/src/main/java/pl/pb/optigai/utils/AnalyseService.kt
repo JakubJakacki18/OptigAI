@@ -1,25 +1,3 @@
-/**
- * AnalyseService
- *
- * Service class responsible for performing different types of analysis on images.
- * It supports text recognition, Braille recognition via an external API, and object detection using YOLO models.
- *
- * @property context Context of the application used for initializing detectors and accessing resources.
- *
- * Features:
- * - Detects printed text using ML Kit Text Recognition.
- * - Sends bitmap images to a Braille detection API and parses the returned predictions.
- * - Detects objects (items or keys) in images using YOLO models.
- * - Provides summary text and detailed detection results including bounding boxes.
- *
- * Collaborates with:
- * - [TextRecognition] from ML Kit for OCR functionality.
- * - [IBrailleApi] Retrofit interface for Braille API communication.
- * - [Bitmap] images as input for analysis.
- * - [DetectionData] and [DetectionResult] to store results and bounding boxes.
- * - [YoloModelPathsStorage] for YOLO model paths used in object detection.
- * - [BrailleActivity.decode] to convert Braille predictions into readable text.
- */
 package pl.pb.optigai.utils
 
 import android.content.Context
@@ -48,6 +26,28 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileOutputStream
 
+/**
+ * AnalyseService
+ *
+ * Service class responsible for performing different types of analysis on images.
+ * It supports text recognition, Braille recognition via an external API, and object detection using YOLO models.
+ *
+ * @property context Context of the application used for initializing detectors and accessing resources.
+ *
+ * Features:
+ * - Detects printed text using ML Kit Text Recognition.
+ * - Sends bitmap images to a Braille detection API and parses the returned predictions.
+ * - Detects objects (items or keys) in images using YOLO models.
+ * - Provides summary text and detailed detection results including bounding boxes.
+ *
+ * Collaborates with:
+ * - [TextRecognition] from ML Kit for OCR functionality.
+ * - [IBrailleApi] Retrofit interface for Braille API communication.
+ * - [Bitmap] images as input for analysis.
+ * - [DetectionData] and [DetectionResult] to store results and bounding boxes.
+ * - [YoloModelPathsStorage] for YOLO model paths used in object detection.
+ * - [BrailleActivity.decode] to convert Braille predictions into readable text.
+ */
 class AnalyseService(
     private val context: Context,
 ) {
@@ -84,6 +84,7 @@ class AnalyseService(
             )
         }
     }
+
     /**
      * Performs Braille detection on the given bitmap by uploading it to the external Braille API.
      *
@@ -142,6 +143,7 @@ class AnalyseService(
             return DetectionData("Error creating temp file or bitmap: ${e.message}", emptyList())
         }
     }
+
     /**
      * Performs object detection on the given bitmap using all YOLO models defined in [YoloModelPathsStorage].
      *
@@ -152,29 +154,6 @@ class AnalyseService(
      */
     suspend fun analyseItem(bitmap: Bitmap): DetectionData =
         coroutineScope {
-//            // Step 1: Create TFLite's TensorImage object
-//            val image = TensorImage.fromBitmap(bitmap)
-//            // Step 2: Initialize the detector object
-//            val options =
-//                ObjectDetector.ObjectDetectorOptions
-//                    .builder()
-//                    .setMaxResults(5)
-//                    .setScoreThreshold(0.3f)
-//                    .build()
-//
-//            val itemDetector =
-//                ObjectDetector.createFromFileAndOptions(
-//                    context,
-//                    "item_recognition_model_edl4.tflite",
-//                    options,
-//                )
-
-//            val keyDetector =
-//                ObjectDetector.createFromFileAndOptions(
-//                    context,
-//                    "yolo11m_trained_v1.01_with_metadata.tflite",
-//                    options,
-//                )
             val detectionResultsByModels =
                 YoloModelPathsStorage.paths
                     .map { model ->
@@ -183,22 +162,11 @@ class AnalyseService(
                             detector.detect(bitmap)
                         }
                     }.awaitAll()
-            // Step 3: Feed given image to the detector
-//            val itemResults = YoloDetector(context, "yolo11m_float32.tflite", "coco_labels.yaml").detect(bitmap)
-//            val keyResults = YoloDetector(context, "yolo11m_trained_v1.01_with_metadata.tflite", "keys_labels.yaml").detect(bitmap)
-
-            // Step 4: Parse the detection result and show it
-//            var detectionResults =
-//                itemResults.map {
-//                    // Get the top-1 category and craft the display text
-//                    val category = it.categories.first()
-//                    DetectionResult(category.label, it.boundingBox, category.score)
-//                }
-            // val detectionResults = itemResults + keyResults
             val detectionResults = detectionResultsByModels.flatten()
             val textResult = getResultSummaryText(detectionResults)
             DetectionData(textResult, detectionResults)
         }
+
     /**
      * Generates a summary string from a list of [DetectionResult] objects.
      *
