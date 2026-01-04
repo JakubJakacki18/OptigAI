@@ -1,3 +1,15 @@
+/**
+ * SettingsActivity
+ *
+ * Activity that allows users to configure application settings, including:
+ * - Font size for analysis results
+ * - Color selection for bounding boxes
+ * - Photo saving toggle
+ * - Zoom slider visibility
+ * - Gallery grid column count
+ *
+ * Uses [SettingsViewModel] to persist user preferences and observe changes.
+ */
 package pl.pb.optigai.ui
 
 import android.annotation.SuppressLint
@@ -26,9 +38,15 @@ class SettingsActivity : AppCompatActivity() {
     private val minFont = 16
     private val maxFont = 48
     private val step = 4
-
     /**
-     * Initializes the activity, sets up the view binding, and binds UI components to the ViewModel.
+     * Initializes the activity and binds UI components to the ViewModel.
+     * Sets up listeners for:
+     * - Font size increase/decrease buttons
+     * - Zoom slider visibility toggle
+     * - Color selection circles
+     * - Gallery columns slider
+     * - Photo saving toggle
+     * Configures header title and back button.
      */
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,8 +171,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Determines if a given color is light or dark to set a contrasting text color.
-     * @return true if the color is light, false otherwise.
+     * Determines whether a color is light or dark for contrast.
+     *
+     * @param color Color integer.
+     * @return True if the color is light, false if dark.
      */
     private fun isColorLight(color: Int): Boolean {
         val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
@@ -162,7 +182,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Binds the gallery view slider to the ViewModel to manage grid columns.
+     * Binds the gallery column slider to the ViewModel.
+     * Updates the slider value and persists changes on user interaction.
      */
     private fun bindGalleryViewColumnsSlider() {
         lifecycleScope.launch {
@@ -185,9 +206,9 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.gallery_slider_annotation_value, intValue)
         }
     }
-
     /**
-     * Binds the photo saving switch to the ViewModel to toggle photo saving.
+     * Binds the photo saving toggle to the ViewModel.
+     * Updates the switch state and persists changes on toggle.
      */
     private fun bindPhotoSavingToggle() {
         lifecycleScope.launch {
@@ -204,11 +225,12 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
-
     /**
-     * Sets the background color and border for a given circle view.
+     * Sets the background color, stroke color, stroke width, and elevation
+     * for a color circle.
+     *
      * @param circleView The MaterialCardView representing the color circle.
-     * @param circleColorInt The color integer to set as the background.
+     * @param circleColorInt The resource ID of the color to set as the circle background.
      */
     private fun setBackgroundColorAndBorderForCircleView(
         circleView: MaterialCardView,

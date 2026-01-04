@@ -1,3 +1,25 @@
+/**
+ * AnalyseService
+ *
+ * Service class responsible for performing different types of analysis on images.
+ * It supports text recognition, Braille recognition via an external API, and object detection using YOLO models.
+ *
+ * @property context Context of the application used for initializing detectors and accessing resources.
+ *
+ * Features:
+ * - Detects printed text using ML Kit Text Recognition.
+ * - Sends bitmap images to a Braille detection API and parses the returned predictions.
+ * - Detects objects (items or keys) in images using YOLO models.
+ * - Provides summary text and detailed detection results including bounding boxes.
+ *
+ * Collaborates with:
+ * - [TextRecognition] from ML Kit for OCR functionality.
+ * - [IBrailleApi] Retrofit interface for Braille API communication.
+ * - [Bitmap] images as input for analysis.
+ * - [DetectionData] and [DetectionResult] to store results and bounding boxes.
+ * - [YoloModelPathsStorage] for YOLO model paths used in object detection.
+ * - [BrailleActivity.decode] to convert Braille predictions into readable text.
+ */
 package pl.pb.optigai.utils
 
 import android.content.Context
@@ -29,9 +51,19 @@ import java.io.FileOutputStream
 class AnalyseService(
     private val context: Context,
 ) {
+    /** API key used for authentication with the Braille model API. */
     private val apiKey = "nT4D3OfHfZE0E8tI4sL0"
+
+    /** Base URL for the Braille detection API hosted on Roboflow. */
     private val brailleModelUrl = "https://detect.roboflow.com/"
 
+    /**
+     * Performs text detection on the given bitmap using ML Kit Text Recognition.
+     *
+     * @param bitmap Bitmap image to analyze.
+     * @return [DetectionData] containing recognized text and bounding boxes of text blocks.
+     *         Returns empty results if recognition fails.
+     */
     suspend fun analyseText(bitmap: Bitmap): DetectionData {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val image = InputImage.fromBitmap(bitmap, 0)
@@ -52,7 +84,16 @@ class AnalyseService(
             )
         }
     }
-
+    /**
+     * Performs Braille detection on the given bitmap by uploading it to the external Braille API.
+     *
+     * The bitmap is temporarily saved as a JPEG file, sent via Retrofit, and the response is parsed
+     * into [DetectionResult] objects representing each Braille character.
+     *
+     * @param bitmap Bitmap image to analyze.
+     * @return [DetectionData] containing the decoded Braille sentence and bounding boxes of detected characters.
+     *         Returns an error message if the API call fails or bitmap processing fails.
+     */
     suspend fun analyseBraille(bitmap: Bitmap): DetectionData {
         try {
             val tempFile = File.createTempFile("braille", ".jpg")
@@ -101,7 +142,14 @@ class AnalyseService(
             return DetectionData("Error creating temp file or bitmap: ${e.message}", emptyList())
         }
     }
-
+    /**
+     * Performs object detection on the given bitmap using all YOLO models defined in [YoloModelPathsStorage].
+     *
+     * The detection runs concurrently for all models and aggregates results from each model.
+     *
+     * @param bitmap Bitmap image to analyze.
+     * @return [DetectionData] containing the summary text and a list of detected objects with their bounding boxes.
+     */
     suspend fun analyseItem(bitmap: Bitmap): DetectionData =
         coroutineScope {
 //            // Step 1: Create TFLite's TensorImage object
@@ -151,7 +199,14 @@ class AnalyseService(
             val textResult = getResultSummaryText(detectionResults)
             DetectionData(textResult, detectionResults)
         }
-
+    /**
+     * Generates a summary string from a list of [DetectionResult] objects.
+     *
+     * If the list is empty, returns a localized string indicating no results were found.
+     *
+     * @param detectionResult List of [DetectionResult] objects.
+     * @return A formatted string summarizing the detection results.
+     */
     private fun getResultSummaryText(detectionResult: List<DetectionResult>): String =
         if (detectionResult.isNotEmpty()) {
             detectionResult.joinToString(separator = "\n") {

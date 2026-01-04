@@ -1,3 +1,14 @@
+/**
+ * PhotoAlbumActivity
+ *
+ * Activity that displays all images from the device's storage in a grid layout.
+ * Supports selecting an image to open in [PhotoActivity] for preview and analysis.
+ * Handles runtime permissions for reading media and adjusts grid layout based on user settings.
+ *
+ * @property viewModel ViewModel storing user settings, such as grid column count.
+ * @property viewBinding View binding for [PhotoAlbumBinding].
+ * @property imageList List of [Image] objects loaded from device storage.
+ */
 package pl.pb.optigai.ui
 
 import android.content.Intent
