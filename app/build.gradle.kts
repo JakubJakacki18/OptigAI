@@ -89,6 +89,12 @@ dependencies {
     implementation(libs.snakeyaml)
     implementation(libs.jakubjakacki18.ucrop)
     implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    implementation(kotlin("test"))
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 }
 
 protobuf {
