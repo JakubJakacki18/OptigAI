@@ -1,9 +1,3 @@
-/**
- * Utility object for working with photos on the device.
- *
- * Provides functions to read images from storage, extract metadata, and convert between
- * [Bitmap] and [Uri].
- */
 package pl.pb.optigai.utils
 
 import android.content.ContentUris
@@ -12,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.core.graphics.scale
 import pl.pb.optigai.ui.PhotoAlbumActivity.Companion.RELATIVE_PICTURES_PATH
 import pl.pb.optigai.utils.data.Image
 import java.io.File
@@ -20,6 +15,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Utility object for working with photos on the device.
+ *
+ * Provides functions to read images from storage, extract metadata, and convert between
+ * [Bitmap] and [Uri].
+ */
 object PhotoUtils {
     /**
      * Reads all images from the app-specific pictures directory (`RELATIVE_PICTURES_PATH`)
@@ -70,6 +71,7 @@ object PhotoUtils {
         AppLogger.i("Found ${images.size} images")
         return images
     }
+
     /**
      * Extracts a formatted date and time from a Unix timestamp.
      *
@@ -86,6 +88,7 @@ object PhotoUtils {
         val formattedTime = timeFormat.format(date)
         return formattedDate to formattedTime
     }
+
     /**
      * Converts a [Uri] pointing to an image into a [Bitmap].
      *
@@ -101,6 +104,39 @@ object PhotoUtils {
         val loadedBitmap = ImageDecoder.decodeBitmap(source)
         return loadedBitmap.copy(Bitmap.Config.ARGB_8888, false)
     }
+
+    /**
+     * Resizes [source] Bitmap while maintaining its original aspect ratio.
+     *
+     * @param source The input [Bitmap] to be resized
+     * @param maxLength The maximum allowed size of width/height(longer side) in pixels
+     * @return resized or original [Bitmap] if no resizing is required
+     */
+    fun resizeBitmap(
+        source: Bitmap,
+        maxLength: Int = 2048,
+    ): Bitmap {
+        if (source.height <= maxLength && source.width <= maxLength) {
+            return source
+        }
+
+        val targetWidth: Int
+        val targetHeight: Int
+        try {
+            val aspectRatio = source.width.toDouble() / source.height.toDouble()
+            if (source.width > source.height) {
+                targetWidth = maxLength
+                targetHeight = (maxLength / aspectRatio).toInt()
+            } else {
+                targetHeight = maxLength
+                targetWidth = (maxLength * aspectRatio).toInt()
+            }
+        } catch (_: Exception) {
+            return source
+        }
+        return source.scale(targetWidth, targetHeight)
+    }
+
     /**
      * Converts a [Bitmap] into a [Uri] by saving it temporarily in the cache directory.
      *

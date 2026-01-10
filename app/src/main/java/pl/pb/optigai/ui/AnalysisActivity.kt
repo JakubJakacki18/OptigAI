@@ -1,3 +1,23 @@
+package pl.pb.optigai.ui
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.widget.TextView
+import androidx.activity.addCallback
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import pl.pb.optigai.R
+import pl.pb.optigai.utils.AppLogger
+import pl.pb.optigai.utils.PhotoUtils.convertUriToBitmap
+import pl.pb.optigai.utils.PhotoUtils.resizeBitmap
+import pl.pb.optigai.utils.data.AnalysisViewModel
+import pl.pb.optigai.utils.data.BitmapCache
+import java.lang.IllegalArgumentException
+
 /**
  * AnalysisActivity
  *
@@ -19,28 +39,10 @@
  * - [PhotoUtils] – utility functions for converting URI to bitmap.
  * - [AppLogger] – logging events and errors.
  */
-package pl.pb.optigai.ui
-
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.view.View
-import android.widget.TextView
-import androidx.activity.addCallback
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
-import pl.pb.optigai.R
-import pl.pb.optigai.utils.AppLogger
-import pl.pb.optigai.utils.PhotoUtils.convertUriToBitmap
-import pl.pb.optigai.utils.data.AnalysisViewModel
-import pl.pb.optigai.utils.data.BitmapCache
-import java.lang.IllegalArgumentException
-
 class AnalysisActivity : AppCompatActivity() {
     /** ViewModel responsible for the image analysis logic. */
     private val analysisViewModel: AnalysisViewModel by viewModels()
+
     /**
      * Called when the activity is created.
      * - Sets the layout from R.layout.activity_analysis.
@@ -56,7 +58,8 @@ class AnalysisActivity : AppCompatActivity() {
 
         uri?.let { uri ->
             analysisViewModel.initPhotoUri(uri)
-            BitmapCache.bitmap = convertUriToBitmap(this, uri)
+            val bitmapFromUri = convertUriToBitmap(this, uri)
+            BitmapCache.bitmap = resizeBitmap(bitmapFromUri)
         }
 
         handleBitmapCacheIsNull()
@@ -85,6 +88,7 @@ class AnalysisActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
     }
+
     /**
      * Called when the activity is destroyed.
      * Clears the bitmap from the cache and logs the event.
@@ -94,6 +98,7 @@ class AnalysisActivity : AppCompatActivity() {
         BitmapCache.bitmap = null
         AppLogger.i("onDestroy: Bitmap cleared from cache")
     }
+
     /**
      * Retrieves the image URI from the Intent or parameters.
      *
@@ -115,6 +120,7 @@ class AnalysisActivity : AppCompatActivity() {
         }
         return uri
     }
+
     /**
      * Checks whether the BitmapCache contains a bitmap.
      * Logs an error if the bitmap is null.
