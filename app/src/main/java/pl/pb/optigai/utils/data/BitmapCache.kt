@@ -1,3 +1,7 @@
+package pl.pb.optigai.utils.data
+
+import android.net.Uri
+
 /**
  * BitmapCache
  *
@@ -9,15 +13,12 @@
  * - [bitmap]: The currently cached [android.graphics.Bitmap], or null if none.
  * - [lastUri]: The [Uri] corresponding to the cached bitmap, or null if none.
  */
-package pl.pb.optigai.utils.data
-
-import android.net.Uri
-
 object BitmapCache {
     /**
      * The currently cached bitmap.
      */
     var bitmap: android.graphics.Bitmap? = null
+
     /**
      * The URI of the last cached bitmap.
      */

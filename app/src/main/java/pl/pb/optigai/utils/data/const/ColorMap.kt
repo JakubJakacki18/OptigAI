@@ -1,3 +1,8 @@
+package pl.pb.optigai.utils.data.const
+
+import pl.pb.optigai.R
+import pl.pb.optigai.Settings
+
 /**
  * ColorMap
  *
@@ -10,11 +15,6 @@
  * val redColorRes = ColorMap.getColorRes(Settings.ColorOfBorder.RED)
  * ```
  */
-package pl.pb.optigai.utils.data.const
-
-import pl.pb.optigai.R
-import pl.pb.optigai.Settings
-
 object ColorMap {
     /**
      * Internal mapping from [Settings.ColorOfBorder] to color resource IDs.
@@ -32,6 +32,7 @@ object ColorMap {
             Settings.ColorOfBorder.WHITE to R.color.white_toggle,
             Settings.ColorOfBorder.ORANGE to R.color.orange_toggle,
         )
+
     /**
      * Retrieves the color resource ID associated with the given [color].
      *

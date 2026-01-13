@@ -1,3 +1,7 @@
+package pl.pb.optigai.utils.data
+
+import com.google.gson.annotations.SerializedName
+
 /**
  * Represents a single detected Braille character from an image.
  *
@@ -10,16 +14,11 @@
  * @property height The height of the character's bounding box (in pixels).
  * @property width The width of the character's bounding box (in pixels).
  */
-package pl.pb.optigai.utils.data
-
-import com.google.gson.annotations.SerializedName
-
 data class BrailleChar(
     val x: Float,
     val y: Float,
     @SerializedName("class")
     val clazz: String,
     val height: Float,
-    val width: Float
+    val width: Float,
 )
-

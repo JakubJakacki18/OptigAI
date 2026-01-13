@@ -1,3 +1,27 @@
+package pl.pb.optigai.ui
+
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.Typeface
+import android.os.Bundle
+import android.util.AttributeSet
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
+import android.view.View
+import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.ImageView
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.customview.widget.ExploreByTouchHelper
+import pl.pb.optigai.R
+import pl.pb.optigai.utils.AppLogger
+import pl.pb.optigai.utils.data.DetectionResult
+import java.util.Locale
+
 /**
  * DetectionOverlay
  *
@@ -25,56 +49,40 @@
  * - Each bounding box is treated as a virtual view for screen readers.
  * - Provides description, bounds, and click action for TalkBack.
  */
-package pl.pb.optigai.ui
-
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.RectF
-import android.graphics.Typeface
-import android.os.Bundle
-import android.util.AttributeSet
-import android.view.HapticFeedbackConstants
-import android.view.MotionEvent
-import android.view.View
-import android.view.accessibility.AccessibilityNodeInfo
-import android.widget.ImageView
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.customview.widget.ExploreByTouchHelper
-import pl.pb.optigai.R
-import pl.pb.optigai.utils.AppLogger
-import pl.pb.optigai.utils.data.DetectionResult
-import java.util.Locale
-
 class DetectionOverlay(
     context: Context,
     attrs: AttributeSet? = null,
 ) : View(context, attrs) {
     /** List of pairs of detection results and assigned colors for drawing. */
     private val detectionResultsAndColors = mutableListOf<Pair<DetectionResult, Int>>()
+
     /** Width of the original image to map coordinates. */
     private var imageWidth = 0
+
     /** Height of the original image to map coordinates. */
     private var imageHeight = 0
 
     /** The ImageView on which the overlay is applied. */
     private var imageView: ImageView? = null
+
     /** List of available colors for bounding boxes. */
     private var colorsAvailable: List<Int?> = emptyList()
+
     /** Paint used for drawing bounding boxes. */
-    private val boxPaint = Paint().apply {
-        style = Paint.Style.STROKE
-        strokeWidth = 6f
-    }
+    private val boxPaint =
+        Paint().apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 6f
+        }
+
     /** Paint used for drawing overlay text. */
-    private val textPaint = Paint().apply {
-        color = Color.WHITE
-        textSize = 42f
-        typeface = Typeface.DEFAULT_BOLD
-    }
+    private val textPaint =
+        Paint().apply {
+            color = Color.WHITE
+            textSize = 42f
+            typeface = Typeface.DEFAULT_BOLD
+        }
+
     /**
      * Sets detection results to be displayed and associates random colors from [colorsAvailable].
      *
@@ -102,6 +110,7 @@ class DetectionOverlay(
         invalidate()
         // accessibilityHelper.invalidateRoot()
     }
+
     /**
      * Maps a bounding box from image coordinates to view coordinates, considering scaling and padding.
      *
@@ -122,6 +131,7 @@ class DetectionOverlay(
         mapped.offset(viewRect.left, viewRect.top)
         return mapped
     }
+
     /** Draws bounding boxes and overlay text for each detection result. */
 
     override fun onDraw(canvas: Canvas) {
@@ -153,6 +163,7 @@ class DetectionOverlay(
             )
         }
     }
+
     /**
      * Sets the list of available colors for bounding boxes.
      *
@@ -161,6 +172,7 @@ class DetectionOverlay(
     fun setAvailableColors(colorsAvailable: List<Int?>) {
         this.colorsAvailable = colorsAvailable
     }
+
     /** Accessibility helper to support TalkBack for each detection bounding box. */
     private val accessibilityHelper =
         object : ExploreByTouchHelper(this) {
@@ -225,6 +237,7 @@ class DetectionOverlay(
     }
 
     override fun onHoverEvent(event: MotionEvent): Boolean = accessibilityHelper.dispatchHoverEvent(event) || super.onHoverEvent(event)
+
     /**
      * Returns formatted text for overlay based on detection result.
      * Includes accuracy as a percentage if available.

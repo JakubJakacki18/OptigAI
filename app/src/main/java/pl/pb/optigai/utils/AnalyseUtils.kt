@@ -1,11 +1,11 @@
-/**
- * Utility object for common image analysis operations.
- */
 package pl.pb.optigai.utils
 
 import android.graphics.Bitmap
 import android.net.Uri
 
+/**
+ * Utility object for common image analysis operations.
+ */
 object AnalyseUtils {
     /**
      * Updates an ImageView with a provided [bitmap] or [uri].

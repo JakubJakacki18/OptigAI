@@ -1,14 +1,14 @@
-/**
- * Utility object for handling Android runtime permissions.
- *
- * Provides a simple method to check if all required permissions have been granted.
- */
 package pl.pb.optigai.utils
 
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 
+/**
+ * Utility object for handling Android runtime permissions.
+ *
+ * Provides a simple method to check if all required permissions have been granted.
+ */
 object PermissionHandler {
     /**
      * Checks if all required permissions are granted.

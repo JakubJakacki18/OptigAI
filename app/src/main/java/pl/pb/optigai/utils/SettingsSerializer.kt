@@ -1,9 +1,3 @@
-/**
- * A [Serializer] implementation for the [Settings] Protobuf object.
- *
- * This serializer handles reading and writing the app's settings from/to
- * a [DataStore] using Protocol Buffers.
- */
 package pl.pb.optigai.utils
 
 import androidx.datastore.core.Serializer
@@ -12,6 +6,12 @@ import pl.pb.optigai.Settings
 import java.io.InputStream
 import java.io.OutputStream
 
+/**
+ * A [Serializer] implementation for the [Settings] Protobuf object.
+ *
+ * This serializer handles reading and writing the app's settings from/to
+ * a [DataStore] using Protocol Buffers.
+ */
 object SettingsSerializer : Serializer<Settings> {
     /**
      * Default settings used when the settings file is missing or cannot be read.
@@ -34,6 +34,7 @@ object SettingsSerializer : Serializer<Settings> {
                     Settings.ColorOfBorder.PURPLE,
                 ),
             ).build()
+
     /**
      * Reads the [Settings] object from the provided [InputStream].
      *
@@ -47,6 +48,7 @@ object SettingsSerializer : Serializer<Settings> {
             AppLogger.e("Error reading settings", e)
             defaultValue
         }
+
     /**
      * Writes the [Settings] object to the provided [OutputStream].
      *

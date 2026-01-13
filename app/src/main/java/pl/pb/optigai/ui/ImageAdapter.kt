@@ -1,13 +1,3 @@
-/**
- * ImageAdapter
- *
- * RecyclerView adapter used to display a list of images in a gallery-style view.
- * Utilizes [Glide] to efficiently load images and supports click handling.
- *
- * @property context The context used for loading resources and creating views.
- * @property images List of [Image] objects to be displayed.
- * @property onImageClick Lambda function invoked when an image is clicked, receiving the clicked position.
- */
 package pl.pb.optigai.ui
 
 import android.view.LayoutInflater
@@ -20,6 +10,16 @@ import pl.pb.optigai.R
 import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 
+/**
+ * ImageAdapter
+ *
+ * RecyclerView adapter used to display a list of images in a gallery-style view.
+ * Utilizes [Glide] to efficiently load images and supports click handling.
+ *
+ * @property context The context used for loading resources and creating views.
+ * @property images List of [Image] objects to be displayed.
+ * @property onImageClick Lambda function invoked when an image is clicked, receiving the clicked position.
+ */
 class ImageAdapter(
     private val context: android.content.Context,
     private val images: List<Image>,
@@ -34,6 +34,7 @@ class ImageAdapter(
     ) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.imageView)
     }
+
     /**
      * Called when the RecyclerView needs a new ViewHolder to represent an item.
      * Inflates the item layout and returns a new [ImageViewHolder].
@@ -52,6 +53,7 @@ class ImageAdapter(
                 .inflate(R.layout.item_photo, parent, false)
         return ImageViewHolder(view)
     }
+
     /**
      * Called by the RecyclerView to display the data at the specified position.
      * Loads the image into the holder using [Glide] and sets a click listener.
@@ -83,6 +85,7 @@ class ImageAdapter(
                 image.fileName,
             )
     }
+
     /**
      * Returns the total number of items in the data set held by the adapter.
      *

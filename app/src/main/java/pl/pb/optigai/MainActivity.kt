@@ -1,11 +1,3 @@
-/**
- * Main launcher activity for the app.
- *
- * Displays an animated eye vector drawable for a brief splash effect,
- * then automatically transitions to the [CameraActivity].
- *
- * The animation duration is controlled by [ANIMATION_DURATION].
- */
 package pl.pb.optigai
 
 import android.content.Intent
@@ -15,10 +7,19 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import pl.pb.optigai.ui.CameraActivity
 
+/**
+ * Main launcher activity for the app.
+ *
+ * Displays an animated eye vector drawable for a brief splash effect,
+ * then automatically transitions to the [CameraActivity].
+ *
+ * The animation duration is controlled by [ANIMATION_DURATION].
+ */
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
     /** Duration (in milliseconds) to show the splash animation before transitioning. */
     private val ANIMATION_DURATION = 800L
+
     /**
      * Called when the activity is first created.
      *
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
             openCameraActivityAndFinish()
         }, ANIMATION_DURATION)
     }
+
     /**
      * Opens the [CameraActivity] and finishes the current [MainActivity].
      *

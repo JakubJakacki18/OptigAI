@@ -1,15 +1,3 @@
-/**
- * SettingsActivity
- *
- * Activity that allows users to configure application settings, including:
- * - Font size for analysis results
- * - Color selection for bounding boxes
- * - Photo saving toggle
- * - Zoom slider visibility
- * - Gallery grid column count
- *
- * Uses [SettingsViewModel] to persist user preferences and observe changes.
- */
 package pl.pb.optigai.ui
 
 import android.annotation.SuppressLint
@@ -32,12 +20,25 @@ import pl.pb.optigai.databinding.ActivitySettingsBinding
 import pl.pb.optigai.utils.data.SettingsViewModel
 import pl.pb.optigai.utils.data.const.ColorMap
 
+/**
+ * SettingsActivity
+ *
+ * Activity that allows users to configure application settings, including:
+ * - Font size for analysis results
+ * - Color selection for bounding boxes
+ * - Photo saving toggle
+ * - Zoom slider visibility
+ * - Gallery grid column count
+ *
+ * Uses [SettingsViewModel] to persist user preferences and observe changes.
+ */
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
     private val minFont = 16
     private val maxFont = 48
     private val step = 4
+
     /**
      * Initializes the activity and binds UI components to the ViewModel.
      * Sets up listeners for:
@@ -74,9 +75,18 @@ class SettingsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.zoomSeekBarMode.collect { mode ->
                     when (mode) {
-                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOff)
-                        Settings.ZoomSeekBarMode.AUTO -> zoomToggle.check(R.id.zoomSliderVisibilityAuto)
-                        Settings.ZoomSeekBarMode.ALWAYS_ON -> zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOn)
+                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> {
+                            zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOff)
+                        }
+
+                        Settings.ZoomSeekBarMode.AUTO -> {
+                            zoomToggle.check(R.id.zoomSliderVisibilityAuto)
+                        }
+
+                        Settings.ZoomSeekBarMode.ALWAYS_ON -> {
+                            zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOn)
+                        }
+
                         Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
                             zoomToggle.clearChecked()
                         }
@@ -206,6 +216,7 @@ class SettingsActivity : AppCompatActivity() {
             getString(R.string.gallery_slider_annotation_value, intValue)
         }
     }
+
     /**
      * Binds the photo saving toggle to the ViewModel.
      * Updates the switch state and persists changes on toggle.
@@ -225,6 +236,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
     }
+
     /**
      * Sets the background color, stroke color, stroke width, and elevation
      * for a color circle.

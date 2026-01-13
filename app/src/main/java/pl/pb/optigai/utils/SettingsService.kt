@@ -1,9 +1,3 @@
-/**
- * Singleton service class for managing application settings using
- * [DataStore] backed by Protocol Buffers ([SettingsSerializer]).
- *
- * Provides flows for observing settings and suspend functions for updating them.
- */
 package pl.pb.optigai.utils
 
 import android.content.Context
@@ -18,10 +12,15 @@ private val Context.settingsDataStore: DataStore<Settings> by dataStore(
     serializer = SettingsSerializer,
 )
 
+/**
+ * Singleton service class for managing application settings using
+ * [DataStore] backed by Protocol Buffers ([SettingsSerializer]).
+ *
+ * Provides flows for observing settings and suspend functions for updating them.
+ */
 class SettingsService private constructor(
     private val dataStore: DataStore<Settings>,
 ) {
-
     /** The full [Settings] object as a flow. */
     val settingsFlow: Flow<Settings> = dataStore.data
 
@@ -44,9 +43,10 @@ class SettingsService private constructor(
     val zoomSeekBarMode: Flow<Settings.ZoomSeekBarMode> = settingsFlow.map { it.zoomSeekBarMode }
 
     /** Font size in sp for overlay text (defaults to 28 if not set). */
-    val fontSizeSp: Flow<Int> = settingsFlow.map { s ->
-        if (s.fontSizeSp > 0) s.fontSizeSp else 28
-    }
+    val fontSizeSp: Flow<Int> =
+        settingsFlow.map { s ->
+            if (s.fontSizeSp > 0) s.fontSizeSp else 28
+        }
 
     /**
      * Updates the number of grid columns in the gallery.
@@ -101,11 +101,16 @@ class SettingsService private constructor(
     suspend fun toggleColorOfBorder(color: Settings.ColorOfBorder) {
         AppLogger.d("Toggling color: $color")
         dataStore.updateData { settings ->
-            val updatedColors = settings.colorList.toMutableList().apply {
-                if (!remove(color)) add(color)
-            }
+            val updatedColors =
+                settings.colorList.toMutableList().apply {
+                    if (!remove(color)) add(color)
+                }
             AppLogger.d("New color list: $updatedColors")
-            settings.toBuilder().clearColor().addAllColor(updatedColors).build()
+            settings
+                .toBuilder()
+                .clearColor()
+                .addAllColor(updatedColors)
+                .build()
         }
     }
 

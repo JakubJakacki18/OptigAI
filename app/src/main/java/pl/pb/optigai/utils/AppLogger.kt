@@ -1,21 +1,23 @@
+package pl.pb.optigai.utils
+
+import android.util.Log
+
 /**
  * A centralized logging utility for the OptigAI app.
  *
  * Provides convenience methods for logging at different levels (debug, info, warning, error)
  * with automatically generated tags based on the calling Kotlin file.
  */
-package pl.pb.optigai.utils
-
-import android.util.Log
-
 object AppLogger {
     private const val APP_NAME = "OptigAI"
+
     /**
      * Retrieves the stack trace element of the caller.
      *
      * @return The stack trace element representing the caller function/file.
      */
     private fun getCallerStackTraceElement(): StackTraceElement? = Thread.currentThread().stackTrace[5]
+
     /**
      * Generates a log tag using the app name and caller class name.
      *
@@ -26,6 +28,7 @@ object AppLogger {
         val className = element?.fileName?.replace(".kt", "") ?: "Unknown"
         return "$APP_NAME/$className"
     }
+
     /**
      * Logs a debug message.
      *
@@ -34,6 +37,7 @@ object AppLogger {
     fun d(message: String) {
         Log.d(getTag(), message)
     }
+
     /**
      * Logs an error message.
      *
@@ -46,6 +50,7 @@ object AppLogger {
     ) {
         Log.e(getTag(), message, throwable)
     }
+
     /**
      * Logs an informational message.
      *
@@ -54,6 +59,7 @@ object AppLogger {
     fun i(message: String) {
         Log.i(getTag(), message)
     }
+
     /**
      * Logs a warning message.
      *

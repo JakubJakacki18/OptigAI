@@ -1,3 +1,7 @@
+package pl.pb.optigai.ui
+
+import pl.pb.optigai.utils.data.BrailleChar
+
 /**
  * BrailleActivity
  *
@@ -8,10 +12,6 @@
  * - Detecting word spaces based on horizontal gaps.
  * - Converting letters to numbers when a NUMBER_PREFIX is present.
  */
-package pl.pb.optigai.ui
-
-import pl.pb.optigai.utils.data.BrailleChar
-
 class BrailleActivity {
     companion object {
         /**
@@ -30,6 +30,7 @@ class BrailleActivity {
                 "I" to "9",
                 "J" to "0",
             )
+
         /**
          * Decodes a list of [BrailleChar] predictions into a readable string.
          *

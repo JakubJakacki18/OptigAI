@@ -1,3 +1,7 @@
+package pl.pb.optigai.utils.data.const
+
+import pl.pb.optigai.utils.data.YoloModelPaths
+
 /**
  * YoloModelPathsStorage
  *
@@ -16,10 +20,6 @@
  * }
  * ```
  */
-package pl.pb.optigai.utils.data.const
-
-import pl.pb.optigai.utils.data.YoloModelPaths
-
 object YoloModelPathsStorage {
     /**
      * List of YOLO models used by the app.

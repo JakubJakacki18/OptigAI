@@ -1,10 +1,3 @@
-/**
- * IBrailleApi
- *
- * Retrofit interface for interacting with the Braille detection API.
- * Provides endpoints for uploading images containing Braille text
- * and receiving predictions from the remote model.
- */
 package pl.pb.optigai.utils.api
 
 import okhttp3.MultipartBody
@@ -15,6 +8,13 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
 
+/**
+ * IBrailleApi
+ *
+ * Retrofit interface for interacting with the Braille detection API.
+ * Provides endpoints for uploading images containing Braille text
+ * and receiving predictions from the remote model.
+ */
 interface IBrailleApi {
     /**
      * Uploads an image containing Braille text to the remote Braille detection API.

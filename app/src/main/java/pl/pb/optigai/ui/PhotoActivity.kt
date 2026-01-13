@@ -1,13 +1,3 @@
-/**
- * PhotoActivity
- *
- * Activity used to display a single image from the device's gallery with navigation controls.
- * Supports scrolling through images, previewing them, and launching the analysis workflow.
- *
- * @property images List of [Image] objects read from the device storage.
- * @property currentIndex Index of the currently displayed image in [images].
- * @property viewBinding View binding for [PhotoPreviewBinding].
- */
 package pl.pb.optigai.ui
 
 import android.content.Intent
@@ -18,6 +8,16 @@ import pl.pb.optigai.databinding.PhotoPreviewBinding
 import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
 
+/**
+ * PhotoActivity
+ *
+ * Activity used to display a single image from the device's gallery with navigation controls.
+ * Supports scrolling through images, previewing them, and launching the analysis workflow.
+ *
+ * @property images List of [Image] objects read from the device storage.
+ * @property currentIndex Index of the currently displayed image in [images].
+ * @property viewBinding View binding for [PhotoPreviewBinding].
+ */
 class PhotoActivity : AppCompatActivity() {
     private lateinit var images: List<Image>
     private var currentIndex: Int = 0
@@ -35,6 +35,7 @@ class PhotoActivity : AppCompatActivity() {
         bindHeaderLayout()
         bindPreviewButtons()
     }
+
     /**
      * Updates the ImageView to show the currently selected image.
      * Also updates the navigation arrows' enabled state.
@@ -44,6 +45,7 @@ class PhotoActivity : AppCompatActivity() {
         viewBinding.previewImageView.setImageURI(currentImage.uri)
         updateNavigationButtons()
     }
+
     /**
      * Updates the state and alpha of the left and right navigation buttons
      * depending on the currently displayed image.
@@ -58,6 +60,7 @@ class PhotoActivity : AppCompatActivity() {
         leftArrow.alpha = if (leftArrow.isEnabled) 1f else 0.4f
         rightArrow.alpha = if (rightArrow.isEnabled) 1f else 0.4f
     }
+
     /**
      * Sets up the header layout, including the title and the back button behavior.
      */
@@ -67,6 +70,7 @@ class PhotoActivity : AppCompatActivity() {
             finish()
         }
     }
+
     /**
      * Sets up the left/right navigation buttons and the middle button for analysis.
      * Left/right buttons change the current image.
@@ -94,5 +98,4 @@ class PhotoActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
 }

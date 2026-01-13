@@ -1,26 +1,3 @@
-/**
- * AnalysisSelectorFragment
- *
- * Fragment responsible for allowing the user to select and initiate different types of image analysis.
- * It also supports cropping the image before analysis and displaying the updated bitmap.
- *
- * Features:
- * - Displays the currently analyzed image from [BitmapCache].
- * - Provides buttons to perform text analysis, Braille analysis, and object detection via [AnalyseService].
- * - Allows editing (cropping) of the image using UCrop before running analysis.
- * - Updates the shared [AnalysisViewModel] with detection results and summary text.
- * - Shows a loading fragment while analysis is in progress and then transitions to [AnalysisResultFragment].
- *
- * Collaborates with:
- * - [AnalyseService] – performs the actual analysis (text, Braille, object detection).
- * - [BitmapCache] – stores the current bitmap and the last image URI.
- * - [PhotoUtils] – utility functions for converting between bitmap and URI.
- * - [AnalysisViewModel] – shares detection results and summary text across fragments.
- * - [UCrop] – provides cropping functionality.
- * - [AnalyseUtils] – updates the displayed bitmap in the ImageView.
- * - [LoadingFragment] – temporary fragment shown while analysis is running.
- * - [AnalysisResultFragment] – fragment displaying final analysis results.
- */
 package pl.pb.optigai.ui
 
 import android.graphics.Bitmap
@@ -49,11 +26,36 @@ import pl.pb.optigai.utils.data.BitmapCache
 import pl.pb.optigai.utils.data.DetectionData
 import java.io.File
 
+/**
+ * AnalysisSelectorFragment
+ *
+ * Fragment responsible for allowing the user to select and initiate different types of image analysis.
+ * It also supports cropping the image before analysis and displaying the updated bitmap.
+ *
+ * Features:
+ * - Displays the currently analyzed image from [BitmapCache].
+ * - Provides buttons to perform text analysis, Braille analysis, and object detection via [AnalyseService].
+ * - Allows editing (cropping) of the image using UCrop before running analysis.
+ * - Updates the shared [AnalysisViewModel] with detection results and summary text.
+ * - Shows a loading fragment while analysis is in progress and then transitions to [AnalysisResultFragment].
+ *
+ * Collaborates with:
+ * - [AnalyseService] – performs the actual analysis (text, Braille, object detection).
+ * - [BitmapCache] – stores the current bitmap and the last image URI.
+ * - [PhotoUtils] – utility functions for converting between bitmap and URI.
+ * - [AnalysisViewModel] – shares detection results and summary text across fragments.
+ * - [UCrop] – provides cropping functionality.
+ * - [AnalyseUtils] – updates the displayed bitmap in the ImageView.
+ * - [LoadingFragment] – temporary fragment shown while analysis is running.
+ * - [AnalysisResultFragment] – fragment displaying final analysis results.
+ */
 class AnalysisSelectorFragment : Fragment() {
     /** Shared ViewModel for managing analysis data across the activity. */
     private val viewModel: AnalysisViewModel by activityViewModels()
+
     /** View binding for the fragment layout. */
     private lateinit var viewBinding: FragmentAnalysisSelectorBinding
+
     /**
      * Activity result launcher for cropping images with UCrop.
      * Updates [BitmapCache] and the ImageView when the cropping is complete.
@@ -104,6 +106,7 @@ class AnalysisSelectorFragment : Fragment() {
 
         return viewBinding.root
     }
+
     /**
      * Called immediately after onCreateView.
      * Sets up click listeners for analysis buttons and the edit (crop) button.
@@ -143,6 +146,7 @@ class AnalysisSelectorFragment : Fragment() {
             startCropActivity(freshUri)
         }
     }
+
     /**
      * Starts the UCrop activity to crop the given [sourceUri].
      * Configures colors and UI options for the cropping toolbar.
@@ -167,6 +171,7 @@ class AnalysisSelectorFragment : Fragment() {
         val uCrop = UCrop.of(sourceUri, destinationUri).withOptions(options)
         cropImageLauncher.launch(uCrop.getIntent(requireContext()))
     }
+
     /**
      * Throws an [IllegalStateException] if [BitmapCache.bitmap] is null.
      * Used to ensure that a valid bitmap exists before performing analysis.
@@ -176,6 +181,7 @@ class AnalysisSelectorFragment : Fragment() {
             throw IllegalStateException("BitmapCache.bitmap is null")
         }
     }
+
     /**
      * Helper function to call a suspend analysis function (text, Braille, or item detection) on the current bitmap.
      * Shows the loading fragment during analysis and then navigates to [AnalysisResultFragment].
@@ -193,6 +199,7 @@ class AnalysisSelectorFragment : Fragment() {
             showResultFragment()
         }
     }
+
     /**
      * Replaces the current fragment with [LoadingFragment] and adds the transaction to the back stack.
      */
@@ -203,6 +210,7 @@ class AnalysisSelectorFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
+
     /**
      * Replaces the current fragment with [AnalysisResultFragment] and adds the transaction to the back stack.
      */

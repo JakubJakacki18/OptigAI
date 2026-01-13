@@ -1,3 +1,12 @@
+package pl.pb.optigai.utils.data
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import pl.pb.optigai.Settings
+import pl.pb.optigai.utils.SettingsService
+
 /**
  * [AndroidViewModel] responsible for managing and exposing the user settings.
  *
@@ -15,15 +24,6 @@
  * All setter functions launch coroutines in [viewModelScope] to update values asynchronously
  * through [SettingsService].
  */
-package pl.pb.optigai.utils.data
-
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import pl.pb.optigai.Settings
-import pl.pb.optigai.utils.SettingsService
-
 class SettingsViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
@@ -36,35 +36,39 @@ class SettingsViewModel(
     val colors = settingsService.colors
     val zoomSeekBarMode = settingsService.zoomSeekBarMode
     val fontSizeSp = settingsService.fontSizeSp
+
     /** Updates the number of columns in the gallery grid. */
     fun setGridColumns(columns: Int) {
         viewModelScope.launch {
             settingsService.updateGridColumns(columns)
         }
     }
+
     /** Updates whether photos are saved automatically. */
     fun setIsPhotoSaving(isPhotoSaving: Boolean) {
         viewModelScope.launch {
             settingsService.updateIsPhotoSaving(isPhotoSaving)
         }
     }
+
     /** Toggles a color in the selected border colors list. */
     fun toggleColorOfBorder(color: Settings.ColorOfBorder) {
         viewModelScope.launch {
             settingsService.toggleColorOfBorder(color)
         }
     }
+
     /** Updates the zoom slider visibility mode. */
     fun setZoomSeekBarMode(mode: Settings.ZoomSeekBarMode) {
         viewModelScope.launch {
             settingsService.updateZoomSeekBarMode(mode)
         }
     }
+
     /** Updates the preferred font size (in sp). */
     fun setFontSize(sp: Int) {
         viewModelScope.launch {
             settingsService.updateFontSize(sp)
         }
     }
-
 }
