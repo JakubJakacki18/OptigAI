@@ -16,7 +16,6 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
 import pl.pb.optigai.R
-import pl.pb.optigai.ui.BrailleActivity
 import pl.pb.optigai.utils.api.IBrailleApi
 import pl.pb.optigai.utils.data.DetectionData
 import pl.pb.optigai.utils.data.DetectionResult

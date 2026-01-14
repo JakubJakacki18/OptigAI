@@ -1,6 +1,7 @@
-package pl.pb.optigai.ui
+package pl.pb.optigai.utils
 
 import pl.pb.optigai.utils.data.BrailleChar
+import kotlin.math.abs
 
 /**
  * BrailleActivity
@@ -32,7 +33,7 @@ class BrailleActivity {
             )
 
         /**
-         * Decodes a list of [BrailleChar] predictions into a readable string.
+         * Decodes a list of [pl.pb.optigai.utils.data.BrailleChar] predictions into a readable string.
          *
          * Algorithm:
          * - Sorts the characters by vertical position (y) and then horizontal position (x).
@@ -42,7 +43,7 @@ class BrailleActivity {
          * - Converts letters to numbers if a NUMBER_PREFIX is detected before the letters.
          * - Joins lines with spaces to form the final text.
          *
-         * @param predictions List of [BrailleChar] objects representing detected Braille characters.
+         * @param predictions List of [pl.pb.optigai.utils.data.BrailleChar] objects representing detected Braille characters.
          * @return Decoded string of the Braille text. Returns an empty string if predictions are empty.
          */
         fun decode(predictions: List<BrailleChar>): String {
@@ -57,7 +58,7 @@ class BrailleActivity {
                 val line =
                     lines.find { existingLine ->
                         val avgY = existingLine.map { it.y }.average().toFloat()
-                        kotlin.math.abs(avgY - char.y) < lineTolerance
+                        abs(avgY - char.y) < lineTolerance
                     }
                 if (line != null) {
                     line.add(char)
