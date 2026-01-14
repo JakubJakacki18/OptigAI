@@ -14,6 +14,17 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * YOLO object detector for images using TensorFlow Lite models.
+ *
+ * This class handles loading a YOLO TFLite model with its YAML configuration,
+ * preprocessing images, running inference, and postprocessing the results
+ * including non-maximum suppression.
+ *
+ * @param context Application context used for loading assets.
+ * @param modelPath Path to the TFLite model file in assets.
+ * @param modelConfigPath Path to the YAML configuration file in assets.
+ */
 class YoloDetector(
     context: Context,
     modelPath: String,
@@ -43,6 +54,9 @@ class YoloDetector(
         maxAmountOfDetections = data["max_detections_per_image"] as Int
     }
 
+    /**
+     * Converts label names from YAML to a [Map] of class indices to label strings.
+     */
     private fun loadLabels(namesAny: Map<*, *>): Map<Int, String> {
         val namesMap = mutableMapOf<Int, String>()
         for ((key, value) in namesAny) {
@@ -54,6 +68,12 @@ class YoloDetector(
         return namesMap.toMap()
     }
 
+    /**
+     * Performs object detection on a given [image].
+     *
+     * @param image Bitmap to analyze.
+     * @return List of [DetectionResult] containing detected objects.
+     */
     fun detect(image: Bitmap): List<DetectionResult> {
         val input = preprocessImage(image)
         val output = Array(1) { Array(channels) { FloatArray(8400) } }
@@ -61,6 +81,9 @@ class YoloDetector(
         return postprocess(image.width, image.height, output)
     }
 
+    /**
+     * Preprocesses the input [bitmap] by resizing to 640x640 and normalizing RGB values to [0,1].
+     */
     private fun preprocessImage(bitmap: Bitmap): Array<Array<Array<FloatArray>>> {
         val inputSize = 640
         val resized = bitmap.scale(inputSize, inputSize)
@@ -77,6 +100,10 @@ class YoloDetector(
         return input
     }
 
+    /**
+     * Postprocesses the raw output from YOLO to a list of [DetectionResult],
+     * applies confidence thresholding, bounding box scaling, and non-maximum suppression.
+     */
     private fun postprocess(
         imageWidth: Int,
         imageHeight: Int,
@@ -108,29 +135,37 @@ class YoloDetector(
             detectionResults.add(DetectionResult(className, box, maxClassScore))
         }
 
-        val result = nonMaximumSuppression(detectionResults)
+        val result = nonMaximumSuppression(detectionResults).sortedByDescending { it.accuracy }
         return result.take(maxAmountOfDetections)
     }
 
+    /**
+     * Applies Non-Maximum Suppression (NMS) to filter overlapping detections.
+     */
     private fun nonMaximumSuppression(detections: List<DetectionResult>): List<DetectionResult> {
         val result = mutableListOf<DetectionResult>()
-        val sorted = detections.sortedByDescending { it.accuracy }.toMutableList()
+        val detectionsByClass = detections.sortedByDescending { it.accuracy }.groupBy { it.text }
 
-        while (sorted.isNotEmpty()) {
-            val best = sorted.removeAt(0)
-            result.add(best)
+        for ((_, classDetections) in detectionsByClass) {
+            val sorted = classDetections.toMutableList()
 
-            val iterator = sorted.iterator()
-            while (iterator.hasNext()) {
-                val det = iterator.next()
-                if (intersectionOverUnion(best.boundingBox!!, det.boundingBox!!) > iouThreshold) {
-                    iterator.remove()
+            while (sorted.isNotEmpty()) {
+                val best = sorted.removeAt(0)
+                result.add(best)
+                sorted.removeAll {
+                    intersectionOverUnion(best.boundingBox!!, it.boundingBox!!) > iouThreshold
                 }
             }
         }
+
         return result
     }
 
+    /**
+     * Calculates the Intersection over Union (IoU) for two bounding boxes.
+     *
+     * @return IoU value between 0 and 1.
+     */
     private fun intersectionOverUnion(
         a: RectF,
         b: RectF,
@@ -148,6 +183,9 @@ class YoloDetector(
         return if (unionArea == 0f) 0f else interArea / unionArea
     }
 
+    /**
+     * Chooses the correct language-specific label names from YAML config.
+     */
     private fun getNamesInProperLanguage(
         context: Context,
         data: Map<String, Any>,

@@ -1,17 +1,22 @@
-package pl.pb.optigai.ui
+package pl.pb.optigai.utils
 
 import pl.pb.optigai.utils.data.BrailleChar
+import kotlin.math.abs
 
+/**
+ * BrailleActivity
+ *
+ * Utility class for decoding detected Braille characters into readable text.
+ * The decoding handles:
+ * - Grouping characters into lines based on their vertical positions.
+ * - Sorting characters within a line from left to right.
+ * - Detecting word spaces based on horizontal gaps.
+ * - Converting letters to numbers when a NUMBER_PREFIX is present.
+ */
 class BrailleActivity {
     companion object {
         /**
-         * Decodes a list of Braille character predictions into a readable string.
-         * The function handles grouping characters into lines, adding word spaces,
-         * and converting letters to numbers when a number prefix is present.
-         *
-         * @param predictions A list of BrailleChar objects containing character information
-         * (e.g., class, x/y coordinates, height).
-         * @return The decoded string of the Braille text.
+         * Mapping of Braille letter classes to corresponding digits when in number mode.
          */
         private val numberMap =
             mapOf(
@@ -27,6 +32,20 @@ class BrailleActivity {
                 "J" to "0",
             )
 
+        /**
+         * Decodes a list of [pl.pb.optigai.utils.data.BrailleChar] predictions into a readable string.
+         *
+         * Algorithm:
+         * - Sorts the characters by vertical position (y) and then horizontal position (x).
+         * - Groups characters into lines based on vertical proximity (lineTolerance).
+         * - Sorts characters within each line by x-coordinate.
+         * - Adds spaces if horizontal gaps between characters exceed 1.5x the average gap.
+         * - Converts letters to numbers if a NUMBER_PREFIX is detected before the letters.
+         * - Joins lines with spaces to form the final text.
+         *
+         * @param predictions List of [pl.pb.optigai.utils.data.BrailleChar] objects representing detected Braille characters.
+         * @return Decoded string of the Braille text. Returns an empty string if predictions are empty.
+         */
         fun decode(predictions: List<BrailleChar>): String {
             if (predictions.isEmpty()) return ""
 
@@ -39,7 +58,7 @@ class BrailleActivity {
                 val line =
                     lines.find { existingLine ->
                         val avgY = existingLine.map { it.y }.average().toFloat()
-                        kotlin.math.abs(avgY - char.y) < lineTolerance
+                        abs(avgY - char.y) < lineTolerance
                     }
                 if (line != null) {
                     line.add(char)

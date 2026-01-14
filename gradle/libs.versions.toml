@@ -11,13 +11,14 @@ espressoCore = "3.6.1"
 appcompat = "1.7.0"
 kotlinxCoroutinesAndroid = "1.7.3"
 kotlinxCoroutinesPlayServices = "1.6.4"
+lifecycleRuntimeKtxVersion = "2.6.2"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 lifecycleRuntimeKtx = "2.8.0"
 concurrentFuturesKtx = "1.3.0"
 fragmentKtx = "1.8.9"
-materialVersion = "1.6.0"
+materialVersion = "1.9.4"
 okhttp = "4.11.0"
 opencv = "4.5.2"
 opencvAndroid = "4.6.0"
@@ -33,6 +34,7 @@ tensorflowLite = "2.15.0"
 tensorflowLiteSupport = "0.4.4"
 tensorflowLiteTaskVision = "0.4.4"
 ucrop = "2.2.11-native"
+ucropVersion = "changed-layout-SNAPSHOT"
 ui = "1.9.1"
 foundationLayout = "1.9.1"
 mlkit_text_recognition = "16.0.1"
@@ -50,8 +52,10 @@ androidx-camera-video = { module = "androidx.camera:camera-video", version.ref =
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraxVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-fragment-ktx-v162 = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
+androidx-lifecycle-runtime-ktx-v262 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+jakubjakacki18-ucrop = { module = "com.github.jakubjakacki18:uCrop", version.ref = "ucropVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

@@ -1,20 +1,23 @@
 package pl.pb.optigai.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.yalantis.ucrop.UCrop
 import pl.pb.optigai.R
 import pl.pb.optigai.databinding.PhotoPreviewBinding
-import pl.pb.optigai.utils.AppLogger
 import pl.pb.optigai.utils.PhotoUtils
 import pl.pb.optigai.utils.data.Image
-import java.io.File
 
+/**
+ * PhotoActivity
+ *
+ * Activity used to display a single image from the device's gallery with navigation controls.
+ * Supports scrolling through images, previewing them, and launching the analysis workflow.
+ *
+ * @property images List of [Image] objects read from the device storage.
+ * @property currentIndex Index of the currently displayed image in [images].
+ * @property viewBinding View binding for [PhotoPreviewBinding].
+ */
 class PhotoActivity : AppCompatActivity() {
     private lateinit var images: List<Image>
     private var currentIndex: Int = 0
@@ -31,110 +34,36 @@ class PhotoActivity : AppCompatActivity() {
         updateImage()
         bindHeaderLayout()
         bindPreviewButtons()
-        bindCropperButtons()
     }
 
     /**
-     * Launcher for the cropping activity.
+     * Updates the ImageView to show the currently selected image.
+     * Also updates the navigation arrows' enabled state.
      */
-    private val cropImageLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val resultUri = result.data?.let { UCrop.getOutput(it) }
-
-                if (resultUri != null) {
-                    val currentImage = images[currentIndex]
-                    val newImage = currentImage.copy(uri = resultUri)
-
-                    images =
-                        images
-                            .toMutableList()
-                            .also {
-                                it[currentIndex] = newImage
-                            }.toList()
-
-                    viewBinding.previewImageView.setImageURI(resultUri)
-                    updateUndoButtonState()
-                    AppLogger.d("Image cropped and list updated. New URI: $resultUri")
-                }
-            } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                val cropError = result.data?.let { UCrop.getError(it) }
-                AppLogger.e("UCrop Error: ${cropError?.message}")
-            }
-        }
-
     private fun updateImage() {
         val currentImage = images[currentIndex]
         viewBinding.previewImageView.setImageURI(currentImage.uri)
         updateNavigationButtons()
-        updateUndoButtonState()
     }
 
+    /**
+     * Updates the state and alpha of the left and right navigation buttons
+     * depending on the currently displayed image.
+     */
     private fun updateNavigationButtons() {
-        viewBinding.leftArrow.isEnabled = currentIndex > 0
-        viewBinding.rightArrow.isEnabled = currentIndex < images.size - 1
-    }
+        val leftArrow = viewBinding.leftArrow
+        val rightArrow = viewBinding.rightArrow
 
-    private fun revertImageChanges() {
-        val currentImage = images[currentIndex]
+        leftArrow.isEnabled = currentIndex > 0
+        rightArrow.isEnabled = currentIndex < images.size - 1
 
-        // Use the stored originalUri to revert the changes
-        if (currentImage.uri != currentImage.originalUri) {
-            val revertedImage = currentImage.copy(uri = currentImage.originalUri)
-
-            images =
-                images
-                    .toMutableList()
-                    .also {
-                        it[currentIndex] = revertedImage
-                    }.toList()
-
-            viewBinding.previewImageView.setImageURI(revertedImage.uri)
-            updateUndoButtonState()
-            AppLogger.d("Image changes reverted to original URI.")
-        }
+        leftArrow.alpha = if (leftArrow.isEnabled) 1f else 0.4f
+        rightArrow.alpha = if (rightArrow.isEnabled) 1f else 0.4f
     }
 
     /**
-     * Toggles the state of the undo button based on whether the image has been cropped.
-     * Assumes 'undoButton' is an ID in your PhotoPreviewBinding.
+     * Sets up the header layout, including the title and the back button behavior.
      */
-    private fun updateUndoButtonState() {
-        val currentImage = images[currentIndex]
-        val isChanged = currentImage.uri != currentImage.originalUri
-        viewBinding.undoButton.isEnabled = isChanged
-        viewBinding.undoButton.visibility = if (isChanged) View.VISIBLE else View.INVISIBLE
-    }
-
-    /**
-     * Starts the UCrop activity for the given image URI with custom styling.
-     */
-    private fun startCropActivity(sourceUri: Uri) {
-        val outputFileName = "cropped_image_${System.currentTimeMillis()}.jpg"
-        val destinationUri = Uri.fromFile(File(cacheDir, outputFileName))
-
-        val options = UCrop.Options()
-
-        val primaryColor = ContextCompat.getColor(this, R.color.light_blue)
-        val toolbarIconColor = ContextCompat.getColor(this, R.color.creme)
-        val dimmedLayerColor = ContextCompat.getColor(this, R.color.dark_blue)
-
-        options.setToolbarColor(primaryColor)
-        options.setToolbarWidgetColor(toolbarIconColor)
-        options.setActiveControlsWidgetColor(primaryColor)
-        options.setCropFrameColor(toolbarIconColor)
-        options.setDimmedLayerColor(dimmedLayerColor)
-
-        val uCrop =
-            UCrop
-                .of(sourceUri, destinationUri)
-                .withOptions(options)
-
-        cropImageLauncher.launch(uCrop.getIntent(this))
-    }
-
     private fun bindHeaderLayout() {
         viewBinding.headerLayout.headerTitle.text = getString(R.string.preview_header_shared)
         viewBinding.headerLayout.backButton.setOnClickListener {
@@ -142,6 +71,11 @@ class PhotoActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets up the left/right navigation buttons and the middle button for analysis.
+     * Left/right buttons change the current image.
+     * Middle button launches [AnalysisActivity] with the currently displayed image.
+     */
     private fun bindPreviewButtons() {
         viewBinding.leftArrow.setOnClickListener {
             if (currentIndex > 0) {
@@ -162,15 +96,6 @@ class PhotoActivity : AppCompatActivity() {
             val intent = Intent(this@PhotoActivity, AnalysisActivity::class.java)
             intent.putExtra("IMAGE_URI", currentImage.uri.toString())
             startActivity(intent)
-        }
-    }
-
-    private fun bindCropperButtons() {
-        viewBinding.editButton.setOnClickListener {
-            startCropActivity(images[currentIndex].uri)
-        }
-        viewBinding.undoButton.setOnClickListener {
-            revertImageChanges()
         }
     }
 }

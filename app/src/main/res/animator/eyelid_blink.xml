@@ -1,0 +1,9 @@
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:propertyName="fillColor"
+    android:duration="200"
+    android:startOffset="250"
+    android:valueFrom="#00000000"
+    android:valueTo="@color/creme"
+    android:valueType="colorType"
+    android:repeatMode="reverse"
+    android:repeatCount="1"/>

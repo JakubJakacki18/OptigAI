@@ -36,27 +36,70 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.getValue
 
+/**
+ * CameraActivity
+ *
+ * Activity responsible for handling the device camera, capturing photos, and initiating image analysis.
+ * Supports both saving photos to external storage and temporarily storing them in memory for analysis.
+ *
+ * Features:
+ * - Initializes CameraX with back camera and provides live preview.
+ * - Captures photos and either saves them to external storage or caches them in [BitmapCache].
+ * - Supports pinch-to-zoom and a zoom SeekBar with configurable visibility modes.
+ * - Allows toggling flash modes (Auto, On, Off).
+ * - Provides buttons to open gallery ([PhotoAlbumActivity]) and settings ([SettingsActivity]).
+ * - Automatically rotates captured images according to device orientation.
+ * - Initiates [AnalysisActivity] after capturing a photo.
+ *
+ * Collaborates with:
+ * - [SettingsViewModel] – stores user preferences such as zoom bar mode and photo saving behavior.
+ * - [BitmapCache] – stores temporarily captured bitmap images.
+ * - [PermissionHandler] – checks and requests camera permissions.
+ * - CameraX APIs – [ImageCapture], [Preview], [ProcessCameraProvider], [CameraSelector].
+ * - [MediaStore] – saves captured photos to device storage.
+ */
 class CameraActivity : AppCompatActivity() {
+    /** View binding for the camera activity layout. */
     private lateinit var viewBinding: ActivityCameraBinding
+
+    /** ViewModel storing user settings (zoom mode, photo saving preferences). */
     private val viewModel: SettingsViewModel by viewModels()
+
+    /** CameraX ImageCapture instance used to take photos. */
     private var imageCapture: ImageCapture? = null
+
+    /** Current flash mode (Auto, On, Off) applied to [imageCapture]. */
     private var flashMode: Int? = null
+
+    /** SeekBar for zoom control. */
     private lateinit var zoomSeekBar: SeekBar
+
+    /** Gesture detector for pinch-to-zoom functionality. */
     private lateinit var scaleGestureDetector: ScaleGestureDetector
+
+    /** CameraX Camera instance controlling zoom and other camera features. */
     private lateinit var camera: androidx.camera.core.Camera
 
+    /**
+     * Initializes the activity, sets up the camera preview, zoom controls, flash toggle, and
+     * button listeners for taking photos, opening gallery, and opening settings.
+     *
+     * Handles permissions via [PermissionHandler] and [ActivityResultContracts.RequestMultiplePermissions].
+     */
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        setFlashMode()
+        zoomSeekBar = viewBinding.zoomSeekBar
+
         if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
             activityResultLauncher.launch(REQUIRED_PERMISSIONS)
         } else {
             lifecycleScope.launch { startCamera() }
         }
-        zoomSeekBar = viewBinding.zoomSeekBar!!
 
         viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
 
@@ -73,25 +116,28 @@ class CameraActivity : AppCompatActivity() {
             viewModel.zoomSeekBarMode.collect { mode ->
                 when (mode) {
                     Settings.ZoomSeekBarMode.ALWAYS_ON -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.VISIBLE
+                        viewBinding.zoomSeekBar.visibility = View.VISIBLE
                     }
+
                     Settings.ZoomSeekBarMode.ALWAYS_OFF -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                        viewBinding.zoomSeekBar.visibility = View.GONE
                     }
+
                     Settings.ZoomSeekBarMode.AUTO -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                        viewBinding.zoomSeekBar.visibility = View.GONE
                     }
+
                     else -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                        viewBinding.zoomSeekBar.visibility = View.GONE
                     }
                 }
             }
         }
 
-        viewBinding.flashToggleButton!!.setOnClickListener {
+        viewBinding.flashToggleButton.setOnClickListener {
             setFlashMode()
         }
-        setFlashMode()
+
         scaleGestureDetector =
             ScaleGestureDetector(
                 this,
@@ -128,8 +174,12 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Toggles the flash mode between Auto, On, and Off.
+     * Updates the UI icon and description accordingly.
+     */
     private fun setFlashMode() {
-        val flashButton = viewBinding.flashToggleButton!!
+        val flashButton = viewBinding.flashToggleButton
         flashMode =
             when (flashMode) {
                 ImageCapture.FLASH_MODE_AUTO -> {
@@ -137,11 +187,13 @@ class CameraActivity : AppCompatActivity() {
                     flashButton.contentDescription = getString(R.string.flash_on_description)
                     ImageCapture.FLASH_MODE_ON
                 }
+
                 ImageCapture.FLASH_MODE_ON -> {
                     flashButton.setImageResource(R.drawable.ic_flash_off)
                     flashButton.contentDescription = getString(R.string.flash_off_description)
                     ImageCapture.FLASH_MODE_OFF
                 }
+
                 else -> {
                     flashButton.setImageResource(R.drawable.ic_flash_auto)
                     flashButton.contentDescription = getString(R.string.flash_auto_description)
@@ -151,6 +203,10 @@ class CameraActivity : AppCompatActivity() {
         imageCapture?.flashMode = flashMode!!
     }
 
+    /**
+     * ActivityResult launcher for requesting multiple permissions (camera).
+     * Starts the camera if permissions are granted.
+     */
     private val activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             var permissionGranted = true
@@ -160,7 +216,7 @@ class CameraActivity : AppCompatActivity() {
                 }
             }
             if (!permissionGranted) {
-                Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, R.string.permission_denied_toast, Toast.LENGTH_LONG).show()
             } else {
                 lifecycleScope.launch { startCamera() }
             }
@@ -174,6 +230,10 @@ class CameraActivity : AppCompatActivity() {
             ).toTypedArray()
     }
 
+    /**
+     * Initializes CameraX, sets up preview and [imageCapture], binds lifecycle to this activity.
+     * Also sets up initial zoom ratio and zoom controls.
+     */
     private suspend fun startCamera() {
         val cameraProvider = ProcessCameraProvider.getInstance(this).await()
         val preview = Preview.Builder().build()
@@ -203,8 +263,16 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Captures a photo using [imageCapture].
+     * Decides whether to save the photo to external storage or to temporary bitmap based on user settings.
+     */
     private fun takePhoto() {
         lifecycleScope.launch {
+            if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
+                Toast.makeText(baseContext, R.string.permission_not_granted_toast, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
             if (getIsSavingPhoto()) {
                 takePhotoAndSaveToExternalStorage()
             } else {
@@ -213,6 +281,11 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Builds the output file options for saving a photo to MediaStore.
+     *
+     * @return [ImageCapture.OutputFileOptions] configured with display name, MIME type, and relative path.
+     */
     private fun getOutputFileOptions(): ImageCapture.OutputFileOptions {
         val locale = Locale.getDefault()
         val name = SimpleDateFormat(FILENAME_FORMAT, locale).format(System.currentTimeMillis())
@@ -227,6 +300,10 @@ class CameraActivity : AppCompatActivity() {
             .build()
     }
 
+    /**
+     * Takes a photo and saves it to external storage.
+     * Starts analysis after saving the photo.
+     */
     private fun takePhotoAndSaveToExternalStorage() {
         imageCapture?.takePicture(
             getOutputFileOptions(),
@@ -253,6 +330,10 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Takes a photo and stores it temporarily in [BitmapCache].
+     * Starts analysis using the in-memory bitmap.
+     */
     private fun takePhotoAndSaveToTemporaryBitmap() {
         imageCapture?.takePicture(
             ContextCompat.getMainExecutor(this),
@@ -277,6 +358,12 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Starts [AnalysisActivity] for a captured image.
+     *
+     * @param data Either a [Uri] for saved image or a [Bitmap] for in-memory image.
+     * @throws IllegalArgumentException if data type is unsupported.
+     */
     private fun startAnalysis(data: Any) {
         val intent = Intent(this, AnalysisActivity::class.java)
         when (data) {
@@ -287,11 +374,17 @@ class CameraActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    /** Runnable that hides the zoom SeekBar after a delay when in AUTO mode. */
+
     private val hideZoomBarRunnable =
         Runnable {
-            viewBinding.zoomSeekBar!!.visibility = View.GONE
+            viewBinding.zoomSeekBar.visibility = View.GONE
         }
 
+    /**
+     * Sets up zoom controls for [zoomSeekBar].
+     * Synchronizes SeekBar progress with camera zoom and supports auto-hide in AUTO mode.
+     */
     @SuppressLint("ClickableViewAccessibility")
     private fun setupZoomControls() {
         zoomSeekBar.max = 100
@@ -325,11 +418,22 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Rotates a [Bitmap] by the given degrees.
+     *
+     * @param degrees Rotation in degrees.
+     * @return Rotated [Bitmap].
+     */
     private fun Bitmap.rotate(degrees: Int): Bitmap {
         if (degrees == 0) return this
         val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
         return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
 
+    /**
+     * Checks user settings to determine if photos should be saved to storage or temporarily cached.
+     *
+     * @return True if saving to external storage, false if caching temporarily.
+     */
     private suspend fun getIsSavingPhoto(): Boolean = viewModel.isPhotoSaving.first()
 }

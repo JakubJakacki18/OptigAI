@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        dataBinding = true
         compose = true
     }
 }
@@ -67,7 +68,7 @@ dependencies {
     implementation(libs.tensorflow.lite)
     implementation(libs.tensorflow.lite.support)
     implementation(libs.tensorflow.tensorflow.lite.task.vision)
-    implementation(libs.material)
+    implementation("com.google.android.material:material:1.11.0")
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.datastore.core)
@@ -83,10 +84,17 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx.v162)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.ucrop)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.snakeyaml)
+    implementation(libs.jakubjakacki18.ucrop)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    implementation(kotlin("test"))
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 }
 
 protobuf {

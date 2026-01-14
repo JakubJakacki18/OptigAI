@@ -16,6 +16,8 @@
     <string name="open_settings_description">Settings</string>
     <string name="take_photo_description">Take Photo</string>
     <string name="open_gallery_description">Gallery</string>
+    <string name="permission_denied_toast">Permission request denied</string>
+    <string name="permission_not_granted_toast">The required permissions have not been granted</string>
 
     <!--AnalysisResultFragment-->
     <string name="photo_analysis_description">Image Analysis</string>
@@ -52,4 +54,5 @@
     <string name="content_description_edit_image">Edit photo</string>
     <string name="rotate_left">rotate left</string>
     <string name="undo_changes_cropper_description">Undo changes done to the photo button</string>
+    <string name="eye_animation">Eye animation</string>
 </resources>

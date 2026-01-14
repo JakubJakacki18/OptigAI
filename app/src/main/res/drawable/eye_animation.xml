@@ -1,0 +1,69 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+
+    <aapt:attr name="android:drawable">
+        <vector
+            android:width="200dp"
+            android:height="200dp"
+            android:viewportWidth="128"
+            android:viewportHeight="128">
+
+            <!-- Tęczówka -->
+            <group
+                android:name="irisGroup"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                android:translateX="16"
+                android:translateY="16">
+
+                <path
+                    android:fillColor="#2174AB"
+                    android:pathData="M65.04,64.96m-21.5,0.03a21.5,21.5 0,1 1,43 -0.06a21.5,21.5 0,1 1,-43 0.06"
+                    android:strokeColor="#FEFAEC"
+                    android:strokeWidth="7"/>
+
+                <path
+                    android:fillColor="#FEEB5D"
+                    android:pathData="M65,65m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0"/>
+            </group>
+                <!-- Źrenica -->
+            <group
+                android:name="pupilGroup"
+                android:translateX="64.5"
+                android:translateY="64.5"
+                android:scaleX="1.0"
+                android:scaleY="1.0">
+                <path
+                    android:name="pupil_black"
+                    android:fillColor="#2D2F39"
+                    android:pathData="M0,0 m-10,0 a10,10 0,1,1 20,0 a10,10 0,1,1 -20,0"/>
+            </group>
+
+
+
+            <!-- Powieka -->
+            <group
+                android:name="eyelidGroup"
+                android:scaleX="1.0"
+                android:scaleY="1.0">
+
+                <path
+                    android:name="eyelid"
+                    android:fillColor="#00000000"
+                    android:pathData="M13.09,70.7C38.2,29.89 92.92,30.24 114.09,71.28
+                                      M114.11,67.62C89.85,95.9 35.19,95.4 13.19,66.7"
+                    android:strokeColor="#FEFAEC"
+                    android:strokeWidth="7"/>
+            </group>
+
+        </vector>
+    </aapt:attr>
+
+    <target
+        android:name="pupilGroup"
+        android:animation="@animator/pupil_zoom"/>
+
+    <target
+        android:name="eyelid"
+        android:animation="@animator/eyelid_blink"/>
+</animated-vector>

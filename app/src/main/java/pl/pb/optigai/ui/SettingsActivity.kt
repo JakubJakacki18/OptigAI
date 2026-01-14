@@ -20,6 +20,18 @@ import pl.pb.optigai.databinding.ActivitySettingsBinding
 import pl.pb.optigai.utils.data.SettingsViewModel
 import pl.pb.optigai.utils.data.const.ColorMap
 
+/**
+ * SettingsActivity
+ *
+ * Activity that allows users to configure application settings, including:
+ * - Font size for analysis results
+ * - Color selection for bounding boxes
+ * - Photo saving toggle
+ * - Zoom slider visibility
+ * - Gallery grid column count
+ *
+ * Uses [SettingsViewModel] to persist user preferences and observe changes.
+ */
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModels()
@@ -28,7 +40,14 @@ class SettingsActivity : AppCompatActivity() {
     private val step = 4
 
     /**
-     * Initializes the activity, sets up the view binding, and binds UI components to the ViewModel.
+     * Initializes the activity and binds UI components to the ViewModel.
+     * Sets up listeners for:
+     * - Font size increase/decrease buttons
+     * - Zoom slider visibility toggle
+     * - Color selection circles
+     * - Gallery columns slider
+     * - Photo saving toggle
+     * Configures header title and back button.
      */
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,9 +75,18 @@ class SettingsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.zoomSeekBarMode.collect { mode ->
                     when (mode) {
-                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOff)
-                        Settings.ZoomSeekBarMode.AUTO -> zoomToggle.check(R.id.zoomSliderVisibilityAuto)
-                        Settings.ZoomSeekBarMode.ALWAYS_ON -> zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOn)
+                        Settings.ZoomSeekBarMode.ALWAYS_OFF -> {
+                            zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOff)
+                        }
+
+                        Settings.ZoomSeekBarMode.AUTO -> {
+                            zoomToggle.check(R.id.zoomSliderVisibilityAuto)
+                        }
+
+                        Settings.ZoomSeekBarMode.ALWAYS_ON -> {
+                            zoomToggle.check(R.id.zoomSliderVisibilityAlwaysOn)
+                        }
+
                         Settings.ZoomSeekBarMode.UNRECOGNIZED -> {
                             zoomToggle.clearChecked()
                         }
@@ -133,10 +161,11 @@ class SettingsActivity : AppCompatActivity() {
 
         colorItems.forEach { (circleView, color) ->
             val checkMark = circleView.findViewById<TextView>(R.id.checkMark)
-            val circleColorInt = ColorMap.getColorRes(color)
+            val circleColorRes = ColorMap.getColorRes(color)
+            val realColorInt = ContextCompat.getColor(this, circleColorRes)
 
-            setBackgroundColorAndBorderForCircleView(circleView, circleColorInt)
-            checkMark?.setTextColor(if (isColorLight(circleColorInt)) Color.BLACK else Color.WHITE)
+            setBackgroundColorAndBorderForCircleView(circleView, circleColorRes)
+            checkMark?.setTextColor(if (isColorLight(realColorInt)) Color.BLACK else Color.WHITE)
 
             circleView.setOnClickListener {
                 lifecycleScope.launch { viewModel.toggleColorOfBorder(color) }
@@ -152,8 +181,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Determines if a given color is light or dark to set a contrasting text color.
-     * @return true if the color is light, false otherwise.
+     * Determines whether a color is light or dark for contrast.
+     *
+     * @param color Color integer.
+     * @return True if the color is light, false if dark.
      */
     private fun isColorLight(color: Int): Boolean {
         val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
@@ -161,7 +192,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Binds the gallery view slider to the ViewModel to manage grid columns.
+     * Binds the gallery column slider to the ViewModel.
+     * Updates the slider value and persists changes on user interaction.
      */
     private fun bindGalleryViewColumnsSlider() {
         lifecycleScope.launch {
@@ -186,7 +218,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Binds the photo saving switch to the ViewModel to toggle photo saving.
+     * Binds the photo saving toggle to the ViewModel.
+     * Updates the switch state and persists changes on toggle.
      */
     private fun bindPhotoSavingToggle() {
         lifecycleScope.launch {
@@ -205,9 +238,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Sets the background color and border for a given circle view.
+     * Sets the background color, stroke color, stroke width, and elevation
+     * for a color circle.
+     *
      * @param circleView The MaterialCardView representing the color circle.
-     * @param circleColorInt The color integer to set as the background.
+     * @param circleColorInt The resource ID of the color to set as the circle background.
      */
     private fun setBackgroundColorAndBorderForCircleView(
         circleView: MaterialCardView,

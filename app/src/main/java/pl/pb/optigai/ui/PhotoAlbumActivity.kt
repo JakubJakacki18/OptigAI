@@ -23,6 +23,17 @@ import pl.pb.optigai.utils.data.Image
 import pl.pb.optigai.utils.data.SettingsViewModel
 import kotlin.getValue
 
+/**
+ * PhotoAlbumActivity
+ *
+ * Activity that displays all images from the device's storage in a grid layout.
+ * Supports selecting an image to open in [PhotoActivity] for preview and analysis.
+ * Handles runtime permissions for reading media and adjusts grid layout based on user settings.
+ *
+ * @property viewModel ViewModel storing user settings, such as grid column count.
+ * @property viewBinding View binding for [PhotoAlbumBinding].
+ * @property imageList List of [Image] objects loaded from device storage.
+ */
 class PhotoAlbumActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels()
     private lateinit var viewBinding: PhotoAlbumBinding

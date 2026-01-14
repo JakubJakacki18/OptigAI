@@ -29,7 +29,7 @@
         android:contentDescription="@string/flash_toggle_description"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:padding="12dp"
+        android:padding="16dp"
         android:stateListAnimator="@animator/scale_animator"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/cameraPreviewView"

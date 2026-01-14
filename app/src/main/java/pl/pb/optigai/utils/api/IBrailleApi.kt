@@ -8,7 +8,29 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
 
+/**
+ * IBrailleApi
+ *
+ * Retrofit interface for interacting with the Braille detection API.
+ * Provides endpoints for uploading images containing Braille text
+ * and receiving predictions from the remote model.
+ */
 interface IBrailleApi {
+    /**
+     * Uploads an image containing Braille text to the remote Braille detection API.
+     *
+     * @param file The image file to upload as a [MultipartBody.Part].
+     * @param apiKey API key for authentication.
+     * @return [Response] containing a [BrailleResponse] with detected characters.
+     *
+     * Example usage:
+     * ```
+     * val response = api.uploadBraille(filePart, "YOUR_API_KEY")
+     * if (response.isSuccessful) {
+     *     val brailleResponse = response.body()
+     * }
+     * ```
+     */
     @Multipart
     @POST("braille-detection-f0rb5/10")
     suspend fun uploadBraille(

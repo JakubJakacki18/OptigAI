@@ -13,9 +13,9 @@
     <string name="result_select_color_annotation_label_value">Select annotation colors</string>
 
     <!--UI descriptions-->
-    <string name="zoom_slider_visibility_off_toggle_description">Off, the zoom slider won\'t be displayed</string>
+    <string name="zoom_slider_visibility_off_toggle_description">The zoom slider won\'t be displayed</string>
     <string name="zoom_slider_visibility_auto_toggle_description">Auto, the zoom slider will appear if the screen is pinched</string>
-    <string name="zoom_slider_visibility_on_toggle_description">On, the zoom slider will be displayed</string>
+    <string name="zoom_slider_visibility_on_toggle_description">The zoom slider will be displayed</string>
 
     <string name="current_font_size_description">Current Font Size</string>
     <string name="font_size_increase_button_description">Increase font size</string>

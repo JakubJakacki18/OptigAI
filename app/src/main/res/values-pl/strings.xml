@@ -11,6 +11,7 @@
     <string name="open_settings_description">Ustawienia</string>
     <string name="take_photo_description">Zrób zdjęcie</string>
     <string name="open_gallery_description">Galeria</string>
+    <string name="permission_not_granted_toast">Wymagane uprawnienia nie zostały przyznane</string>
     <string name="photo_analysis_description">Analiza obrazu</string>
     <string name="photo_analysis_text_box">Wynik analizy zdjęcia</string>
     <string name="error_result_fragment_analysis_result">Coś poszło nie tak</string>
@@ -56,12 +57,14 @@
     <string name="undo_changes_cropper_description">Przywróć zmiany</string>
     <string name="content_description_edit_image">Edytuj obraz</string>
     <string name="empty_result_fragment_analysis_result">Nic nie zostało wykryte. Spróbuj z innym obrazem.</string>
-    <string name="camera_save_to_memory_on_value">Włączono, zapisz zdjęcie do pamięci urządzenia</string>
-    <string name="camera_save_to_memory_off_value">Wyłączono, nie zapisuj zdjęcia do pamięci urządzenia</string>
+    <string name="camera_save_to_memory_on_value">Zapisz zdjęcie do pamięci urządzenia</string>
+    <string name="camera_save_to_memory_off_value">Nie zapisuj zdjęcia do pamięci urządzenia</string>
     <string name="background_photo_description">Obraz w tle do analizy</string>
     <string name="zoom_slider_visibility_off_toggle_description">Wyłączono, suwak przybliżenie nie zostanie wyświetlony</string>
     <string name="zoom_slider_visibility_auto_toggle_description">Automatycznie, suwak przybliżenia pojawi się po uszczypnięciu ekranu</string>
     <string name="flash_auto_description">Lampa błyskowa automatyczna</string>
     <string name="flash_on_description">Lampa błyskowa włączona</string>
     <string name="gallery_image_description">Obraz dodany dnia %s o godzinie %s nazwany %s</string>
+    <string name="eye_animation">Animacja oka</string>
+    <string name="permission_denied_toast">Uprawnienie odmówione</string>
 </resources>
