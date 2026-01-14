@@ -132,7 +132,11 @@ class AnalyseService(
                         DetectionResult(brailleChar.clazz, rectF, null)
                     }
 
-                return DetectionData(sentence, detectionResults) // Return both
+                return DetectionData(
+                    sentence.takeUnless { it.isNullOrBlank() }
+                        ?: context.getString(R.string.empty_result_fragment_analysis_result),
+                    detectionResults,
+                )
             } else {
                 AppLogger.e("BrailleError: HTTP ${response.code()} ${response.errorBody()}")
                 return DetectionData("Error: ${response.code()}", emptyList())
