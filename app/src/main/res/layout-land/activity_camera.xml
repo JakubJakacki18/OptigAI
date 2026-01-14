@@ -13,13 +13,31 @@
         android:id="@+id/cameraPreviewView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/flashToggleButton"
+        android:layout_width="82dp"
+        android:layout_height="82dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/flash_button_background"
+        android:contentDescription="@string/flash_toggle_description"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_flash_auto"
+        android:stateListAnimator="@animator/scale_animator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/cameraPreviewView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@id/cameraControlLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@android:color/transparent"
@@ -29,34 +47,58 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <Button
+        <ImageView
             android:id="@+id/openGalleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Open gallery"
-            app:layout_constraintBottom_toTopOf="@id/takePhotoButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/takePhotoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Take photo"
-            app:layout_constraintBottom_toTopOf="@id/openSettingsButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/openGalleryButton" />
-
-        <Button
-            android:id="@+id/openSettingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Open settings"
+            android:layout_width="82dp"
+            android:layout_height="82dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/gallery_button"
+            android:contentDescription="@string/open_gallery_description"
+            android:stateListAnimator="@animator/scale_animator"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/takePhotoButton" />
+ />
+
+        <ImageButton
+            android:id="@+id/takePhotoButton"
+            android:layout_width="136dp"
+            android:layout_height="136dp"
+            android:src="@drawable/take_photo_button"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/take_photo_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:stateListAnimator="@animator/scale_animator"/>
+
+        <ImageView
+            android:id="@+id/openSettingsButton"
+            android:layout_width="82dp"
+            android:layout_height="82dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/settings_button"
+            android:contentDescription="@string/open_settings_description"
+            android:stateListAnimator="@animator/scale_animator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Zoom -->
+    <SeekBar
+        android:id="@+id/zoomSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0"
+        android:thumb="@drawable/ic_zoom_thumb"
+        android:progressDrawable="@drawable/zoom_seekbar_progress"
+        app:layout_constraintBottom_toBottomOf="@id/cameraControlLayout"
+        app:layout_constraintStart_toStartOf="@+id/cameraPreviewView"
+        app:layout_constraintEnd_toEndOf="@+id/cameraPreviewView"
+        android:layout_marginBottom="16dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

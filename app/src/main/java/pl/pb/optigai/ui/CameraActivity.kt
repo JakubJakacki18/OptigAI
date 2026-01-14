@@ -57,7 +57,6 @@ import kotlin.getValue
  * - [PermissionHandler] – checks and requests camera permissions.
  * - CameraX APIs – [ImageCapture], [Preview], [ProcessCameraProvider], [CameraSelector].
  * - [MediaStore] – saves captured photos to device storage.
- * - [UCrop] – not used here, but cropping is handled in other fragments if needed.
  */
 class CameraActivity : AppCompatActivity() {
     /** View binding for the camera activity layout. */
@@ -93,12 +92,14 @@ class CameraActivity : AppCompatActivity() {
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        setFlashMode()
+        zoomSeekBar = viewBinding.zoomSeekBar
+
         if (!PermissionHandler.hasPermissions(baseContext, REQUIRED_PERMISSIONS)) {
             activityResultLauncher.launch(REQUIRED_PERMISSIONS)
         } else {
             lifecycleScope.launch { startCamera() }
         }
-        zoomSeekBar = viewBinding.zoomSeekBar!!
 
         viewBinding.takePhotoButton.setOnClickListener { takePhoto() }
 
@@ -115,28 +116,28 @@ class CameraActivity : AppCompatActivity() {
             viewModel.zoomSeekBarMode.collect { mode ->
                 when (mode) {
                     Settings.ZoomSeekBarMode.ALWAYS_ON -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.VISIBLE
+                        viewBinding.zoomSeekBar.visibility = View.VISIBLE
                     }
 
                     Settings.ZoomSeekBarMode.ALWAYS_OFF -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                        viewBinding.zoomSeekBar.visibility = View.GONE
                     }
 
                     Settings.ZoomSeekBarMode.AUTO -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                        viewBinding.zoomSeekBar.visibility = View.GONE
                     }
 
                     else -> {
-                        viewBinding.zoomSeekBar!!.visibility = View.GONE
+                        viewBinding.zoomSeekBar.visibility = View.GONE
                     }
                 }
             }
         }
 
-        viewBinding.flashToggleButton!!.setOnClickListener {
+        viewBinding.flashToggleButton.setOnClickListener {
             setFlashMode()
         }
-        setFlashMode()
+
         scaleGestureDetector =
             ScaleGestureDetector(
                 this,
@@ -178,7 +179,7 @@ class CameraActivity : AppCompatActivity() {
      * Updates the UI icon and description accordingly.
      */
     private fun setFlashMode() {
-        val flashButton = viewBinding.flashToggleButton!!
+        val flashButton = viewBinding.flashToggleButton
         flashMode =
             when (flashMode) {
                 ImageCapture.FLASH_MODE_AUTO -> {
@@ -377,7 +378,7 @@ class CameraActivity : AppCompatActivity() {
 
     private val hideZoomBarRunnable =
         Runnable {
-            viewBinding.zoomSeekBar!!.visibility = View.GONE
+            viewBinding.zoomSeekBar.visibility = View.GONE
         }
 
     /**
